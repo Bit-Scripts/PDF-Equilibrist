@@ -3,7 +3,7 @@
 
 # ![PDF-Equilibrist Logo](assets/logo/PDF-Equilibrist-logo.png)
 
-![Build Status](https://github.com/Bit-Scripts/PDF-Equilibrist/workflows/build.yml/badge.svg)
+![Build Status](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/build.yml/badge.svg)
 ![License](https://img.shields.io/github/license/Bit-Scripts/PDF-Equilibrist)
 ![Platform](https://img.shields.io/badge/platform-linux%20|%20macOS%20|%20windows-lightgrey)
 
