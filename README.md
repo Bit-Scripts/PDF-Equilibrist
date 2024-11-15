@@ -1,6 +1,7 @@
-# ![PDF-Equilibrist Logo](assets/logo/PDF-Equilibrist-logo.png)
-
 # PDF-Equilibrist!
+
+
+# ![PDF-Equilibrist Logo](assets/logo/PDF-Equilibrist-logo.png)
 
 ![Build Status](https://github.com/Bit-Scripts/PDF-Equilibrist/workflows/build.yml/badge.svg)
 ![License](https://img.shields.io/github/license/Bit-Scripts/PDF-Equilibrist)
