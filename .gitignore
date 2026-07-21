@@ -11,7 +11,10 @@ env/
 
 # Distribution / packaging
 build/
-dist/release/*.egg-info/
+dist/
+release/
+PDF Equilibrist.zip
+*.egg-info/
 .eggs/
 
 # PyInstaller
