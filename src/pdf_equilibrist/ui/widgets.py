@@ -34,7 +34,6 @@ from __future__ import annotations
 from PyQt6.QtWidgets import (QPushButton, QWidget, QVBoxLayout,
                               QHBoxLayout, QLabel, QFrame, QSizePolicy)
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont
 
 ACCENT = "#6BBF4E"
 

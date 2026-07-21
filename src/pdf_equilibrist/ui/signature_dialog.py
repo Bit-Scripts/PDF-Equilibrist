@@ -1,13 +1,12 @@
 """Dialogue de sélection et placement de signature / tampon."""
 from __future__ import annotations
-from pathlib import Path
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QTabWidget, QWidget,
-    QLabel, QPushButton, QFileDialog, QGridLayout, QFrame,
+    QLabel, QPushButton, QFileDialog, QGridLayout,
     QSpinBox,
 )
-from PyQt6.QtGui import QPixmap, QColor
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt
 import fitz
 
 ACCENT = "#6BBF4E"

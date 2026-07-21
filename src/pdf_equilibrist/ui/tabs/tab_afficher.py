@@ -19,7 +19,6 @@ Appelle ``operations.pages.rotate_pages()`` sur toutes les pages du document,
 puis émet ``document.changed`` pour rafraîchir le viewer et les miniatures.
 """
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox
-from PyQt6.QtCore import Qt
 from pdf_equilibrist.ui.widgets import RibbonButton, RibbonGroup
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations.pages import rotate_pages

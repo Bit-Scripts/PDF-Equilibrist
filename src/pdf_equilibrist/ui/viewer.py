@@ -50,13 +50,10 @@ ce qui lui permet d'utiliser les coordonnées locales de la page.
 """
 from __future__ import annotations
 import webbrowser
-import subprocess
-import sys
 from pathlib import Path
-from PyQt6.QtWidgets import (QScrollArea, QLabel, QWidget, QVBoxLayout,
-                             QLineEdit, QHBoxLayout, QPushButton, QToolButton)
+from PyQt6.QtWidgets import QScrollArea, QLabel, QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt, pyqtSignal, QPoint, QRect
-from PyQt6.QtGui import QPixmap, QImage, QPainter, QColor, QFont, QPen
+from PyQt6.QtGui import QPixmap, QPainter, QColor, QFont, QPen
 import fitz
 from pdf_equilibrist.core.document import Document
 

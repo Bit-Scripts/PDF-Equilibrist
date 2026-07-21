@@ -6,7 +6,6 @@ import re
 import tempfile
 import urllib.error
 import urllib.request
-import webbrowser
 from pathlib import Path
 
 DEFAULT_GITHUB_REPO = os.getenv(

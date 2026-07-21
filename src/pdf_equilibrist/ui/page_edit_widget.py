@@ -1,6 +1,6 @@
 """Widget page en mode édition : survol + clic pour éditer bloc par bloc."""
 from __future__ import annotations
-from PyQt6.QtWidgets import QWidget, QTextEdit, QToolBar, QHBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget, QTextEdit
 from PyQt6.QtGui import (QPixmap, QPainter, QColor, QFont, QPen,
                           QTextOption, QKeyEvent)
 from PyQt6.QtCore import Qt, QRect, pyqtSignal

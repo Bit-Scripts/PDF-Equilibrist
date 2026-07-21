@@ -14,7 +14,9 @@
 
 ; ── Définitions ───────────────────────────────────────────────────────────────
 !define APP_NAME      "PDF-Equilibrist"
-!define APP_VERSION   "1.0.0"
+!ifndef APP_VERSION
+  !define APP_VERSION "1.0.0"
+!endif
 !define APP_PUBLISHER "PDF Equilibrist"
 !define APP_EXE       "PDF-Equilibrist.exe"
 !define PROG_ID       "PDFEquilibrist.Document"

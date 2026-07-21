@@ -153,7 +153,7 @@ def register(exe_path: str) -> bool:
              "", f'"{exe_path}" "%1"')
 
         # Ajout dans OpenWithProgids de .pdf → apparaît dans "Ouvrir avec..."
-        _set(rf"Software\Classes\.pdf\OpenWithProgids",
+        _set(r"Software\Classes\.pdf\OpenWithProgids",
              _PROG_ID, "")
 
         # Nom lisible dans "Ouvrir avec..." à la place du nom de l'exe

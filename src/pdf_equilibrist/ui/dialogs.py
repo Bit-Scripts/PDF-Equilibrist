@@ -24,9 +24,8 @@ Fonctions disponibles
 """
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-    QPushButton, QSpinBox, QComboBox, QFileDialog, QMessageBox,
+    QPushButton, QSpinBox, QComboBox, QMessageBox,
 )
-from PyQt6.QtCore import Qt
 
 
 DIALOG_STYLE = """

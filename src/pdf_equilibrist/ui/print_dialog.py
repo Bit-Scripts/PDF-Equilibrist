@@ -17,11 +17,10 @@ import ctypes, ctypes.wintypes
 from PyQt6.QtWidgets import (
     QDialog, QHBoxLayout, QVBoxLayout, QFormLayout,
     QComboBox, QSpinBox, QGroupBox, QPushButton, QLineEdit,
-    QScrollArea, QWidget, QSizePolicy, QFrame, QLabel, QProgressBar,
+    QScrollArea, QWidget, QFrame, QLabel, QProgressBar,
 )
-from PyQt6.QtGui import (QPainter, QImage, QPixmap,
-                          QPageLayout, QPageSize, QTransform)
-from PyQt6.QtCore import QRect, QSizeF, Qt, QMarginsF, QThread, pyqtSignal
+from PyQt6.QtGui import QPainter, QImage, QPixmap, QPageSize
+from PyQt6.QtCore import QRect, Qt, QThread, pyqtSignal
 from pdf_equilibrist.core.document import Document
 
 _log = logging.getLogger(__name__)

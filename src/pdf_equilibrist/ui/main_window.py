@@ -49,12 +49,11 @@ de ``utils.py`` pour la compatibilité dev/exe PyInstaller.
 from __future__ import annotations
 from pathlib import Path
 from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QWidget, QVBoxLayout, QHBoxLayout,
     QTabBar, QStackedWidget, QFileDialog, QLabel, QSplitter,
-    QApplication,
 )
-from PyQt6.QtGui import QAction, QKeySequence, QColor, QPainter, QPen, QCursor
-from PyQt6.QtCore import Qt, QPoint, QRect, QSize, QSettings
+from PyQt6.QtGui import QAction, QKeySequence, QColor, QPainter, QPen
+from PyQt6.QtCore import Qt, QPoint, QSettings
 
 _RECENT_MAX = 10   # nombre maximum de fichiers dans "Ouvrir récemment"
 
@@ -73,16 +72,16 @@ ACCENT       = "#6BBF4E"
 BORDER_COLOR = "#2A2A2A"
 RESIZE_MARGIN = 6
 
-TABBAR_STYLE = f"""
-QTabBar {{ background: #1A1A1A; padding: 3px 4px 0 4px; }}
-QTabBar::tab {{
+TABBAR_STYLE = """
+QTabBar { background: #1A1A1A; padding: 3px 4px 0 4px; }
+QTabBar::tab {
     background: transparent; color: #888888;
     padding: 5px 18px; border: none;
     border-radius: 5px 5px 0 0;
     font-size: 12px; font-family: "Segoe UI"; margin-right: 2px;
-}}
-QTabBar::tab:selected {{ background: #2D2D2D; color: #F0F0F0; }}
-QTabBar::tab:hover:!selected {{ background: #242424; color: #C0C0C0; }}
+}
+QTabBar::tab:selected { background: #2D2D2D; color: #F0F0F0; }
+QTabBar::tab:hover:!selected { background: #242424; color: #C0C0C0; }
 """
 
 

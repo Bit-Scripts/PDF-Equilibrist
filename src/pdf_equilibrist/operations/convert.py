@@ -30,7 +30,6 @@ Dépendances externes
 """
 from pathlib import Path
 import fitz
-from PIL import Image
 import io
 import subprocess
 import shutil
@@ -435,7 +434,6 @@ def to_markdown(doc: fitz.Document, output_path: Path) -> Path:
         Si le document est un scan (aucune couche texte extractible).
     """
     import statistics
-    import re
     import pdfplumber
 
     # ── Passe 1 : collecter toutes les tailles pour déduire le corps ──────────

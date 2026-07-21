@@ -47,13 +47,12 @@ L'icône du bouton max bascule entre ``maximized.png`` et ``unmaximized.png``
 via ``update_max_button(is_maximized)``.
 """
 from __future__ import annotations
-from pathlib import Path
 from PyQt6.QtWidgets import (
     QWidget, QHBoxLayout, QLabel, QPushButton, QTabBar,
-    QFrame, QSizePolicy,
+    QFrame,
 )
-from PyQt6.QtGui import QPixmap, QIcon, QColor, QPainter, QFont
-from PyQt6.QtCore import Qt, pyqtSignal, QPoint, QSize
+from PyQt6.QtGui import QPixmap, QIcon
+from PyQt6.QtCore import Qt, pyqtSignal, QSize
 
 ACCENT = "#6BBF4E"
 
@@ -80,11 +79,11 @@ QPushButton:pressed { background: #4A0A0A; border-radius: 6px; }
 """
 
 # Style du QTabBar des documents ouverts
-_TAB_STYLE = f"""
-QTabBar {{
+_TAB_STYLE = """
+QTabBar {
     background: transparent;
-}}
-QTabBar::tab {{
+}
+QTabBar::tab {
     background: #1E1E1E;
     color: #888888;
     padding: 4px 14px 4px 14px;
@@ -93,19 +92,19 @@ QTabBar::tab {{
     min-width: 80px;
     max-width: 200px;
     font-size: 12px;
-}}
-QTabBar::tab:selected {{
+}
+QTabBar::tab:selected {
     background: #2D2D2D;
     color: #F0F0F0;
-}}
-QTabBar::tab:hover:!selected {{
+}
+QTabBar::tab:hover:!selected {
     background: #252525;
     color: #CCCCCC;
-}}
-QTabBar::close-button {{
+}
+QTabBar::close-button {
     image: none;       /* désactiver l'icône système — on utilise des QPushButton custom */
     subcontrol-position: right;
-}}
+}
 """
 
 

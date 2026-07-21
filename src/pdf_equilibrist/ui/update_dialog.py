@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from pathlib import Path
 import os
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QProgressBar,
 )
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal
 
 from pdf_equilibrist import __version__
 from pdf_equilibrist import update as updater

@@ -32,8 +32,8 @@ from pdf_equilibrist.ui.widgets import RibbonButton, RibbonGroup
 from pdf_equilibrist.ui.dialogs import ask_watermark_text, ask_text_input, show_info, show_error
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations.edit import (
-    compress, add_watermark, add_text,
-    extract_text_blocks, apply_text_edits,
+    compress, add_watermark,
+    extract_text_blocks,
 )
 import fitz
 
@@ -124,7 +124,7 @@ class TabModifier(QWidget):
             show_error(self, "Modifier", "Aucun texte extractible (PDF scanné ?).")
             return
         if self.viewer.enter_edit_mode(self._edit_blocks):
-            self._btn_edit.setText(f"✎\nActif")
+            self._btn_edit.setText("✎\nActif")
             self._btn_edit.setStyleSheet(f"""
                 QPushButton {{ background:{ACCENT}22; color:{ACCENT};
                     border:1px solid {ACCENT}; border-radius:5px;

@@ -38,7 +38,7 @@ from __future__ import annotations
 import math
 from PyQt6.QtWidgets import QWidget, QPushButton, QHBoxLayout
 from PyQt6.QtGui import (QPainter, QPen, QBrush, QColor, QPixmap,
-                          QFont, QTransform, QCursor)
+                          QFont)
 from PyQt6.QtCore import Qt, pyqtSignal, QPoint, QPointF, QRectF, QSizeF
 
 ACCENT   = "#6BBF4E"

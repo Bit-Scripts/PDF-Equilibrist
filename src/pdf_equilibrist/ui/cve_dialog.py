@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import webbrowser
 from PyQt6.QtWidgets import (
     QDialog,
     QVBoxLayout,
