@@ -1,0 +1,50 @@
+name: Equilibrist
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - bcrypt==5.0.0
+    - cffi==2.0.0
+    - chardet==7.4.3
+    - charset-normalizer==3.4.7
+    - cryptography==48.0.0
+    - cssselect==1.4.0
+    - et_xmlfile==2.0.0
+    - ezdxf==1.4.4
+    - fire==0.7.1
+    - fonttools==4.63.0
+    - invoke==3.0.3
+    - lxml==6.1.1
+    - numpy==2.4.6
+    - opencv-python-headless==4.13.0.92
+    - openpyxl==3.1.5
+    - packaging==26.0
+    - paramiko==5.0.0
+    - pdf2docx==0.5.13
+    - pdfminer.six==20251230
+    - pdfplumber==0.11.9
+    - pdfquery==0.4.3
+    - pillow==12.2.0
+    - psutil==7.2.2
+    - pycparser==3.0
+    - PyMuPDF==1.27.2.3
+    - PyNaCl==1.6.2
+    - pyparsing==3.3.2
+    - pypdfium2==5.9.0
+    - PyQt6==6.11.0
+    - PyQt6-Qt6==6.11.1
+    - PyQt6_sip==13.11.1
+    - pyquery==2.0.1
+    - python-docx==1.2.0
+    - python-dotenv==1.2.2
+    - python-pptx==1.0.2
+    - requests==2.34.2
+    - roman==5.2
+    - termcolor==3.3.0
+    - typing_extensions==4.15.0
+    - urllib3==2.7.0
+    - xlsxwriter==3.2.9
+
+# Restaurer : conda env create -p D:\Developpement\CONDA\envs\Equilibrist -f environment.yml

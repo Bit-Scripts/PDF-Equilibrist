@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf-equilibrist"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "PyQt6>=6.11",
+    "PyMuPDF>=1.27",
+    "pdf2docx>=0.5",
+    "pdfplumber>=0.11",
+    "openpyxl>=3.1",
+    "python-pptx>=1.0",
+    "Pillow>=12",
+    "pyparsing>=3.0",
+]
+
+[project.scripts]
+pdf-equilibrist = "pdf_equilibrist.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

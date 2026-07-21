@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(conda info *)",
+      "Bash(conda create *)",
+      "Bash(python tools/build_docs_pdf.py)",
+      "Bash(ls \"C:\\\\Users\\\\paul.woisard\\\\Downloads\\\\skills\\\\skills\\\\pdf\")",
+      "Bash(conda run -p D:DeveloppementCONDAenvsEquilibrist python -c ' *)",
+      "Bash(D:DeveloppementCONDAenvsEquilibristpython.exe -c ' *)",
+      "PowerShell(cd \"D:\\\\Developpement\\\\PDF-Equilibrist\"; $env:PYTHONPATH = \"src\"; & \"D:\\\\Developpement\\\\CONDA\\\\envs\\\\Equilibrist\\\\python.exe\" -c \"from pdf_equilibrist.operations.ocr import apply_ocr_to_pdf, ocr_to_markdown; print\\('ocr.py OK'\\)\")",
+      "Bash(conda run *)",
+      "PowerShell(conda activate D:\\\\Developpement\\\\CONDA\\\\envs\\\\Equilibrist)",
+      "PowerShell(python -c \"from pptx import Presentation; prs = Presentation\\(r'D:\\\\Developpement\\\\PDF-Equilibrist\\\\docs\\\\pr�sentation\\\\2026-07-15 - Pr�sentation PDF Equilibrist.pptx'\\); print\\('OK', len\\(prs.slides\\)\\)\" 2>&1)"
+    ]
+  }
+}

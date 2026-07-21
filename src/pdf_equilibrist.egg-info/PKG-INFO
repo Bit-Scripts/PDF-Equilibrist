@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: pdf-equilibrist
+Version: 0.1.0
+Requires-Python: >=3.12
+Requires-Dist: PyQt6>=6.11
+Requires-Dist: PyMuPDF>=1.27
+Requires-Dist: pdf2docx>=0.5
+Requires-Dist: pdfplumber>=0.11
+Requires-Dist: openpyxl>=3.1
+Requires-Dist: python-pptx>=1.0
+Requires-Dist: Pillow>=12
+Requires-Dist: pyparsing>=3.0

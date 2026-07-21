@@ -1,0 +1,57 @@
+=== D√©marrage ===
+QApplication cr√©√©e
+Splash affich√©
+fitz OK
+Qt OK
+pdf2docx OK
+pdfplumber OK
+openpyxl OK
+pptx OK
+create_app import√©
+=== D√©marrage ===
+QApplication cr√©√©e
+Splash affich√©
+fitz OK
+Qt OK
+pdf2docx OK
+pdfplumber OK
+openpyxl OK
+pptx OK
+create_app import√©
+=== D√©marrage ===
+QApplication cr√©√©e
+Splash affich√©
+fitz OK
+Qt OK
+pdf2docx OK
+pdfplumber OK
+openpyxl OK
+pptx OK
+create_app import√©
+Appel create_app‚Ä¶
+  create_app: setApplicationName
+  create_app: setWindowIcon
+  create_app: setStyleSheet
+  create_app: setStyleSheet OK ó import MainWindow
+  create_app: MainWindow importÈ ó crÈation
+  create_app: MainWindow() crÈÈ ó show()
+=== D√©marrage ===
+QApplication cr√©√©e
+Splash affich√©
+fitz OK
+Qt OK
+pdf2docx OK
+pdfplumber OK
+openpyxl OK
+pptx OK
+create_app import√©
+Appel create_app‚Ä¶
+  create_app: setApplicationName
+  create_app: setWindowIcon
+  create_app: setStyleSheet
+  create_app: setStyleSheet OK ó import MainWindow
+  create_app: MainWindow importÈ ó crÈation
+  create_app: MainWindow() crÈÈ ó show()
+  create_app: show() OK
+MainWindow cr√©√©e
+Splash ferm√© ‚Äî exec()

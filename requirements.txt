@@ -1,0 +1,8 @@
+PyQt6>=6.11
+PyMuPDF>=1.27
+pdf2docx>=0.5
+pdfplumber>=0.11
+openpyxl>=3.1
+python-pptx>=1.0
+Pillow>=12
+pyparsing>=3.0
