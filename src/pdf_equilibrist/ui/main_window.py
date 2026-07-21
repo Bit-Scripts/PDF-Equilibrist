@@ -375,11 +375,15 @@ class MainWindow(QWidget):
         act_search.triggered.connect(lambda: self._search_bar.toggle())
         edition.addAction(act_search)
 
-        # ── Aide / Mises à jour ─────────────────────────────────────────
+        # ── Aide / Mises à jour / Sécurité ──────────────────────────────────
         aide = mb.addMenu("Aide")
         act_updates = QAction("Vérifier les mises à jour…", self)
         act_updates.triggered.connect(self._check_for_updates)
         aide.addAction(act_updates)
+
+        act_cve = QAction("Vérifier les vulnérabilités CVE…", self)
+        act_cve.triggered.connect(self._check_for_cves)
+        aide.addAction(act_cve)
 
         return mb
 
@@ -391,6 +395,15 @@ class MainWindow(QWidget):
             dlg.exec()
         except Exception:
             # Ne doit pas empêcher l'application de fonctionner
+            pass
+
+    def _check_for_cves(self):
+        """Ouvre le dialogue de vérification CVE des dépendances."""
+        try:
+            from pdf_equilibrist.ui.cve_dialog import CVEDialog
+            dlg = CVEDialog(self)
+            dlg.exec()
+        except Exception:
             pass
 
     # ── Fichiers récents ──────────────────────────────────────────────────────
