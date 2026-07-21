@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "pdf-equilibrist"
 version = "0.1.0"
 requires-python = ">=3.12"
+license = "MIT"
 dependencies = [
     "PyQt6>=6.11",
     "PyMuPDF>=1.27",
