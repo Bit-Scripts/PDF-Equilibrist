@@ -11,8 +11,7 @@ env/
 
 # Distribution / packaging
 build/
-dist/
-*.egg-info/
+dist/release/*.egg-info/
 .eggs/
 
 # PyInstaller
