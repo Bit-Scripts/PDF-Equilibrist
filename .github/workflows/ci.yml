@@ -40,6 +40,8 @@ jobs:
   build:
     name: Build installer
     needs: test
+    env:
+      PYTHONUTF8: '1'
     runs-on: windows-latest
     strategy:
       matrix:
