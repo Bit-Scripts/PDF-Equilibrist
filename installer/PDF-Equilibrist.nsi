@@ -30,7 +30,7 @@ InstallDir      "$LOCALAPPDATA\Programs\${APP_NAME}"
 InstallDirRegKey HKCU "${REG_UNINST}" "InstallLocation"
 RequestExecutionLevel user   ; pas de UAC — installation per-user dans %LocalAppData%
 Unicode         True
-SetCompressor   /SOLID lzma
+SetCompressor   lzma
 
 ; ── MUI2 — Apparence ──────────────────────────────────────────────────────────
 !define MUI_ICON    "..\assets\logo\PDF-Equilibrist-logo.ico"

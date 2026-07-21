@@ -15,30 +15,35 @@ from pdf_equilibrist import cve_checker
 
 
 class _ScanThread(QThread):
+    progress = pyqtSignal(int, int)   # (done, total)
     finished_ok = pyqtSignal(object)
     finished_err = pyqtSignal(str)
 
-    def __init__(self, packages: list[str] | None = None):
+    def __init__(self, packages: dict[str, str] | None = None):
         super().__init__()
         self.packages = packages
 
     def run(self):
         try:
-            summary = cve_checker.scan_dependencies(self.packages)
-            self.finished_ok.emit(summary)
+            pkgs = self.packages or cve_checker.get_installed_packages()
+            total = len(pkgs)
+            self.progress.emit(0, total)
+            results = cve_checker.scan_dependencies(pkgs)
+            self.progress.emit(total, total)
+            self.finished_ok.emit(results)
         except Exception as exc:
             self.finished_err.emit(str(exc))
 
 
 class CVEDialog(QDialog):
-    def __init__(self, parent=None, packages: list[str] | None = None):
+    def __init__(self, parent=None, packages: dict[str, str] | None = None):
         super().__init__(parent)
         self.setWindowTitle("Vérifier les vulnérabilités CVE")
-        self.setMinimumWidth(560)
+        self.setMinimumWidth(600)
         self.setModal(True)
 
         layout = QVBoxLayout(self)
-        self._lbl = QLabel("Recherche des vulnérabilités CVE pour les dépendances…")
+        self._lbl = QLabel("Analyse des paquets installés…")
         layout.addWidget(self._lbl)
 
         self._progress = QProgressBar()
@@ -61,26 +66,27 @@ class CVEDialog(QDialog):
         layout.addLayout(button_row)
 
         self._packages = packages
-        self._results: list[dict] = []
-
-        self._thread = _ScanThread(self._packages)
-        self._thread.finished_ok.connect(self._on_result)
-        self._thread.finished_err.connect(self._on_error)
-        self._thread.start()
+        self._start_scan()
 
     def _render_results(self, results: list[dict]) -> str:
         if not results:
-            return "Aucune dépendance n'a été trouvée pour analyse."
-        vulnerable = [item for item in results if item["vulnerabilities"]]
+            return "Aucun paquet installé détecté."
+
+        vulnerable = [r for r in results if r["vulnerabilities"]]
+        total = len(results)
+
         if not vulnerable:
-            return "Aucune vulnérabilité CVE détectée pour les dépendances analysées.\n\nPackages scannés:\n" + "\n".join(item["package"] for item in results)
+            return (
+                f"Aucune vulnérabilité CVE détectée ({total} paquets analysés).\n\n"
+                + "\n".join(f"  {r['package']} {r['version']}" for r in results)
+            )
 
         lines: list[str] = [
-            f"Vulnérabilités détectées pour {len(vulnerable)} package(s) :",
+            f"{len(vulnerable)} paquet(s) vulnérable(s) sur {total} analysés :",
             "",
         ]
         for item in vulnerable:
-            lines.append(f"{item['package']} :")
+            lines.append(f"{item['package']} {item['version']} :")
             for vuln in item["vulnerabilities"]:
                 ids = vuln["cve_ids"] or [vuln["id"]]
                 lines.append(f"  - {', '.join(ids)}")
@@ -88,30 +94,47 @@ class CVEDialog(QDialog):
                     lines.append(f"    Gravité : {', '.join(vuln['severity'])}")
                 if vuln["summary"]:
                     lines.append(f"    Résumé : {vuln['summary']}")
-                if vuln["references"]:
-                    for ref in vuln["references"][:3]:
-                        url = ref.get("url")
-                        if url:
-                            lines.append(f"      {ref.get('type', 'ref')}: {url}")
+                for ref in vuln["references"][:3]:
+                    url = ref.get("url")
+                    if url:
+                        lines.append(f"      {ref.get('type', 'ref')}: {url}")
             lines.append("")
+
+        lines.append("─" * 40)
+        lines.append("Paquets sans vulnérabilité connue :")
+        for r in results:
+            if not r["vulnerabilities"]:
+                lines.append(f"  {r['package']} {r['version']}")
         return "\n".join(lines)
 
+    def _on_progress(self, done: int, total: int):
+        if total > 0:
+            self._progress.setRange(0, total)
+            self._progress.setValue(done)
+            self._lbl.setText(f"Analyse en cours… {done}/{total} paquets")
+
     def _on_result(self, results: list[dict]):
-        self._results = results
+        total = len(results)
+        vuln_count = sum(1 for r in results if r["vulnerabilities"])
         self._progress.setRange(0, 1)
-        self._lbl.setText("Analyse des vulnérabilités terminée")
+        self._progress.setValue(1)
+        if vuln_count:
+            self._lbl.setText(f"⚠ {vuln_count} paquet(s) vulnérable(s) sur {total} analysés")
+        else:
+            self._lbl.setText(f"✓ Aucune vulnérabilité détectée ({total} paquets)")
         self._output.setPlainText(self._render_results(results))
 
     def _on_error(self, message: str):
         self._progress.setRange(0, 1)
-        self._lbl.setText("Échec de l'analyse des vulnérabilités")
+        self._lbl.setText("Échec de l'analyse")
         self._output.setPlainText(f"Erreur : {message}")
 
     def _start_scan(self):
-        self._lbl.setText("Recherche des vulnérabilités CVE pour les dépendances…")
+        self._lbl.setText("Analyse des paquets installés…")
         self._output.clear()
         self._progress.setRange(0, 0)
         self._thread = _ScanThread(self._packages)
+        self._thread.progress.connect(self._on_progress)
         self._thread.finished_ok.connect(self._on_result)
         self._thread.finished_err.connect(self._on_error)
         self._thread.start()

@@ -1,76 +1,25 @@
 from __future__ import annotations
 
+import importlib.metadata
 import json
-import re
 import urllib.error
 import urllib.request
-from pathlib import Path
-
-try:
-    import tomllib
-except ImportError:  # pragma: no cover
-    import tomli as tomllib
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 OSV_API_URL = "https://api.osv.dev/v1/query"
 PACKAGE_ECOSYSTEM = "PyPI"
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-REQUIREMENTS_FILE = PROJECT_ROOT / "requirements.txt"
-PYPROJECT_FILE = PROJECT_ROOT / "pyproject.toml"
+_MAX_WORKERS = 8
 
 
-def _clean_requirement_name(line: str) -> str:
-    line = line.strip()
-    if not line or line.startswith("#"):
-        return ""
-    line = re.split(r"\s|[<>=!~\[]", line, 1)[0].strip()
-    return line
-
-
-def _parse_requirements(path: Path) -> list[str]:
-    if not path.exists():
-        return []
-    result: list[str] = []
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
-        name = _clean_requirement_name(raw_line)
-        if name:
-            result.append(name)
-    return result
-
-
-def _parse_pyproject(path: Path) -> list[str]:
-    if not path.exists():
-        return []
-    text = path.read_text(encoding="utf-8")
-    data = tomllib.loads(text)
-    deps: list[str] = []
-    project = data.get("project", {}) or {}
-    for section in ("dependencies",):
-        for item in project.get(section, []) or []:
-            name = _clean_requirement_name(item)
-            if name:
-                deps.append(name)
-    optional = project.get("optional-dependencies", {}) or {}
-    for extras in optional.values():
-        for item in extras or []:
-            name = _clean_requirement_name(item)
-            if name:
-                deps.append(name)
-    return deps
-
-
-def get_project_dependencies() -> list[str]:
-    dependencies = []
-    dependencies.extend(_parse_requirements(REQUIREMENTS_FILE))
-    dependencies.extend(_parse_pyproject(PYPROJECT_FILE))
-    normalized = []
-    seen: set[str] = set()
-    for pkg in dependencies:
-        normalized_name = pkg.strip()
-        if normalized_name and normalized_name not in seen:
-            seen.add(normalized_name)
-            normalized.append(normalized_name)
-    return normalized
+def get_installed_packages() -> dict[str, str]:
+    """Retourne {nom_normalisé: version} pour tous les paquets installés."""
+    packages: dict[str, str] = {}
+    for dist in importlib.metadata.distributions():
+        name = dist.metadata.get("Name", "")
+        version = dist.metadata.get("Version", "")
+        if name and version:
+            packages[name] = version
+    return packages
 
 
 def _fetch_json(url: str, data: bytes, timeout: int = 15) -> dict:
@@ -86,12 +35,11 @@ def _fetch_json(url: str, data: bytes, timeout: int = 15) -> dict:
         return json.load(response)
 
 
-def query_package_vulnerabilities(package_name: str) -> list[dict]:
+def query_package_vulnerabilities(package_name: str, version: str) -> list[dict]:
+    """Interroge OSV.dev pour un paquet à une version précise."""
     payload = {
-        "package": {
-            "name": package_name,
-            "ecosystem": PACKAGE_ECOSYSTEM,
-        }
+        "package": {"name": package_name, "ecosystem": PACKAGE_ECOSYSTEM},
+        "version": version,
     }
     try:
         response = _fetch_json(OSV_API_URL, json.dumps(payload).encode("utf-8"))
@@ -105,34 +53,56 @@ def query_package_vulnerabilities(package_name: str) -> list[dict]:
     vulnerabilities = []
     for item in response.get("vulns", []) or []:
         aliases = item.get("aliases", []) or []
-        cve_ids = [alias for alias in aliases if alias.upper().startswith("CVE-")]
+        cve_ids = [a for a in aliases if a.upper().startswith("CVE-")]
         severity = []
         for sev in item.get("severity", []) or []:
-            severity_type = sev.get("type", "")
-            score = sev.get("score", "")
-            severity.append(f"{severity_type}={score}" if severity_type or score else "N/A")
-        vulnerabilities.append(
-            {
-                "id": item.get("id", ""),
-                "cve_ids": cve_ids,
-                "summary": item.get("summary", ""),
-                "details": item.get("details", ""),
-                "severity": severity,
-                "references": item.get("references", []) or [],
-            }
-        )
+            t = sev.get("type", "")
+            s = sev.get("score", "")
+            severity.append(f"{t}={s}" if t or s else "N/A")
+        vulnerabilities.append({
+            "id": item.get("id", ""),
+            "cve_ids": cve_ids,
+            "summary": item.get("summary", ""),
+            "severity": severity,
+            "references": item.get("references", []) or [],
+        })
     return vulnerabilities
 
 
-def scan_dependencies(package_names: list[str] | None = None) -> list[dict]:
-    if package_names is None:
-        package_names = get_project_dependencies()
-    result = []
-    for package_name in sorted(set(package_names), key=str.lower):
-        result.append(
-            {
-                "package": package_name,
-                "vulnerabilities": query_package_vulnerabilities(package_name),
-            }
-        )
-    return result
+def scan_dependencies(packages: dict[str, str] | None = None) -> list[dict]:
+    """
+    Scanne les paquets installés contre OSV.dev en parallèle.
+
+    Parameters
+    ----------
+    packages:
+        Dict {nom: version}. Si None, utilise get_installed_packages().
+
+    Returns
+    -------
+    Liste triée par nom : [{"package", "version", "vulnerabilities"}, ...]
+    """
+    if packages is None:
+        packages = get_installed_packages()
+
+    items = sorted(packages.items(), key=lambda kv: kv[0].lower())
+
+    def _scan_one(name: str, version: str) -> dict:
+        return {
+            "package": name,
+            "version": version,
+            "vulnerabilities": query_package_vulnerabilities(name, version),
+        }
+
+    results: list[dict] = [None] * len(items)  # type: ignore[list-item]
+
+    with ThreadPoolExecutor(max_workers=_MAX_WORKERS) as pool:
+        future_to_idx = {
+            pool.submit(_scan_one, name, ver): i
+            for i, (name, ver) in enumerate(items)
+        }
+        for future in as_completed(future_to_idx):
+            idx = future_to_idx[future]
+            results[idx] = future.result()
+
+    return results
