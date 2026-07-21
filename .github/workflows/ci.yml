@@ -67,14 +67,14 @@ jobs:
         run: |
           pyinstaller PDF-Equilibrist.spec
 
-      - name: Install NSIS
-        uses: ianwilmshurst/nsis-action@v1
-        with:
-          nsis-version: latest
+      - name: Install NSIS (Chocolatey)
+        run: |
+          choco install nsis -y
 
       - name: Build NSIS installer
+        shell: pwsh
         run: |
-          makensis installer\PDF-Equilibrist.nsi
+          & 'C:\Program Files (x86)\NSIS\makensis.exe' 'installer\PDF-Equilibrist.nsi'
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
