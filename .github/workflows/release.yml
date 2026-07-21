@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build_and_release:
+    name: Build installer and create release
+    runs-on: windows-latest
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+          pip install pyinstaller
+
+      - name: Prepare build assets
+        run: |
+          python tools/prepare_build.py
+
+      - name: Build PyInstaller bundle
+        run: |
+          pyinstaller PDF-Equilibrist.spec
+
+      - name: Install NSIS (Chocolatey)
+        run: |
+          choco install nsis -y
+
+      - name: Build NSIS installer
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path installer\Output -Force
+          & 'C:\Program Files (x86)\NSIS\makensis.exe' 'installer\PDF-Equilibrist.nsi'
+
+      - name: Create GitHub release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: installer/Output/PDF-Equilibrist-Setup.exe
+          asset_name: PDF-Equilibrist-Setup.exe
+          asset_content_type: application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
