@@ -1,5 +1,9 @@
 # PDF-Equilibrist
 
+[![CI](https://github.com/PDF-Equilibrist/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg)](https://github.com/PDF-Equilibrist/PDF-Equilibrist/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/PDF-Equilibrist/PDF-Equilibrist)](https://github.com/PDF-Equilibrist/PDF-Equilibrist/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/PDF-Equilibrist/PDF-Equilibrist/total)](https://github.com/PDF-Equilibrist/PDF-Equilibrist/releases)
+
 PDF-Equilibrist est un éditeur PDF de bureau construit en Python avec PyQt6 et PyMuPDF.
 Il permet de modifier, convertir, annoter, protéger et exporter des documents PDF.
 

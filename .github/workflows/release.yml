@@ -63,11 +63,33 @@ jobs:
           New-Item -ItemType Directory -Path installer\Output -Force
           & 'C:\Program Files (x86)\NSIS\makensis.exe' "/DAPP_VERSION=$v" 'installer\PDF-Equilibrist.nsi'
 
+      - name: Sign installer (optionnel — nécessite le secret SIGNING_CERT_PFX_B64)
+        shell: pwsh
+        env:
+          CERT_B64: ${{ secrets.SIGNING_CERT_PFX_B64 }}
+          CERT_PASS: ${{ secrets.SIGNING_CERT_PASSWORD }}
+        run: |
+          if (-not $env:CERT_B64) {
+            Write-Host "Aucun certificat configuré — étape de signature ignorée."
+            exit 0
+          }
+          $bytes = [System.Convert]::FromBase64String($env:CERT_B64)
+          [IO.File]::WriteAllBytes('signing.pfx', $bytes)
+          $signtool = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter 'signtool.exe' -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $signtool) {
+            Write-Host "signtool.exe introuvable — signature ignorée."
+            Remove-Item signing.pfx -Force
+            exit 0
+          }
+          & $signtool.FullName sign /f signing.pfx /p $env:CERT_PASS /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 'installer\Output\PDF-Equilibrist-Setup.exe'
+          Remove-Item signing.pfx -Force
+
       - name: Create GitHub release and upload asset
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.VERSION }}
           name: Release v${{ steps.version.outputs.VERSION }}
+          generate_release_notes: true
           draft: false
           prerelease: false
           files: installer/Output/PDF-Equilibrist-Setup.exe
