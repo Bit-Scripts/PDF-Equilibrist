@@ -24,7 +24,7 @@ def _normalize_repo(repo: str) -> tuple[str, str]:
     return owner.strip(), name.strip()
 
 
-def _fetch_json(url: str, timeout: int = 10) -> dict:
+def _fetch_json(url: str, timeout: int = 10):
     request = urllib.request.Request(
         url,
         headers={
@@ -110,3 +110,45 @@ def get_release_page_url(release: dict) -> str | None:
 def get_download_target(asset: dict) -> Path:
     filename = asset.get("name") or "PDF-Equilibrist-Update.exe"
     return Path(tempfile.gettempdir()) / filename
+
+
+def all_releases(repo: str | None = None) -> list[dict]:
+    """Retourne toutes les releases GitHub (max 100)."""
+    owner, name = _normalize_repo(repo or DEFAULT_GITHUB_REPO)
+    url = f"{GITHUB_API_URL}/{owner}/{name}/releases?per_page=100"
+    try:
+        data = _fetch_json(url)
+        return data if isinstance(data, list) else []
+    except (urllib.error.URLError, urllib.error.HTTPError):
+        return []
+
+
+def get_download_stats(
+    repo: str | None = None,
+    current_version: str | None = None,
+) -> dict:
+    """
+    Retourne les compteurs de téléchargements depuis GitHub.
+
+    Returns
+    -------
+    dict avec les clés :
+        "current"   : téléchargements de la version courante (0 si inconnue)
+        "total"     : téléchargements cumulés de toutes les releases
+        "releases"  : nombre de releases trouvées
+    """
+    releases = all_releases(repo)
+    total = 0
+    current = 0
+    for release in releases:
+        tag = release.get("tag_name", "")
+        is_current = current_version and tag in (
+            current_version,
+            f"v{current_version}",
+        )
+        for asset in release.get("assets", []) or []:
+            count = asset.get("download_count", 0) or 0
+            total += count
+            if is_current:
+                current += count
+    return {"current": current, "total": total, "releases": len(releases)}
