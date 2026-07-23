@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
     QProgressBar, QFrame,
 )
 from PyQt6.QtCore import QThread, pyqtSignal, Qt
+from PyQt6.QtGui import QPixmap
 
 from pdf_equilibrist import __version__
 from pdf_equilibrist import update as updater
@@ -13,6 +14,8 @@ from pdf_equilibrist import update as updater
 _GREEN  = "#6BBF4E"
 _GRAY   = "#888888"
 _WHITE  = "#F0F0F0"
+
+_GITHUB_URL = "https://github.com/Bit-Scripts/PDF-Equilibrist"
 
 
 class _CheckThread(QThread):
@@ -57,13 +60,45 @@ def _sep(parent=None) -> QFrame:
 class UpdateDialog(QDialog):
     def __init__(self, parent=None, repo: str | None = None):
         super().__init__(parent)
-        self.setWindowTitle("Mises à jour & statistiques")
+        self.setWindowTitle("À propos de PDF-Equilibrist")
         self.setMinimumWidth(460)
         self.setModal(True)
 
         self._repo = repo
         layout = QVBoxLayout(self)
         layout.setSpacing(8)
+
+        # ── À propos ──────────────────────────────────────────────────────────
+        about_row = QHBoxLayout()
+        from pdf_equilibrist.utils import resource_path
+        logo_path = resource_path("assets/logo/PDF-Equilibrist-logo.png")
+        if logo_path.exists():
+            logo_lbl = QLabel()
+            pix = QPixmap(str(logo_path)).scaled(
+                48, 48, Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            logo_lbl.setPixmap(pix)
+            about_row.addWidget(logo_lbl)
+
+        about_text = QVBoxLayout()
+        about_text.setSpacing(0)
+        name_lbl = QLabel(f"PDF-Equilibrist <span style='color:{_GRAY};font-weight:normal;'>v{__version__}</span>")
+        name_lbl.setTextFormat(Qt.TextFormat.RichText)
+        name_lbl.setStyleSheet("font-size: 15px; font-weight: bold;")
+        about_text.addWidget(name_lbl)
+        desc_lbl = QLabel("Éditeur PDF de bureau — © 2026 PDF Equilibrist — Licence MIT")
+        desc_lbl.setStyleSheet(f"color: {_GRAY}; font-size: 11px;")
+        about_text.addWidget(desc_lbl)
+        about_row.addLayout(about_text)
+        about_row.addStretch()
+
+        btn_github = QPushButton("Dépôt GitHub")
+        btn_github.clicked.connect(self._open_github)
+        about_row.addWidget(btn_github)
+        layout.addLayout(about_row)
+
+        layout.addWidget(_sep())
 
         # ── Vérification de version ───────────────────────────────────────────
         self._lbl = QLabel("Vérification des nouvelles versions…")
@@ -150,6 +185,10 @@ class UpdateDialog(QDialog):
     def _on_stats_error(self, _msg: str):
         self._lbl_current.setText("—")
         self._lbl_total.setText("—")
+
+    def _open_github(self):
+        import webbrowser
+        webbrowser.open(_GITHUB_URL)
 
     def _open_release_page(self):
         if not self._release:

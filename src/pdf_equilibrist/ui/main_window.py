@@ -384,6 +384,14 @@ class MainWindow(QWidget):
         act_cve.triggered.connect(self._check_for_cves)
         aide.addAction(act_cve)
 
+        aide.addSeparator()
+
+        # Même fenêtre que "Vérifier les mises à jour" : elle affiche déjà le
+        # logo, la version et les mises à jour dans un seul dialogue.
+        act_about = QAction("À propos de PDF-Equilibrist…", self)
+        act_about.triggered.connect(self._check_for_updates)
+        aide.addAction(act_about)
+
         return mb
 
     def _check_for_updates(self):
