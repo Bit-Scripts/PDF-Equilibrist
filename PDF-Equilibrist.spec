@@ -10,7 +10,9 @@
 import warnings
 warnings.filterwarnings("ignore", category=SyntaxWarning)
 
-from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+import importlib.metadata
+
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules, copy_metadata
 
 block_cipher = None
 
@@ -22,6 +24,19 @@ datas = [
 datas += collect_data_files("fitz")
 datas += collect_data_files("paddleocr")
 datas += collect_data_files("paddlex")
+
+# Métadonnées (dist-info) de tous les paquets installés dans l'environnement
+# de build. PyInstaller ne les embarque pas par défaut, or cve_checker.py
+# s'appuie sur importlib.metadata.distributions() pour lister les paquets
+# installés (scan CVE) — sans ça, l'exe figé n'en verrait presque aucun.
+for _dist in importlib.metadata.distributions():
+    _name = _dist.metadata.get("Name")
+    if not _name:
+        continue
+    try:
+        datas += copy_metadata(_name)
+    except Exception:
+        pass
 
 # ── Imports cachés ────────────────────────────────────────────────────────────
 hidden = [
