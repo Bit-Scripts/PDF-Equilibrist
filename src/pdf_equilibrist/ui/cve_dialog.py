@@ -28,9 +28,10 @@ class _ScanThread(QThread):
             pkgs = self.packages or cve_checker.get_installed_packages()
             total = len(pkgs)
             self.progress.emit(0, total)
-            results = cve_checker.scan_dependencies(pkgs)
+            packages = cve_checker.scan_dependencies(pkgs)
             self.progress.emit(total, total)
-            self.finished_ok.emit(results)
+            code_scan = cve_checker.scan_source_code()
+            self.finished_ok.emit({"packages": packages, "code_scan": code_scan})
         except Exception as exc:
             self.finished_err.emit(str(exc))
 
@@ -43,7 +44,7 @@ class CVEDialog(QDialog):
         self.setModal(True)
 
         layout = QVBoxLayout(self)
-        self._lbl = QLabel("Analyse des paquets installés…")
+        self._lbl = QLabel("Analyse des paquets installés et du code source…")
         layout.addWidget(self._lbl)
 
         self._progress = QProgressBar()
@@ -107,22 +108,59 @@ class CVEDialog(QDialog):
                 lines.append(f"  {r['package']} {r['version']}")
         return "\n".join(lines)
 
+    def _render_code_scan(self, code_scan: dict) -> str:
+        lines: list[str] = ["", "═" * 40, "Analyse statique du code source (bandit)", "═" * 40, ""]
+
+        if not code_scan["available"]:
+            lines.append(code_scan["reason"])
+            return "\n".join(lines)
+
+        issues = code_scan["issues"]
+        if not issues:
+            lines.append("Aucun problème détecté dans le code source du projet.")
+            return "\n".join(lines)
+
+        lines.append(f"{len(issues)} problème(s) détecté(s) dans le code source :")
+        lines.append("")
+        for issue in issues:
+            lines.append(
+                f"[{issue['severity']}/confiance {issue['confidence']}] "
+                f"{issue['file']}:{issue['line']} — {issue['test_id']} ({issue['test_name']})"
+            )
+            lines.append(f"    {issue['issue_text']}")
+        return "\n".join(lines)
+
     def _on_progress(self, done: int, total: int):
         if total > 0:
             self._progress.setRange(0, total)
             self._progress.setValue(done)
             self._lbl.setText(f"Analyse en cours… {done}/{total} paquets")
 
-    def _on_result(self, results: list[dict]):
-        total = len(results)
-        vuln_count = sum(1 for r in results if r["vulnerabilities"])
+    def _on_result(self, results: dict):
+        packages = results["packages"]
+        code_scan = results["code_scan"]
+        total = len(packages)
+        vuln_count = sum(1 for r in packages if r["vulnerabilities"])
+        code_issue_count = len(code_scan["issues"]) if code_scan["available"] else 0
+
         self._progress.setRange(0, 1)
         self._progress.setValue(1)
+
+        status_parts = []
         if vuln_count:
-            self._lbl.setText(f"⚠ {vuln_count} paquet(s) vulnérable(s) sur {total} analysés")
+            status_parts.append(f"⚠ {vuln_count} paquet(s) vulnérable(s)/{total}")
         else:
-            self._lbl.setText(f"✓ Aucune vulnérabilité détectée ({total} paquets)")
-        self._output.setPlainText(self._render_results(results))
+            status_parts.append(f"✓ {total} paquets OK")
+        if code_scan["available"]:
+            if code_issue_count:
+                status_parts.append(f"⚠ {code_issue_count} problème(s) dans le code")
+            else:
+                status_parts.append("✓ code source OK")
+        self._lbl.setText("  |  ".join(status_parts))
+
+        self._output.setPlainText(
+            self._render_results(packages) + "\n" + self._render_code_scan(code_scan)
+        )
 
     def _on_error(self, message: str):
         self._progress.setRange(0, 1)
@@ -130,7 +168,7 @@ class CVEDialog(QDialog):
         self._output.setPlainText(f"Erreur : {message}")
 
     def _start_scan(self):
-        self._lbl.setText("Analyse des paquets installés…")
+        self._lbl.setText("Analyse des paquets installés et du code source…")
         self._output.clear()
         self._progress.setRange(0, 0)
         self._thread = _ScanThread(self._packages)

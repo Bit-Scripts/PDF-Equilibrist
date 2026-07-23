@@ -193,7 +193,7 @@ def unregister() -> bool:
                                 r"Software\Classes\.pdf\OpenWithProgids",
                                 access=winreg.KEY_SET_VALUE) as key:
                 winreg.DeleteValue(key, _PROG_ID)
-        except Exception:
+        except Exception:  # nosec B110
             pass
 
         # Supprimer l'arbre ProgID complet
@@ -260,7 +260,7 @@ def _clean_mru_duplicates():
                 try:
                     winreg.DeleteValue(key, name)
                     deleted_letters.add(name)
-                except Exception:
+                except Exception:  # nosec B110
                     pass
 
             # Reconstruire MRUList en retirant les lettres supprimées
@@ -268,10 +268,10 @@ def _clean_mru_duplicates():
             new_mru = "".join(c for c in mru if c not in deleted_letters)
             try:
                 winreg.SetValueEx(key, "MRUList", 0, winreg.REG_SZ, new_mru)
-            except Exception:
+            except Exception:  # nosec B110
                 pass
 
-    except Exception:
+    except Exception:  # nosec B110
         pass
 
 
@@ -305,9 +305,9 @@ def _clean_open_with_progids():
             for name in to_delete:
                 try:
                     winreg.DeleteValue(key, name)
-                except Exception:
+                except Exception:  # nosec B110
                     pass
-    except Exception:
+    except Exception:  # nosec B110
         pass
 
 
@@ -324,7 +324,7 @@ def _delete_tree(hive, path: str):
                 except OSError:
                     break
         winreg.DeleteKey(hive, path)
-    except Exception:
+    except Exception:  # nosec B110
         pass
 
 
@@ -334,7 +334,7 @@ def _notify_shell():
         import ctypes
         # SHChangeNotify avec SHCNE_ASSOCCHANGED (0x08000000)
         ctypes.windll.shell32.SHChangeNotify(0x08000000, 0, None, None)
-    except Exception:
+    except Exception:  # nosec B110
         pass
 
 

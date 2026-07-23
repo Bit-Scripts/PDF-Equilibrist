@@ -235,15 +235,36 @@ class _PageLabel(QLabel):
         elif kind == fitz.LINK_LAUNCH:
             file = link.get("file", "")
             if file:
-                self._open_with_system(file)
+                self._confirm_and_launch(file)
+
+    def _confirm_and_launch(self, path: str):
+        """
+        Demande confirmation avant d'exécuter un fichier référencé par une action
+        'Launch' du PDF. Ces liens peuvent pointer vers n'importe quel exécutable
+        local — un PDF piégé pourrait sinon lancer un programme à l'insu de
+        l'utilisateur dès qu'il clique sur le lien.
+        """
+        from PyQt6.QtWidgets import QMessageBox
+        reply = QMessageBox.warning(
+            self,
+            "Ouverture d'un fichier externe",
+            "Ce document PDF demande à ouvrir :\n\n"
+            f"{path}\n\n"
+            "N'acceptez que si vous faites confiance à ce document.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            self._open_with_system(path)
 
     @staticmethod
     def _open_with_system(path: str):
         """Ouvre un fichier avec l'application par défaut du système."""
         try:
             import os
-            os.startfile(path)
-        except Exception:
+            # Action Launch confirmée explicitement par l'utilisateur (voir _confirm_and_launch)
+            os.startfile(path)  # nosec B606
+        except Exception:  # nosec B110
             pass
 
 ACCENT       = "#6BBF4E"

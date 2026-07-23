@@ -154,7 +154,7 @@ def extract_text_blocks(doc: fitz.Document, page_index: int) -> list[TextBlock]:
             _, buf = doc.extract_font(xref)  # retourne (extension, bytes)
             if buf:
                 font_buffers[basefont] = buf
-        except Exception:
+        except Exception:  # nosec B110
             # Certaines polices système ne sont pas extractibles → on continue
             pass
 

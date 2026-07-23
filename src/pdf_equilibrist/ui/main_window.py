@@ -279,7 +279,7 @@ class MainWindow(QWidget):
             # Forcer Windows à recalculer le cadre (nécessaire après SetWindowLong)
             SWP_FLAGS = 0x0027  # SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
             ctypes.windll.user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0, SWP_FLAGS)
-        except Exception:
+        except Exception:  # nosec B110
             pass
 
     # ── Ctrl+P ────────────────────────────────────────────────────────────────
@@ -392,9 +392,12 @@ class MainWindow(QWidget):
             from pdf_equilibrist.ui.update_dialog import UpdateDialog
             dlg = UpdateDialog(self)
             dlg.exec()
-        except Exception:
-            # Ne doit pas empêcher l'application de fonctionner
-            pass
+        except Exception as exc:
+            # Ne doit pas empêcher l'application de fonctionner, mais on informe
+            # l'utilisateur plutôt que d'échouer silencieusement.
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.warning(self, "Vérification des mises à jour",
+                                f"Impossible d'ouvrir le dialogue de mise à jour :\n{exc}")
 
     def _check_for_cves(self):
         """Ouvre le dialogue de vérification CVE des dépendances."""
@@ -402,8 +405,10 @@ class MainWindow(QWidget):
             from pdf_equilibrist.ui.cve_dialog import CVEDialog
             dlg = CVEDialog(self)
             dlg.exec()
-        except Exception:
-            pass
+        except Exception as exc:
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.warning(self, "Vérification CVE",
+                                f"Impossible d'ouvrir le dialogue CVE :\n{exc}")
 
     # ── Fichiers récents ──────────────────────────────────────────────────────
 

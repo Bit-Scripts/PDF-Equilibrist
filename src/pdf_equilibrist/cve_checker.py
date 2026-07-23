@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import importlib.metadata
 import json
+import os
+import sys
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
 
 OSV_API_URL = "https://api.osv.dev/v1/query"
 PACKAGE_ECOSYSTEM = "PyPI"
@@ -23,6 +26,8 @@ def get_installed_packages() -> dict[str, str]:
 
 
 def _fetch_json(url: str, data: bytes, timeout: int = 15) -> dict:
+    if not url.startswith("https://"):
+        raise ValueError(f"Schéma d'URL non autorisé : {url}")
     request = urllib.request.Request(
         url,
         data=data,
@@ -31,7 +36,7 @@ def _fetch_json(url: str, data: bytes, timeout: int = 15) -> dict:
             "Content-Type": "application/json",
         },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
+    with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
         return json.load(response)
 
 
@@ -106,3 +111,96 @@ def scan_dependencies(packages: dict[str, str] | None = None) -> list[dict]:
             results[idx] = future.result()
 
     return results
+
+
+def _project_source_root() -> Path | None:
+    """
+    Retourne le dossier `src/pdf_equilibrist` à analyser, ou None si l'application
+    tourne depuis un exécutable PyInstaller figé (aucun .py source disponible).
+    """
+    if getattr(sys, "frozen", False) or hasattr(sys, "_MEIPASS"):
+        return None
+    return Path(__file__).resolve().parent
+
+
+_SEVERITY_RANK = {"HIGH": 3, "MEDIUM": 2, "LOW": 1, "UNDEFINED": 0}
+
+
+def scan_source_code(source_dir: Path | None = None) -> dict:
+    """
+    Analyse statique (SAST) du code source du projet lui-même avec bandit,
+    en complément du scan des dépendances (SCA) fait par `scan_dependencies`.
+
+    Returns
+    -------
+    dict :
+        {"available": bool, "reason": str, "issues": [...]}
+        Chaque issue : {"file", "line", "severity", "confidence",
+                        "test_id", "test_name", "issue_text"}
+    """
+    if source_dir is None:
+        source_dir = _project_source_root()
+
+    if source_dir is None:
+        return {
+            "available": False,
+            "reason": "Analyse du code source indisponible (application compilée : "
+                      "aucun fichier .py à analyser).",
+            "issues": [],
+        }
+
+    try:
+        import logging as _logging
+
+        # Bandit tente de charger tous ses formatteurs de sortie (sarif, csv...)
+        # via stevedore ; ceux dont les dépendances optionnelles manquent (ex.
+        # sarif_om) loggent une erreur bruyante alors qu'on ne s'en sert jamais
+        # ici (on lit les résultats via get_issue_list(), pas via un formatteur).
+        _logging.getLogger("stevedore.extension").setLevel(_logging.CRITICAL)
+
+        from bandit.core import config as bandit_config
+        from bandit.core import manager as bandit_manager
+    except ImportError:
+        return {
+            "available": False,
+            "reason": "Le paquet 'bandit' n'est pas installé (pip install bandit) : "
+                      "analyse du code source ignorée.",
+            "issues": [],
+        }
+
+    try:
+        b_conf = bandit_config.BanditConfig()
+        b_mgr = bandit_manager.BanditManager(b_conf, "file")
+        b_mgr.discover_files([str(source_dir)], recursive=True)
+        b_mgr.run_tests()
+
+        issues = []
+        for result in b_mgr.get_issue_list():
+            try:
+                rel_path = os.path.relpath(result.fname, start=str(source_dir.parent))
+            except ValueError:
+                rel_path = result.fname
+            issues.append({
+                "file": rel_path,
+                "line": result.lineno,
+                "severity": str(result.severity),
+                "confidence": str(result.confidence),
+                "test_id": result.test_id,
+                "test_name": result.test,
+                "issue_text": result.text,
+            })
+    except Exception as exc:  # défensif : ne jamais faire planter le scan CVE
+        return {
+            "available": False,
+            "reason": f"Erreur pendant l'analyse bandit : {exc}",
+            "issues": [],
+        }
+
+    issues.sort(
+        key=lambda i: (
+            -_SEVERITY_RANK.get(i["severity"].upper(), 0),
+            i["file"],
+            i["line"],
+        )
+    )
+    return {"available": True, "reason": "", "issues": issues}

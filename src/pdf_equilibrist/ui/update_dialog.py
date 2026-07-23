@@ -173,10 +173,16 @@ class UpdateDialog(QDialog):
             self._lbl.setText(f"Téléchargé : {target}")
             try:
                 if os.name == "nt":
-                    os.startfile(str(target))
+                    # Fichier qu'on vient nous-même de télécharger dans le temp
+                    os.startfile(str(target))  # nosec B606
                 else:
-                    import subprocess
-                    subprocess.Popen(["xdg-open", str(target)])
+                    import shutil
+                    import subprocess  # nosec B404
+                    xdg_open = shutil.which("xdg-open")
+                    if xdg_open:
+                        subprocess.Popen([xdg_open, str(target)])  # nosec B603
+                    else:
+                        raise FileNotFoundError("xdg-open introuvable")
             except Exception:
                 import webbrowser
                 webbrowser.open(target.parent.as_uri())

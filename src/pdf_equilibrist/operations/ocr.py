@@ -158,7 +158,7 @@ def apply_ocr_to_pdf(
                     render_mode=3,
                     overlay=True,
                 )
-            except Exception:
+            except Exception:  # nosec B110
                 pass   # certains glyphes non supportés → on ignore
 
         n_ocr += 1

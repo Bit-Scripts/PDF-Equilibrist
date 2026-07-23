@@ -27,10 +27,11 @@ from pathlib import Path
 import fitz
 
 
-def encrypt(
+def encrypt(  # nosec B107
     doc: fitz.Document,
     save_path: Path,
     user_password: str,
+    # owner_password="" = pas de mot de passe propriétaire distinct, pas un secret
     owner_password: str = "",
 ):
     """

@@ -5,6 +5,7 @@ dependencies:
   - python=3.12
   - pip
   - pip:
+    - bandit==1.9.4
     - bcrypt==5.0.0
     - cffi==2.0.0
     - chardet==7.4.3

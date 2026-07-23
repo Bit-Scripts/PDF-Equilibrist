@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+from pathlib import Path
 
 import pytest
 
@@ -60,3 +61,38 @@ def test_scan_dependencies(monkeypatch: pytest.MonkeyPatch):
     assert len(results) == 2
     assert all("version" in r for r in results)
     assert all(r["vulnerabilities"] == [] for r in results)
+
+
+def test_scan_source_code_unavailable_when_frozen(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(cve_checker.sys, "frozen", True, raising=False)
+    result = cve_checker.scan_source_code()
+    assert result["available"] is False
+    assert result["issues"] == []
+
+
+def test_scan_source_code_missing_bandit(monkeypatch: pytest.MonkeyPatch, tmp_path):
+    import builtins
+
+    real_import = builtins.__import__
+
+    def fake_import(name, *args, **kwargs):
+        if name.startswith("bandit"):
+            raise ImportError("no bandit")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    result = cve_checker.scan_source_code(source_dir=tmp_path)
+    assert result["available"] is False
+    assert "bandit" in result["reason"].lower()
+
+
+def test_scan_source_code_runs_on_project():
+    pytest.importorskip("bandit")
+    source_dir = Path(cve_checker.__file__).resolve().parent
+    result = cve_checker.scan_source_code(source_dir=source_dir)
+    assert result["available"] is True
+    assert isinstance(result["issues"], list)
+    for issue in result["issues"]:
+        assert issue["severity"] in {"HIGH", "MEDIUM", "LOW", "UNDEFINED"}
+        assert issue["file"]
+        assert issue["line"] >= 0

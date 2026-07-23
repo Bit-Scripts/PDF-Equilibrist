@@ -50,6 +50,9 @@ hidden += collect_submodules("paddlex")
 # ── Modules lourds inutiles au runtime ───────────────────────────────────────
 excludes = [
     "tkinter", "matplotlib", "scipy", "IPython",
+    # Outil d'analyse statique (dev-only) : jamais invoqué depuis l'exe figé
+    # (cve_checker.scan_source_code() se désactive quand sys.frozen est vrai).
+    "bandit", "stevedore", "pbr",
 ]
 
 # ── Analyse ───────────────────────────────────────────────────────────────────

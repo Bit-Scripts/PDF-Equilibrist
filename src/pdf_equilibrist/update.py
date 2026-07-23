@@ -25,6 +25,8 @@ def _normalize_repo(repo: str) -> tuple[str, str]:
 
 
 def _fetch_json(url: str, timeout: int = 10):
+    if not url.startswith("https://"):
+        raise ValueError(f"Schéma d'URL non autorisé : {url}")
     request = urllib.request.Request(
         url,
         headers={
@@ -32,7 +34,7 @@ def _fetch_json(url: str, timeout: int = 10):
             "Accept": "application/vnd.github+json",
         },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
+    with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
         text = response.read().decode("utf-8")
     return json.loads(text)
 
@@ -88,6 +90,10 @@ def download_release_asset(asset: dict, target_path: Path, timeout: int = 120) -
     url = asset.get("browser_download_url")
     if not url:
         raise ValueError("L'asset ne contient pas d'URL de téléchargement valide.")
+    if not url.startswith("https://"):
+        # L'URL vient de la réponse de l'API GitHub : ne jamais suivre un schéma
+        # inattendu (file:/, ftp:/...) même si le JSON semble légitime.
+        raise ValueError(f"Schéma d'URL de téléchargement non autorisé : {url}")
 
     request = urllib.request.Request(
         url,
@@ -97,7 +103,7 @@ def download_release_asset(asset: dict, target_path: Path, timeout: int = 120) -
         },
     )
     target_path.parent.mkdir(parents=True, exist_ok=True)
-    with urllib.request.urlopen(request, timeout=timeout) as response:
+    with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
         data = response.read()
     target_path.write_bytes(data)
     return target_path
@@ -108,7 +114,9 @@ def get_release_page_url(release: dict) -> str | None:
 
 
 def get_download_target(asset: dict) -> Path:
-    filename = asset.get("name") or "PDF-Equilibrist-Update.exe"
+    # os.path.basename() : le nom vient de la réponse de l'API GitHub, on ne
+    # veut jamais qu'un séparateur/".." dans ce champ sorte du dossier temp.
+    filename = os.path.basename(asset.get("name") or "") or "PDF-Equilibrist-Update.exe"
     return Path(tempfile.gettempdir()) / filename
 
 

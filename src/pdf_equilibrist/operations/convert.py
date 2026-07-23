@@ -31,7 +31,8 @@ Dépendances externes
 from pathlib import Path
 import fitz
 import io
-import subprocess
+# subprocess : toujours appelé en argv liste, jamais shell=True (voir plus bas)
+import subprocess  # nosec B404
 import shutil
 
 
@@ -147,7 +148,8 @@ def office_to_pdf(input_path: Path, output_path: Path) -> Path:
             if Path(r"C:\Program Files\LibreOffice\program\soffice.exe").exists()
             else shutil.which("soffice")
         )
-        result = subprocess.run(
+        # argv liste fixe, pas de shell, chemins locaux choisis par l'utilisateur
+        result = subprocess.run(  # nosec B603
             [
                 lo_exe,
                 "--headless",               # pas d'interface graphique

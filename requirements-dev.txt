@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest
+flake8
+bandit>=1.7
