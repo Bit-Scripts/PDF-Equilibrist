@@ -10,7 +10,7 @@ from pathlib import Path
 
 DEFAULT_GITHUB_REPO = os.getenv(
     "PDF_EQUILIBRIST_UPDATE_REPO",
-    "PDF-Equilibrist/PDF-Equilibrist",
+    "Bit-Scripts/PDF-Equilibrist",
 )
 USER_AGENT = "PDF-Equilibrist-Updater/0.1"
 GITHUB_API_URL = "https://api.github.com/repos"
