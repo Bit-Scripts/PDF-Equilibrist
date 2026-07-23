@@ -63,11 +63,28 @@ def test_scan_dependencies(monkeypatch: pytest.MonkeyPatch):
     assert all(r["vulnerabilities"] == [] for r in results)
 
 
-def test_scan_source_code_unavailable_when_frozen(monkeypatch: pytest.MonkeyPatch):
+def test_scan_source_code_unavailable_when_frozen_without_bundled_source(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+):
+    # Simule un exe figé dont la copie de code source embarquée (datas du
+    # .spec) serait absente/corrompue : doit rester indisponible proprement.
     monkeypatch.setattr(cve_checker.sys, "frozen", True, raising=False)
+    monkeypatch.setattr(cve_checker.sys, "_MEIPASS", str(tmp_path), raising=False)
     result = cve_checker.scan_source_code()
     assert result["available"] is False
     assert result["issues"] == []
+
+
+def test_project_source_root_frozen_uses_bundled_copy(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+):
+    # Simule un exe figé où le .spec a bien embarqué la copie du code source
+    # (cas réel) : _project_source_root() doit la retrouver via resource_path().
+    (tmp_path / "pdf_equilibrist").mkdir()
+    monkeypatch.setattr(cve_checker.sys, "frozen", True, raising=False)
+    monkeypatch.setattr(cve_checker.sys, "_MEIPASS", str(tmp_path), raising=False)
+    root = cve_checker._project_source_root()
+    assert root == tmp_path / "pdf_equilibrist"
 
 
 def test_scan_source_code_missing_bandit(monkeypatch: pytest.MonkeyPatch, tmp_path):

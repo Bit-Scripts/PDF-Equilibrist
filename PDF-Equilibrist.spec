@@ -62,12 +62,16 @@ hidden += collect_submodules("pdf_equilibrist")
 hidden += collect_submodules("paddleocr")
 hidden += collect_submodules("paddlex")
 
+# bandit charge ses tests (B1xx, B3xx, B6xx...) via des entry points (stevedore),
+# invisibles à l'analyse statique d'imports de PyInstaller : sans ce
+# collect_submodules, seuls bandit.core.* seraient embarqués et l'analyse de
+# code échouerait silencieusement une fois figée (aucun test chargé).
+hidden += collect_submodules("bandit")
+hidden += collect_submodules("stevedore")
+
 # ── Modules lourds inutiles au runtime ───────────────────────────────────────
 excludes = [
     "tkinter", "matplotlib", "scipy", "IPython",
-    # Outil d'analyse statique (dev-only) : jamais invoqué depuis l'exe figé
-    # (cve_checker.scan_source_code() se désactive quand sys.frozen est vrai).
-    "bandit", "stevedore", "pbr",
 ]
 
 # ── Analyse ───────────────────────────────────────────────────────────────────

@@ -6,3 +6,4 @@ openpyxl>=3.1
 python-pptx>=1.0
 Pillow>=12
 pyparsing>=3.0
+bandit>=1.7

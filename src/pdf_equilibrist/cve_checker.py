@@ -115,11 +115,17 @@ def scan_dependencies(packages: dict[str, str] | None = None) -> list[dict]:
 
 def _project_source_root() -> Path | None:
     """
-    Retourne le dossier `src/pdf_equilibrist` à analyser, ou None si l'application
-    tourne depuis un exécutable PyInstaller figé (aucun .py source disponible).
+    Retourne le dossier de code source à analyser (bandit).
+
+    En dev, c'est simplement le dossier de ce fichier. Dans l'exe figé,
+    le .spec PyInstaller embarque une copie complète de `src/pdf_equilibrist`
+    (datas) précisément pour cet usage — on la retrouve via resource_path().
+    Ne retourne None que si, contre toute attente, cette copie est absente.
     """
     if getattr(sys, "frozen", False) or hasattr(sys, "_MEIPASS"):
-        return None
+        from pdf_equilibrist.utils import resource_path
+        bundled = resource_path("pdf_equilibrist")
+        return bundled if bundled.exists() else None
     return Path(__file__).resolve().parent
 
 
@@ -144,8 +150,8 @@ def scan_source_code(source_dir: Path | None = None) -> dict:
     if source_dir is None:
         return {
             "available": False,
-            "reason": "Analyse du code source indisponible (application compilée : "
-                      "aucun fichier .py à analyser).",
+            "reason": "Analyse du code source indisponible : code source introuvable "
+                      "(installation corrompue ou incomplète).",
             "issues": [],
         }
 

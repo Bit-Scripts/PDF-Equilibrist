@@ -12,6 +12,22 @@
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
 
+; Vérifie que l'application n'est pas en cours d'exécution avant d'installer
+; ou de désinstaller (fichiers verrouillés sinon). Détection par titre de
+; fenêtre (fiable : main_window.py fixe ce titre une fois pour toutes, il ne
+; change jamais même quand un document est ouvert). Pas de fermeture forcée
+; pour ne pas risquer de perdre un travail non sauvegardé.
+!macro CHECK_APP_RUNNING
+    check_app_running:
+        FindWindow $0 "" "PDF Equilibrist"
+        ${If} $0 <> 0
+            MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION \
+                "${APP_NAME} est en cours d'exécution.$\r$\n$\r$\nVeuillez fermer l'application avant de continuer." \
+                IDRETRY check_app_running
+            Abort
+        ${EndIf}
+!macroend
+
 ; ── Définitions ───────────────────────────────────────────────────────────────
 !define APP_NAME      "PDF-Equilibrist"
 !ifndef APP_VERSION
@@ -70,6 +86,15 @@ personnelle dans votre profil utilisateur.$\r$\n$\r$\nCliquez sur Suivant pour c
 ; ── Langues ───────────────────────────────────────────────────────────────────
 !insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "English"
+
+; ── Fonctions d'initialisation ────────────────────────────────────────────────
+Function .onInit
+    !insertmacro CHECK_APP_RUNNING
+FunctionEnd
+
+Function un.onInit
+    !insertmacro CHECK_APP_RUNNING
+FunctionEnd
 
 ; ── Section principale (obligatoire) ─────────────────────────────────────────
 Section "PDF-Equilibrist" SecMain
