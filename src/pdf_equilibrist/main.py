@@ -104,12 +104,17 @@ def main():
     from pdf_equilibrist.registration import auto_register
     auto_register()
 
+    # Vérification silencieuse des mises à jour au démarrage — n'affiche un
+    # dialogue que si une nouvelle version est réellement disponible.
+    win = getattr(app, "_main_window", None)
+    if win and hasattr(win, "check_updates_on_startup"):
+        win.check_updates_on_startup()
+
     # Ouvrir le fichier PDF passé en argument sur la ligne de commande.
     # Windows transmet sys.argv[1] lors d'un double-clic ou d'un "Ouvrir avec..."
     if len(sys.argv) > 1:
         pdf_path = sys.argv[1]
         if pdf_path.lower().endswith(".pdf"):
-            win = getattr(app, "_main_window", None)
             if win and hasattr(win, "_open_document"):
                 win._open_document(pdf_path)
 

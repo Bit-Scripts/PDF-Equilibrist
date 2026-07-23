@@ -53,7 +53,7 @@ from PyQt6.QtWidgets import (
     QTabBar, QStackedWidget, QFileDialog, QLabel, QSplitter,
 )
 from PyQt6.QtGui import QAction, QKeySequence, QColor, QPainter, QPen
-from PyQt6.QtCore import Qt, QPoint, QSettings
+from PyQt6.QtCore import Qt, QPoint, QSettings, QThread, pyqtSignal
 
 _RECENT_MAX = 10   # nombre maximum de fichiers dans "Ouvrir récemment"
 
@@ -83,6 +83,21 @@ QTabBar::tab {
 QTabBar::tab:selected { background: #2D2D2D; color: #F0F0F0; }
 QTabBar::tab:hover:!selected { background: #242424; color: #C0C0C0; }
 """
+
+
+class _StartupUpdateCheckThread(QThread):
+    """Vérifie en arrière-plan si une nouvelle version est disponible, sans
+    bloquer le démarrage ni afficher quoi que ce soit tant qu'on ne sait pas."""
+    found = pyqtSignal(object)   # dict de la release si plus récente, sinon None
+
+    def run(self):
+        try:
+            from pdf_equilibrist import __version__
+            from pdf_equilibrist import update as updater
+            release = updater.get_latest_release_info(__version__)
+        except Exception:
+            release = None
+        self.found.emit(release)
 
 
 class MainWindow(QWidget):
@@ -393,6 +408,22 @@ class MainWindow(QWidget):
         aide.addAction(act_about)
 
         return mb
+
+    def check_updates_on_startup(self):
+        """
+        Vérifie silencieusement les mises à jour au démarrage.
+
+        Contrairement à ``_check_for_updates()``, n'ouvre le dialogue que
+        si une version plus récente est réellement disponible — sinon
+        aucune fenêtre n'apparaît (vérification en arrière-plan uniquement).
+        """
+        self._startup_update_thread = _StartupUpdateCheckThread(self)
+        self._startup_update_thread.found.connect(self._on_startup_update_found)
+        self._startup_update_thread.start()
+
+    def _on_startup_update_found(self, release: object | None):
+        if release:
+            self._check_for_updates()
 
     def _check_for_updates(self):
         """Ouvre le dialogue de vérification des mises à jour (non bloquant)."""

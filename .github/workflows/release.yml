@@ -32,6 +32,19 @@ jobs:
           }
           echo "VERSION=$v" >> $env:GITHUB_OUTPUT
 
+      - name: Inject version into the package
+        shell: pwsh
+        run: |
+          $v = '${{ steps.version.outputs.VERSION }}'
+
+          (Get-Content src/pdf_equilibrist/__init__.py) `
+            -replace '__version__ = ".*"', "__version__ = ""$v""" |
+            Set-Content src/pdf_equilibrist/__init__.py
+
+          (Get-Content pyproject.toml) `
+            -replace '^version = ".*"$', "version = ""$v""" |
+            Set-Content pyproject.toml
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
