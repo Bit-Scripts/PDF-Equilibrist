@@ -34,9 +34,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # L'image conteneur flatpak-builder est minimale : python3 y est présent mais
+      # pip n'est pas garanti sur le PATH — on le bootstrap plutôt que de le supposer.
+      - name: Ensure pip is available
+        run: |
+          python3 -m pip --version || python3 -m ensurepip --upgrade --user \
+            || (command -v dnf && dnf install -y python3-pip) \
+            || (command -v apt-get && apt-get update && apt-get install -y python3-pip)
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
       - name: Generate pip dependency sources (flatpak-pip-generator)
         run: |
-          pip3 install --user git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=pip
+          python3 -m pip install --user git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=pip
           export PATH="$HOME/.local/bin:$PATH"
           flatpak-pip-generator --output packaging/flatpak/generated-sources \
               PyQt6 PyMuPDF pdf2docx pdfplumber openpyxl python-pptx Pillow pyparsing
@@ -47,7 +56,7 @@ jobs:
       # sur le checkout local — jamais commité, uniquement en mémoire pour ce job.
       - name: Point manifest at checked-out source (CI validation only)
         run: |
-          pip3 install --quiet pyyaml
+          python3 -m pip install --quiet --user pyyaml
           python3 - <<'PY'
           import yaml
           path = "packaging/flatpak/io.github.Bit-Scripts.PDFEquilibrist.yml"
