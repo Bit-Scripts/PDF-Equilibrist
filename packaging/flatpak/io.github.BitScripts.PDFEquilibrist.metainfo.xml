@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.Bit-Scripts.PDFEquilibrist</id>
+  <id>io.github.BitScripts.PDFEquilibrist</id>
   <name>PDF-Equilibrist</name>
   <summary>Éditeur PDF open-source — éditer, annoter, convertir et protéger vos PDF localement</summary>
   <summary xml:lang="en">Open-source PDF editor — edit, annotate, convert and protect PDF files locally</summary>
@@ -8,7 +8,7 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
 
-  <developer id="io.github.Bit-Scripts">
+  <developer id="io.github.bitscripts">
     <name>Paul Woisard</name>
   </developer>
 
@@ -34,7 +34,7 @@
     </ul>
   </description>
 
-  <launchable type="desktop-id">io.github.Bit-Scripts.PDFEquilibrist.desktop</launchable>
+  <launchable type="desktop-id">io.github.BitScripts.PDFEquilibrist.desktop</launchable>
 
   <screenshots>
     <screenshot type="default">

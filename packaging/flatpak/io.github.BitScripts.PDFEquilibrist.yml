@@ -1,7 +1,13 @@
-app-id: io.github.Bit-Scripts.PDFEquilibrist
+app-id: io.github.BitScripts.PDFEquilibrist
 runtime: org.kde.Platform
 runtime-version: '6.9'   # à vérifier/ajuster à la version disponible sur Flathub au moment de la soumission
 sdk: org.kde.Sdk
+# PyQt6 ne se pip-installe pas dans un sandbox Flatpak : flatpak-pip-generator refuse
+# explicitement de générer des sources pour PyQt (wheel qui embarque son propre Qt6,
+# en conflit avec celui du runtime). Le BaseApp officiel fournit PyQt6 déjà compilé
+# contre le Qt6 du runtime — base-version doit rester alignée sur runtime-version.
+base: com.riverbankcomputing.PyQt.BaseApp
+base-version: '6.9'   # idem : à aligner sur la branche BaseApp réellement publiée
 command: pdf-equilibrist
 
 # Pas de --share=network : le vérificateur de mise à jour maison est désactivé
@@ -15,9 +21,10 @@ finish-args:
   - --filesystem=home
 
 modules:
-  # ── Dépendances Python (PyQt6, PyMuPDF, pdf2docx, pdfplumber, openpyxl,
-  #    python-pptx, Pillow, pyparsing) — PAS bandit (dev-only) ni
-  #    paddleocr/paddlepaddle (OCR exclu de la v1, cf. mémoire projet).
+  # ── Dépendances Python pip-installables (PyMuPDF, pdf2docx, pdfplumber,
+  #    openpyxl, python-pptx, Pillow, pyparsing) — PAS bandit (dev-only), PAS
+  #    PyQt6 (fourni par le BaseApp ci-dessus, jamais par flatpak-pip-generator),
+  #    et PAS paddleocr/paddlepaddle (OCR exclu de la v1, cf. mémoire projet).
   #
   #    Le fichier generated-sources.json ci-dessous doit être produit avec
   #    flatpak-pip-generator (nécessite un accès réseau pour résoudre les
@@ -25,7 +32,7 @@ modules:
   #
   #      pip install --user git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=pip
   #      flatpak-pip-generator --output generated-sources \
-  #          PyQt6 PyMuPDF pdf2docx pdfplumber openpyxl python-pptx Pillow pyparsing
+  #          PyMuPDF pdf2docx pdfplumber openpyxl python-pptx Pillow pyparsing
   #
   #    puis déplacer generated-sources.json à côté de ce manifest.
   - name: pdf-equilibrist-pip-deps
@@ -39,14 +46,14 @@ modules:
     buildsystem: simple
     build-commands:
       - pip3 install --no-index --no-build-isolation --prefix=${FLATPAK_DEST} .
-      - install -Dm644 packaging/flatpak/io.github.Bit-Scripts.PDFEquilibrist.desktop
-          ${FLATPAK_DEST}/share/applications/io.github.Bit-Scripts.PDFEquilibrist.desktop
-      - install -Dm644 packaging/flatpak/io.github.Bit-Scripts.PDFEquilibrist.metainfo.xml
-          ${FLATPAK_DEST}/share/metainfo/io.github.Bit-Scripts.PDFEquilibrist.metainfo.xml
-      - install -Dm644 packaging/flatpak/icons/128x128/io.github.Bit-Scripts.PDFEquilibrist.png
-          ${FLATPAK_DEST}/share/icons/hicolor/128x128/apps/io.github.Bit-Scripts.PDFEquilibrist.png
-      - install -Dm644 packaging/flatpak/icons/256x256/io.github.Bit-Scripts.PDFEquilibrist.png
-          ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/io.github.Bit-Scripts.PDFEquilibrist.png
+      - install -Dm644 packaging/flatpak/io.github.BitScripts.PDFEquilibrist.desktop
+          ${FLATPAK_DEST}/share/applications/io.github.BitScripts.PDFEquilibrist.desktop
+      - install -Dm644 packaging/flatpak/io.github.BitScripts.PDFEquilibrist.metainfo.xml
+          ${FLATPAK_DEST}/share/metainfo/io.github.BitScripts.PDFEquilibrist.metainfo.xml
+      - install -Dm644 packaging/flatpak/icons/128x128/io.github.BitScripts.PDFEquilibrist.png
+          ${FLATPAK_DEST}/share/icons/hicolor/128x128/apps/io.github.BitScripts.PDFEquilibrist.png
+      - install -Dm644 packaging/flatpak/icons/256x256/io.github.BitScripts.PDFEquilibrist.png
+          ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/io.github.BitScripts.PDFEquilibrist.png
     sources:
       # Pour la soumission Flathub définitive : remplacer par une source
       # reproductible (type: git avec un tag de release, ou type: archive

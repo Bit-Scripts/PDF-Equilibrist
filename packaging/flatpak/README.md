@@ -1,13 +1,13 @@
 # Packaging Flatpak — PDF-Equilibrist
 
 Ce dossier contient les fichiers nécessaires à la publication de PDF-Equilibrist
-sur Flathub (App ID : `io.github.Bit-Scripts.PDFEquilibrist`).
+sur Flathub (App ID : `io.github.BitScripts.PDFEquilibrist`).
 
 ## Fichiers
 
-- `io.github.Bit-Scripts.PDFEquilibrist.yml` — manifest Flatpak (runtime, dépendances, permissions)
-- `io.github.Bit-Scripts.PDFEquilibrist.desktop` — entrée de menu (nom, icône, MimeType PDF)
-- `io.github.Bit-Scripts.PDFEquilibrist.metainfo.xml` — métadonnées AppStream (description, captures d'écran, licence)
+- `io.github.BitScripts.PDFEquilibrist.yml` — manifest Flatpak (runtime, dépendances, permissions)
+- `io.github.BitScripts.PDFEquilibrist.desktop` — entrée de menu (nom, icône, MimeType PDF)
+- `io.github.BitScripts.PDFEquilibrist.metainfo.xml` — métadonnées AppStream (description, captures d'écran, licence)
 - `icons/` — icônes hicolor (128×128, 256×256) dérivées de `assets/logo/PDF-Equilibrist-logo.png`
 
 ## Générer les dépendances Python (obligatoire avant tout build)
@@ -19,18 +19,22 @@ Linux avec accès réseau :
 ```bash
 pip install --user git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=pip
 flatpak-pip-generator --output packaging/flatpak/generated-sources \
-    PyQt6 PyMuPDF pdf2docx pdfplumber openpyxl python-pptx Pillow pyparsing
+    PyMuPDF pdf2docx pdfplumber openpyxl python-pptx Pillow pyparsing
 ```
 
-Ne pas inclure `bandit` (dev/scan uniquement) ni `paddleocr`/`paddlepaddle` (OCR exclu de la v1 —
-voir la mémoire projet sur le portage Flathub).
+Ne pas inclure `PyQt6` (flatpak-pip-generator le refuse explicitement — le message
+`Please use the baseapp https://github.com/flathub/com.riverbankcomputing.PyQt.BaseApp`
+s'affiche et rien n'est généré ; PyQt6 est fourni par le `base:
+com.riverbankcomputing.PyQt.BaseApp` déjà déclaré dans le manifest), ni `bandit`
+(dev/scan uniquement), ni `paddleocr`/`paddlepaddle` (OCR exclu de la v1 — voir la
+mémoire projet sur le portage Flathub).
 
 ## Build local de test
 
 ```bash
 flatpak-builder --user --install --force-clean build-dir \
-    packaging/flatpak/io.github.Bit-Scripts.PDFEquilibrist.yml
-flatpak run io.github.Bit-Scripts.PDFEquilibrist
+    packaging/flatpak/io.github.BitScripts.PDFEquilibrist.yml
+flatpak run io.github.BitScripts.PDFEquilibrist
 ```
 
 Pour itérer sur le code local sans repasser par un tag Git à chaque fois, remplacer
@@ -48,13 +52,13 @@ sources:
 ## Validation AppStream
 
 ```bash
-appstreamcli validate packaging/flatpak/io.github.Bit-Scripts.PDFEquilibrist.metainfo.xml
+appstreamcli validate packaging/flatpak/io.github.BitScripts.PDFEquilibrist.metainfo.xml
 ```
 
 ## Soumission Flathub (manuelle, unique)
 
 Flathub ne reçoit pas de binaire poussé par CI — la soumission initiale se fait via une PR
 vers l'organisation `flathub` (voir https://docs.flathub.org/docs/for-app-authors/submission).
-Une fois le repo `github.com/flathub/io.github.Bit-Scripts.PDFEquilibrist` créé et l'app
+Une fois le repo `github.com/flathub/io.github.BitScripts.PDFEquilibrist` créé et l'app
 acceptée, les mises à jour se font en proposant une MAJ du manifest (nouveau tag + sha) dans
 ce repo — c'est cette étape-là qui peut être automatisée par CI à chaque release.

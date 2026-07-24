@@ -43,13 +43,17 @@ jobs:
             || (command -v apt-get && apt-get update && apt-get install -y python3-pip)
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
+      # PyQt6 est volontairement exclu : flatpak-pip-generator refuse de le générer
+      # (il faut le BaseApp com.riverbankcomputing.PyQt.BaseApp, déjà dans le manifest).
       - name: Generate pip dependency sources (flatpak-pip-generator)
         run: |
           python3 -m pip install --user requirements-parser packaging
           git clone --depth 1 https://github.com/flatpak/flatpak-builder-tools.git /tmp/flatpak-builder-tools
           python3 /tmp/flatpak-builder-tools/pip/flatpak-pip-generator \
               --output packaging/flatpak/generated-sources \
-              PyQt6 PyMuPDF pdf2docx pdfplumber openpyxl python-pptx Pillow pyparsing
+              PyMuPDF pdf2docx pdfplumber openpyxl python-pptx Pillow pyparsing
+          test -f packaging/flatpak/generated-sources.json || \
+            (echo "::error::generated-sources.json introuvable après flatpak-pip-generator" && ls -la packaging/flatpak/ && exit 1)
 
       # Le manifest commité pointe sur un tag Git figé (source reproductible exigée par
       # Flathub). Pour que CETTE build de CI valide bien le code du push/PR courant (et
@@ -60,7 +64,7 @@ jobs:
           python3 -m pip install --quiet --user pyyaml
           python3 - <<'PY'
           import yaml
-          path = "packaging/flatpak/io.github.Bit-Scripts.PDFEquilibrist.yml"
+          path = "packaging/flatpak/io.github.BitScripts.PDFEquilibrist.yml"
           with open(path) as f:
               manifest = yaml.safe_load(f)
           for module in manifest["modules"]:
@@ -74,5 +78,5 @@ jobs:
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: pdf-equilibrist.flatpak
-          manifest-path: packaging/flatpak/io.github.Bit-Scripts.PDFEquilibrist.yml
+          manifest-path: packaging/flatpak/io.github.BitScripts.PDFEquilibrist.yml
           cache-key: flatpak-builder-${{ github.sha }}
