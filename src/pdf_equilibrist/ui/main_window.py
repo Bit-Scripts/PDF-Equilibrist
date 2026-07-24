@@ -47,6 +47,7 @@ Le viewer et le panneau miniatures accèdent aux assets via ``resource_path()``
 de ``utils.py`` pour la compatibilité dev/exe PyInstaller.
 """
 from __future__ import annotations
+import sys
 from pathlib import Path
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
@@ -269,7 +270,8 @@ class MainWindow(QWidget):
     def showEvent(self, event):
         super().showEvent(event)
         self.setAcceptDrops(True)
-        self._apply_win32_styles()
+        if sys.platform == "win32":
+            self._apply_win32_styles()
 
     def _apply_win32_styles(self):
         """
@@ -279,6 +281,8 @@ class MainWindow(QWidget):
         - **PowerToys FancyZones** : détecte la fenêtre comme redimensionnable
         - **Windows Snap** (Win+flèche, glisser bord écran) : activé par WS_THICKFRAME
         - **Snap Layout** (hover bouton max) : activé par WS_MAXIMIZEBOX
+        - Windows uniquement (appelant garde ``sys.platform == "win32"``) —
+          ``ctypes.windll`` n'existe pas sous Linux/macOS.
         - Toujours silencieux : une exception n'interrompt pas le démarrage.
         """
         try:
@@ -416,7 +420,14 @@ class MainWindow(QWidget):
         Contrairement à ``_check_for_updates()``, n'ouvre le dialogue que
         si une version plus récente est réellement disponible — sinon
         aucune fenêtre n'apparaît (vérification en arrière-plan uniquement).
+
+        Désactivé sous Flatpak : Flathub gère ses propres mises à jour
+        (``flatpak update``), et les assets de release sont des ``.exe``
+        Windows sans équivalent Linux à proposer au téléchargement.
         """
+        from pdf_equilibrist import update as updater
+        if updater.is_flatpak():
+            return
         self._startup_update_thread = _StartupUpdateCheckThread(self)
         self._startup_update_thread.found.connect(self._on_startup_update_found)
         self._startup_update_thread.start()

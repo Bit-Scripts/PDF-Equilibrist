@@ -1,0 +1,68 @@
+name: Linux Flatpak
+
+# Validation continue du portage Linux/Flatpak (voir packaging/flatpak/README.md).
+# Ne modifie pas et ne dépend pas de ci.yml / release.yml (pipeline Windows inchangé).
+on:
+  push:
+    tags:
+      - 'v*'
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'packaging/flatpak/**'
+      - '.github/workflows/linux-flatpak.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'packaging/flatpak/**'
+      - '.github/workflows/linux-flatpak.yml'
+  workflow_dispatch:
+
+jobs:
+  flatpak:
+    name: Build Flatpak bundle
+    runs-on: ubuntu-latest
+    # L'image doit correspondre à runtime-version du manifest (actuellement '6.9') —
+    # ajuster le tag ci-dessous si la version du runtime KDE change.
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:kde-6.7
+      options: --privileged
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate pip dependency sources (flatpak-pip-generator)
+        run: |
+          pip3 install --user git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=pip
+          export PATH="$HOME/.local/bin:$PATH"
+          flatpak-pip-generator --output packaging/flatpak/generated-sources \
+              PyQt6 PyMuPDF pdf2docx pdfplumber openpyxl python-pptx Pillow pyparsing
+
+      # Le manifest commité pointe sur un tag Git figé (source reproductible exigée par
+      # Flathub). Pour que CETTE build de CI valide bien le code du push/PR courant (et
+      # pas la dernière release taguée), on repointe temporairement le module principal
+      # sur le checkout local — jamais commité, uniquement en mémoire pour ce job.
+      - name: Point manifest at checked-out source (CI validation only)
+        run: |
+          pip3 install --quiet pyyaml
+          python3 - <<'PY'
+          import yaml
+          path = "packaging/flatpak/io.github.Bit-Scripts.PDFEquilibrist.yml"
+          with open(path) as f:
+              manifest = yaml.safe_load(f)
+          for module in manifest["modules"]:
+              if module.get("name") == "pdf-equilibrist":
+                  module["sources"] = [{"type": "dir", "path": "../.."}]
+          with open(path, "w") as f:
+              yaml.safe_dump(manifest, f, sort_keys=False)
+          PY
+
+      - name: Build Flatpak
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: pdf-equilibrist.flatpak
+          manifest-path: packaging/flatpak/io.github.Bit-Scripts.PDFEquilibrist.yml
+          cache-key: flatpak-builder-${{ github.sha }}

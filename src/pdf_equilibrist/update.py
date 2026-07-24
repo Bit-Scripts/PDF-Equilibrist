@@ -16,6 +16,18 @@ USER_AGENT = "PDF-Equilibrist-Updater/0.1"
 GITHUB_API_URL = "https://api.github.com/repos"
 
 
+def is_flatpak() -> bool:
+    """
+    Détecte une exécution sandboxée Flatpak.
+
+    Flathub gère ses propres mises à jour via ``flatpak update`` — un
+    vérificateur applicatif maison est à la fois redondant et inadapté
+    (le runtime est en lecture seule, et les assets de release sont des
+    ``.exe`` Windows sans équivalent Flatpak).
+    """
+    return os.path.exists("/.flatpak-info") or "FLATPAK_ID" in os.environ
+
+
 def _normalize_repo(repo: str) -> tuple[str, str]:
     repo = repo.strip()
     if "/" not in repo:

@@ -87,7 +87,7 @@ class UpdateDialog(QDialog):
         name_lbl.setTextFormat(Qt.TextFormat.RichText)
         name_lbl.setStyleSheet("font-size: 15px; font-weight: bold;")
         about_text.addWidget(name_lbl)
-        desc_lbl = QLabel("Éditeur PDF de bureau — © 2026 PDF Equilibrist — Licence MIT")
+        desc_lbl = QLabel("Éditeur PDF de bureau — © 2026 PDF Equilibrist — Licence GPLv3")
         desc_lbl.setStyleSheet(f"color: {_GRAY}; font-size: 11px;")
         about_text.addWidget(desc_lbl)
         about_row.addLayout(about_text)
