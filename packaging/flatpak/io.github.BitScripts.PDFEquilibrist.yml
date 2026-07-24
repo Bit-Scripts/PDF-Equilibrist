@@ -1,13 +1,13 @@
 app-id: io.github.BitScripts.PDFEquilibrist
 runtime: org.kde.Platform
-runtime-version: '6.9'   # à vérifier/ajuster à la version disponible sur Flathub au moment de la soumission
+runtime-version: '6.10'   # 6.9 est EOL (confirmé par flatpak-builder) — à revérifier à chaque MAJ
 sdk: org.kde.Sdk
 # PyQt6 ne se pip-installe pas dans un sandbox Flatpak : flatpak-pip-generator refuse
 # explicitement de générer des sources pour PyQt (wheel qui embarque son propre Qt6,
 # en conflit avec celui du runtime). Le BaseApp officiel fournit PyQt6 déjà compilé
 # contre le Qt6 du runtime — base-version doit rester alignée sur runtime-version.
 base: com.riverbankcomputing.PyQt.BaseApp
-base-version: '6.9'   # idem : à aligner sur la branche BaseApp réellement publiée
+base-version: '6.10'   # idem : à aligner sur la branche BaseApp réellement publiée
 command: pdf-equilibrist
 
 # Pas de --share=network : le vérificateur de mise à jour maison est désactivé
@@ -45,7 +45,10 @@ modules:
   - name: pdf-equilibrist
     buildsystem: simple
     build-commands:
-      - pip3 install --no-index --no-build-isolation --prefix=${FLATPAK_DEST} .
+      # --no-deps : PyQt6 vient du BaseApp (pas une distribution pip visible, --no-index
+      # ne peut pas la résoudre) et le reste des dépendances est déjà installé par le
+      # module pdf-equilibrist-pip-deps ci-dessus — pip ne doit pas re-résoudre l'arbre.
+      - pip3 install --no-index --no-build-isolation --no-deps --prefix=${FLATPAK_DEST} .
       - install -Dm644 packaging/flatpak/io.github.BitScripts.PDFEquilibrist.desktop
           ${FLATPAK_DEST}/share/applications/io.github.BitScripts.PDFEquilibrist.desktop
       - install -Dm644 packaging/flatpak/io.github.BitScripts.PDFEquilibrist.metainfo.xml

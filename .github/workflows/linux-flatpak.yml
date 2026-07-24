@@ -25,8 +25,9 @@ jobs:
   flatpak:
     name: Build Flatpak bundle
     runs-on: ubuntu-latest
-    # L'image doit correspondre à runtime-version du manifest (actuellement '6.9') —
-    # ajuster le tag ci-dessous si la version du runtime KDE change.
+    # Le tag de cette image n'a pas besoin de correspondre exactement à runtime-version
+    # du manifest (actuellement '6.10') — flatpak-builder télécharge dynamiquement le
+    # runtime/SDK/BaseApp déclarés dans le manifest depuis Flathub à chaque run.
     container:
       image: bilelmoussaoui/flatpak-github-actions:kde-6.7
       options: --privileged
