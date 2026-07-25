@@ -71,4 +71,11 @@ package() {
   install -Dm644 "$srcdir/io.github.BitScripts.PDFEquilibrist-256.png" \
     "$pkgdir/usr/share/icons/hicolor/256x256/apps/io.github.BitScripts.PDFEquilibrist.png"
   install -Dm644 LICENSE.md "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+
+  # resource_path() (src/pdf_equilibrist/utils.py) cherche les assets sous
+  # $PREFIX/share/pdf-equilibrist/assets/ pour tout paquet système Linux — sans ça
+  # le splash screen et les icônes internes se dégradent silencieusement (fenêtre
+  # vide au lancement, cf. bug trouvé lors du premier test makepkg -si).
+  mkdir -p "$pkgdir/usr/share/pdf-equilibrist"
+  cp -r assets "$pkgdir/usr/share/pdf-equilibrist/assets"
 }
