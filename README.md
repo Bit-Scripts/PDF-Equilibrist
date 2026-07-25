@@ -4,6 +4,11 @@
 [![Release](https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE.md)
+[![Bandit](https://img.shields.io/badge/Bandit-Passed-brightgreen.svg)](.)
+[![Dependencies](https://img.shields.io/badge/Dependencies-Clean-brightgreen.svg)](.)
+[![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen.svg)](.)
+
+![PDF-Equilibrist](assets/images/PDF-Equilibrist.png)
 
 PDF-Equilibrist est un éditeur PDF de bureau construit en Python avec PyQt6 et PyMuPDF.
 Il permet de modifier, convertir, annoter, protéger et exporter des documents PDF.
