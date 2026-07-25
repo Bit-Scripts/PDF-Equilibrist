@@ -50,7 +50,7 @@
   <content_rating type="oars-1.1" />
 
   <releases>
-    <release version="0.1.0" date="2026-07-24">
+    <release version="0.1.10" date="2026-07-25">
       <description>
         <p>Première version publiée sur Flathub.</p>
       </description>

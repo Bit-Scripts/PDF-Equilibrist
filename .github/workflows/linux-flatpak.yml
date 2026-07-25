@@ -56,6 +56,14 @@ jobs:
           test -f packaging/flatpak/generated-sources.json || \
             (echo "::error::generated-sources.json introuvable après flatpak-pip-generator" && ls -la packaging/flatpak/ && exit 1)
 
+      # Publié en artifact pour pouvoir committer generated-sources.json à jour
+      # (nécessaire pour la soumission Flathub — non versionné, voir packaging/flatpak/README.md).
+      - name: Upload generated-sources.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-sources
+          path: packaging/flatpak/generated-sources.json
+
       # Le manifest commité pointe sur un tag Git figé (source reproductible exigée par
       # Flathub). Pour que CETTE build de CI valide bien le code du push/PR courant (et
       # pas la dernière release taguée), on repointe temporairement le module principal

@@ -64,4 +64,4 @@ modules:
       # jamais en revue Flathub.
       - type: git
         url: https://github.com/Bit-Scripts/PDF-Equilibrist.git
-        tag: v0.1.0   # à faire correspondre au tag de la release à empaqueter
+        tag: v0.1.10   # à faire correspondre au tag de la release à empaqueter
