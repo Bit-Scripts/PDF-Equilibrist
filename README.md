@@ -65,6 +65,12 @@ depuis l'interface :
 📦 Pour installer la version exécutable Windows (`.exe`) sans installer Python :
 téléchargez le dernier installeur dans les [Releases](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest).
 
+🐧 Sur Arch Linux et dérivées, disponible sur l'AUR :
+
+```bash
+yay -S pdf-equilibrist
+```
+
 ### Installation depuis les sources (développeurs)
 
 1. Créez un environnement Python compatible (`>=3.12`).
