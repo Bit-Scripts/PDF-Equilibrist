@@ -102,6 +102,12 @@ jobs:
         with:
           tag_name: v${{ steps.version.outputs.VERSION }}
           name: Release v${{ steps.version.outputs.VERSION }}
+          body: |
+            ## Installation
+
+            - **Windows** : téléchargez `PDF-Equilibrist-Setup.exe` ci-dessous.
+            - **Arch Linux et dérivées** : `yay -S pdf-equilibrist` ([AUR](https://aur.archlinux.org/packages/pdf-equilibrist))
+          append_body: true
           generate_release_notes: true
           draft: false
           prerelease: false
