@@ -28,6 +28,13 @@ python -m pip install -r requirements.txt
 python src/pdf_equilibrist/main.py
 ```
 
+## Analyse de sécurité intégrée
+
+PDF-Equilibrist embarque un outil d'analyse (scan SAST du code source via Bandit et
+vérification des dépendances via OSV) accessible directement depuis l'application.
+
+![Outil d'analyse de sécurité](assets/images/Outil-Analyse-Security.png)
+
 ## Construction et packaging
 
 - Le script NSIS d’installation se trouve dans `installer/PDF-Equilibrist.nsi`.
