@@ -8,10 +8,33 @@
 [![Dependencies](https://img.shields.io/badge/Dependencies-Clean-brightgreen.svg)](.)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen.svg)](.)
 
+**PDF-Equilibrist** est un éditeur PDF de bureau, gratuit et open-source, construit en Python
+avec **PyQt6** et **PyMuPDF**. Il fonctionne entièrement en local — pas de cloud, pas de
+télémétrie, pas de compte requis — et permet de lire, modifier, convertir, annoter et
+protéger vos documents PDF.
+
 ![PDF-Equilibrist](assets/images/PDF-Equilibrist.png)
 
-PDF-Equilibrist est un éditeur PDF de bureau construit en Python avec PyQt6 et PyMuPDF.
-Il permet de modifier, convertir, annoter, protéger et exporter des documents PDF.
+## Fonctionnalités
+
+- **Affichage** : zoom, rotation, navigation multi-onglets et multi-pages.
+- **Édition & annotation** : modification de texte, surlignage, barré, soulignement, zones de texte, filigrane, signatures et tampons.
+- **Pages** : insertion, division, fusion, inversion, rognage.
+- **Conversion** : Word, Excel, PowerPoint, images, Office → PDF, image → PDF, OCR local, traitement par lot.
+- **Protection** : chiffrement et déchiffrement AES-256.
+
+## Sécurité & confidentialité
+
+Contrairement aux outils PDF en ligne qui envoient vos fichiers sur des serveurs tiers,
+PDF-Equilibrist exécute tous ses traitements à 100 % en local.
+
+L'application embarque aussi son propre outil d'audit de sécurité, accessible en un clic
+depuis l'interface :
+
+- **Analyse SAST du code source** via [Bandit](https://github.com/PyCQA/bandit).
+- **Vérification des dépendances** contre les vulnérabilités connues via l'API [OSV](https://osv.dev/).
+
+![Outil d'analyse de sécurité](assets/images/Outil-Analyse-Security.png)
 
 ## Installation
 
@@ -27,13 +50,6 @@ python -m pip install -r requirements.txt
 ```powershell
 python src/pdf_equilibrist/main.py
 ```
-
-## Analyse de sécurité intégrée
-
-PDF-Equilibrist embarque un outil d'analyse (scan SAST du code source via Bandit et
-vérification des dépendances via OSV) accessible directement depuis l'application.
-
-![Outil d'analyse de sécurité](assets/images/Outil-Analyse-Security.png)
 
 ## Construction et packaging
 
