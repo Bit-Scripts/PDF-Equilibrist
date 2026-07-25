@@ -55,6 +55,7 @@ jobs:
       # archive locale du checkout — même idée que le "point manifest at checked-out
       # source" de l'ancien workflow Flatpak. updpkgsums recalcule le sha256 tout seul.
       - name: Point PKGBUILD at checked-out source (CI validation only)
+        shell: bash
         run: |
           cd packaging/aur
           source PKGBUILD
