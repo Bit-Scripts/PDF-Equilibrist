@@ -31,13 +31,19 @@ jobs:
       image: archlinux:base-devel
       options: --privileged
     steps:
+      # git doit être présent AVANT le checkout : l'image archlinux:base-devel ne
+      # l'inclut pas par défaut, et sans lui actions/checkout retombe silencieusement
+      # sur un téléchargement via l'API REST (pas de vrai `git clone`, pas de .git créé).
+      - name: Install git (required before checkout)
+        run: pacman -Sy --noconfirm git
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Update system and install build tooling
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm --needed sudo git pacman-contrib \
+          pacman -S --noconfirm --needed sudo pacman-contrib \
             python-build python-installer python-wheel python-setuptools
 
       # makepkg refuse de tourner en root — un utilisateur non-privilégié est requis,

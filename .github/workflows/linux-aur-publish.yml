@@ -31,16 +31,23 @@ jobs:
       image: archlinux:base-devel
       options: --privileged
     steps:
+      # git doit être présent AVANT le checkout : l'image archlinux:base-devel ne
+      # l'inclut pas par défaut, et sans lui actions/checkout retombe silencieusement
+      # sur un téléchargement via l'API REST (pas de vrai `git clone`) — aucun .git
+      # n'est alors créé, ce qui casse tout commit/push plus loin dans ce job.
+      - name: Install git (required before checkout)
+        run: pacman -Sy --noconfirm git
+
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
 
-      - name: Install tooling
+      - name: Install remaining tooling
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm --needed git openssh pacman-contrib \
+          pacman -S --noconfirm --needed openssh pacman-contrib \
             python-build python-installer python-wheel python-setuptools
 
       - name: Determine version from tag
@@ -76,9 +83,6 @@ jobs:
 
       - name: Commit bumped PKGBUILD to main
         run: |
-          echo "PWD=$(pwd)"
-          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-          ls -la "$GITHUB_WORKSPACE/.git" || echo "NO .git AT GITHUB_WORKSPACE"
           # $GITHUB_WORKSPACE appartient maintenant à "builder" (chown de l'étape
           # précédente) alors que ce step tourne en root — Git refuse par défaut
           # d'opérer sur un dépôt dont il n'est pas propriétaire ("dubious ownership").
