@@ -1,0 +1,114 @@
+name: Linux AUR Publish
+
+# Publie automatiquement la mise à jour du paquet AUR pdf-equilibrist à chaque
+# nouvelle release. Contrairement à "Linux AUR" (validation seule, PR/push sur
+# packaging/aur/**), ce workflow ne se déclenche que sur un vrai tag de release
+# et pousse réellement vers aur.archlinux.org — pas de comité de revue côté AUR,
+# donc rien ne bloque un push direct une fois le build validé.
+#
+# Prérequis (faits manuellement, voir mémoire projet) :
+#   - Secret de dépôt AUR_SSH_PRIVATE_KEY : clé dédiée CI (sans passphrase),
+#     dont la clé publique est ajoutée sur le compte AUR en plus de la clé
+#     personnelle de l'auteur (aur.archlinux.org/account).
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Bump PKGBUILD and push to AUR
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+      options: --privileged
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Install tooling
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm --needed git openssh pacman-contrib \
+            python-build python-installer python-wheel python-setuptools
+
+      - name: Determine version from tag
+        id: version
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
+      - name: Bump pkgver and sha256sums in PKGBUILD
+        run: |
+          v="${{ steps.version.outputs.version }}"
+          url="https://github.com/Bit-Scripts/PDF-Equilibrist/archive/refs/tags/v${v}.tar.gz"
+          sha=$(curl -sL "$url" | sha256sum | cut -d' ' -f1)
+          sed -i "s/^pkgver=.*/pkgver=${v}/" packaging/aur/PKGBUILD
+          sed -i "s/^pkgrel=.*/pkgrel=1/" packaging/aur/PKGBUILD
+          sed -i "0,/^  '[0-9a-f]\{64\}'/s//  '${sha}'/" packaging/aur/PKGBUILD
+
+      - name: Create non-root builder user
+        run: |
+          useradd -m builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+
+      - name: Regenerate .SRCINFO
+        run: su builder -c "cd packaging/aur && makepkg --printsrcinfo > .SRCINFO"
+
+      # Sanity check avant de publier quoi que ce soit : le PKGBUILD doit réellement
+      # builder contre la vraie release taguée (pas de substitution locale ici,
+      # contrairement à linux-aur.yml qui valide le code non encore taggé).
+      - name: Validate build against the real release tarball
+        run: su builder -c "cd packaging/aur && makepkg --nodeps -f"
+
+      - name: Commit bumped PKGBUILD to main
+        run: |
+          # $GITHUB_WORKSPACE appartient maintenant à "builder" (chown de l'étape
+          # précédente) alors que ce step tourne en root — Git refuse par défaut
+          # d'opérer sur un dépôt dont il n'est pas propriétaire ("dubious ownership").
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add packaging/aur/PKGBUILD packaging/aur/.SRCINFO
+          git diff --cached --quiet && echo "no changes" || \
+            git commit -m "chore(aur): bump PKGBUILD to ${{ steps.version.outputs.version }}"
+          git push origin HEAD:main
+
+      # webfactory/ssh-agent charge la clé en mémoire via ssh-agent, sans jamais
+      # l'écrire sur disque ni l'interpoler dans une commande shell — évite le piège
+      # classique du masquage de secrets GitHub Actions qui gère mal le multi-ligne
+      # (une clé SSH échouerait à être totalement masquée avec un `echo "${{ secrets.X }}" > file`).
+      - name: Load AUR deploy key into ssh-agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+
+      - name: Push update to AUR
+        env:
+          GIT_SSH_COMMAND: ssh -o StrictHostKeyChecking=accept-new
+        run: |
+          git clone ssh://aur@aur.archlinux.org/pdf-equilibrist.git /tmp/aur-repo
+          cp packaging/aur/PKGBUILD packaging/aur/.SRCINFO \
+             packaging/aur/io.github.BitScripts.PDFEquilibrist.desktop \
+             packaging/aur/io.github.BitScripts.PDFEquilibrist.metainfo.xml \
+             packaging/aur/io.github.BitScripts.PDFEquilibrist-128.png \
+             packaging/aur/io.github.BitScripts.PDFEquilibrist-256.png \
+             /tmp/aur-repo/
+
+          cd /tmp/aur-repo
+          git config user.name "PDF-Equilibrist CI"
+          git config user.email "paulwoisard@gmail.com"
+          git add PKGBUILD .SRCINFO io.github.BitScripts.PDFEquilibrist.desktop \
+            io.github.BitScripts.PDFEquilibrist.metainfo.xml \
+            io.github.BitScripts.PDFEquilibrist-128.png \
+            io.github.BitScripts.PDFEquilibrist-256.png
+          git diff --cached --quiet && echo "no changes to publish" && exit 0
+          git commit -m "Update to ${{ steps.version.outputs.version }}"
+          git push
