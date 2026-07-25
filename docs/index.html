@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentation — PDF-Equilibrist</title>
+<link rel="icon" href="../assets/logo/PDF-Equilibrist-logo.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <div class="brand">
+    <img src="../assets/logo/PDF-Equilibrist-logo.png" alt="">
+    PDF-Equilibrist
+  </div>
+  <nav>
+    <a href="../index.html">Accueil</a>
+    <a href="../index.html#fonctionnalites">Fonctionnalités</a>
+    <a href="./" class="active">Documentation</a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a>
+  </nav>
+</div>
+
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <h4>Documentation</h4>
+    <div id="doc-links"></div>
+  </aside>
+  <main class="docs-content" id="doc-content">
+    <p class="docs-loading">Chargement…</p>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+const DOCS = [
+  { file: "1.INDEX.md",        title: "1. Index" },
+  { file: "2.ARCHITECTURE.md", title: "2. Architecture" },
+  { file: "3.CONTRIBUTING.md", title: "3. Contributing" },
+  { file: "4.OPERATIONS.md",   title: "4. Operations" },
+  { file: "5.BUILD.md",        title: "5. Build" },
+  { file: "6.SECURITE.md",     title: "6. Sécurité" },
+];
+
+const linksEl = document.getElementById("doc-links");
+const contentEl = document.getElementById("doc-content");
+
+DOCS.forEach(doc => {
+  const a = document.createElement("a");
+  a.href = "#" + doc.file;
+  a.textContent = doc.title;
+  a.dataset.file = doc.file;
+  linksEl.appendChild(a);
+});
+
+function currentFile() {
+  const hash = decodeURIComponent(location.hash.replace(/^#/, ""));
+  const known = DOCS.find(d => d.file === hash);
+  return known ? known.file : DOCS[0].file;
+}
+
+async function loadDoc(file) {
+  contentEl.innerHTML = '<p class="docs-loading">Chargement…</p>';
+  try {
+    const res = await fetch(file);
+    if (!res.ok) throw new Error(res.status);
+    const md = await res.text();
+    contentEl.innerHTML = marked.parse(md);
+  } catch (err) {
+    contentEl.innerHTML = '<p class="docs-loading">Impossible de charger ' + file + ' (' + err + ')</p>';
+  }
+  [...linksEl.children].forEach(a => a.classList.toggle("active", a.dataset.file === file));
+  document.title = "Documentation — PDF-Equilibrist";
+}
+
+// Rewrite in-content links to .md files so they route through the viewer instead of raw-loading the file.
+contentEl.addEventListener("click", (e) => {
+  const a = e.target.closest("a");
+  if (!a) return;
+  const href = a.getAttribute("href") || "";
+  const match = href.match(/^(?:\.\/)?([\w.]+\.md)(#.*)?$/);
+  if (match && DOCS.some(d => d.file === match[1])) {
+    e.preventDefault();
+    location.hash = match[1];
+  }
+});
+
+window.addEventListener("hashchange", () => loadDoc(currentFile()));
+loadDoc(currentFile());
+</script>
+
+</body>
+</html>

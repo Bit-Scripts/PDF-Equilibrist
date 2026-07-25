@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF-Equilibrist — Éditeur PDF open-source, 100% local</title>
+<meta name="description" content="Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Aucun cloud, aucune télémétrie.">
+<link rel="icon" href="assets/logo/PDF-Equilibrist-logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <div class="brand">
+    <img src="assets/logo/PDF-Equilibrist-logo.png" alt="">
+    PDF-Equilibrist
+  </div>
+  <nav>
+    <a href="#fonctionnalites">Fonctionnalités</a>
+    <a href="#securite">Sécurité</a>
+    <a href="docs/">Documentation</a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a>
+  </nav>
+</div>
+
+<div class="hero">
+  <img class="logo" src="assets/logo/PDF-Equilibrist-logo.png" alt="Logo PDF-Equilibrist">
+  <h1>PDF-Equilibrist</h1>
+  <p class="tagline">
+    Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF.
+    Il fonctionne entièrement en local — pas de cloud, pas de télémétrie, pas de compte requis.
+  </p>
+
+  <div class="badges">
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml"><img src="https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"><img src="https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600" alt="Release"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?cacheSeconds=3600" alt="Downloads"></a>
+    <img src="https://img.shields.io/badge/license-GPLv3-blue.svg" alt="License">
+    <img src="https://img.shields.io/badge/Bandit-Passed-brightgreen.svg" alt="Bandit">
+    <img src="https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen.svg" alt="Privacy">
+  </div>
+
+  <div class="cta-row">
+    <a class="btn btn-primary" href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Télécharger (Windows)</a>
+    <a class="btn btn-secondary" href="docs/">Documentation</a>
+  </div>
+
+  <div class="hero-shot">
+    <img src="assets/images/PDF-Equilibrist.png" alt="Capture d'écran de PDF-Equilibrist">
+  </div>
+</div>
+
+<section id="fonctionnalites">
+  <div class="container">
+    <h2>Fonctionnalités</h2>
+    <p class="lead">Tout ce qu'il faut pour lire, modifier, convertir, annoter et protéger vos documents PDF.</p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <img src="assets/images/feature-afficher.png" alt="Affichage">
+        <div class="body">
+          <h3>Affichage</h3>
+          <p>Zoom, rotation, navigation multi-onglets et multi-pages.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-modifier.png" alt="Édition">
+        <div class="body">
+          <h3>Édition</h3>
+          <p>Modification de texte, filigrane, signatures et tampons.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-annoter.png" alt="Annotation">
+        <div class="body">
+          <h3>Annotation</h3>
+          <p>Surlignage, barré, soulignement, zones de texte.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-page.png" alt="Pages">
+        <div class="body">
+          <h3>Pages</h3>
+          <p>Insertion, division, fusion, inversion.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-convertir.png" alt="Conversion">
+        <div class="body">
+          <h3>Conversion</h3>
+          <p>Word, Excel, PowerPoint, images, Office → PDF, image → PDF, OCR local, traitement par lot.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-proteger.png" alt="Protection">
+        <div class="body">
+          <h3>Protection</h3>
+          <p>Chiffrement et déchiffrement AES-256.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="securite">
+  <div class="container">
+    <h2>Sécurité &amp; confidentialité</h2>
+    <p class="lead">
+      Contrairement aux outils PDF en ligne qui envoient vos fichiers sur des serveurs tiers,
+      PDF-Equilibrist exécute tous ses traitements à 100&nbsp;% en local.
+    </p>
+    <div class="security-box">
+      <ul>
+        <li><strong>Analyse SAST du code source</strong> via <a href="https://github.com/PyCQA/bandit">Bandit</a>.</li>
+        <li><strong>Vérification des dépendances</strong> contre les vulnérabilités connues via l'API <a href="https://osv.dev/">OSV</a>.</li>
+        <li>L'outil d'audit est intégré à l'application, accessible en un clic.</li>
+      </ul>
+      <img src="assets/images/Outil-Analyse-Security.png" alt="Outil d'analyse de sécurité">
+    </div>
+  </div>
+</section>
+
+<section id="installation">
+  <div class="container">
+    <h2>Installation</h2>
+    <p class="lead">
+      📦 Pour installer la version exécutable Windows (.exe) sans installer Python,
+      téléchargez le dernier installeur dans les
+      <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Releases</a>.
+    </p>
+    <h3 style="font-size:1.1rem;color:var(--text)">Installation depuis les sources (développeurs)</h3>
+    <p style="color:var(--text-dim)">1. Créez un environnement Python compatible (&gt;=3.12).<br>2. Installez les dépendances :</p>
+    <pre><code>python -m pip install -r requirements.txt</code></pre>
+    <p style="color:var(--text-dim)">3. Exécutez l'application :</p>
+    <pre><code>python src/pdf_equilibrist/main.py</code></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    Licence GNU GPL v3.0 (ou ultérieure) —
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/blob/main/LICENSE.md">LICENSE.md</a>
+    · Un projet <a href="https://bit-scripts.github.io/">Bit-Scripts</a>
+  </div>
+</footer>
+
+</body>
+</html>
