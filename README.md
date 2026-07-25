@@ -17,11 +17,35 @@ protéger vos documents PDF.
 
 ## Fonctionnalités
 
-- **Affichage** : zoom, rotation, navigation multi-onglets et multi-pages.
-- **Édition & annotation** : modification de texte, surlignage, barré, soulignement, zones de texte, filigrane, signatures et tampons.
-- **Pages** : insertion, division, fusion, inversion, rognage.
-- **Conversion** : Word, Excel, PowerPoint, images, Office → PDF, image → PDF, OCR local, traitement par lot.
-- **Protection** : chiffrement et déchiffrement AES-256.
+### Affichage
+Zoom, rotation, navigation multi-onglets et multi-pages.
+
+![Affichage](assets/images/feature-afficher.png)
+
+### Édition
+Modification de texte, filigrane, signatures et tampons.
+
+![Édition](assets/images/feature-modifier.png)
+
+### Annotation
+Surlignage, barré, soulignement, zones de texte.
+
+![Annotation](assets/images/feature-annoter.png)
+
+### Pages
+Insertion, division, fusion, inversion.
+
+![Pages](assets/images/feature-page.png)
+
+### Conversion
+Word, Excel, PowerPoint, images, Office → PDF, image → PDF, OCR local, traitement par lot.
+
+![Conversion](assets/images/feature-convertir.png)
+
+### Protection
+Chiffrement et déchiffrement AES-256.
+
+![Protection](assets/images/feature-proteger.png)
 
 ## Sécurité & confidentialité
 
