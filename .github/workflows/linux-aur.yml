@@ -1,0 +1,83 @@
+name: Linux AUR
+
+# Validation continue du packaging AUR (voir packaging/aur/README.md).
+# Remplace l'ancien "Linux Flatpak" — Flathub a été abandonné (politique anti-IA +
+# "Insufficient development history", voir flathub/flathub#9506 et #9507).
+# Ne modifie pas et ne dépend pas de ci.yml / release.yml (pipeline Windows inchangé).
+on:
+  push:
+    tags:
+      - 'v*'
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'packaging/aur/**'
+      - '.github/workflows/linux-aur.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'packaging/aur/**'
+      - '.github/workflows/linux-aur.yml'
+  workflow_dispatch:
+
+jobs:
+  aur:
+    name: Build PKGBUILD (makepkg)
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+      options: --privileged
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update system and install build tooling
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm --needed sudo git pacman-contrib \
+            python-build python-installer python-wheel python-setuptools
+
+      # makepkg refuse de tourner en root — un utilisateur non-privilégié est requis,
+      # même en CI (cf. mémoire projet : première tentative locale bloquée pareil).
+      - name: Create non-root builder user
+        run: |
+          useradd -m builder
+          echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
+          chmod 440 /etc/sudoers.d/builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+
+      # Le PKGBUILD commité pointe sur un tag Git figé (source reproductible exigée
+      # par l'AUR). Pour que CETTE build de CI valide bien le code du push/PR courant
+      # (et pas la dernière release taguée), on remplace la source distante par une
+      # archive locale du checkout — même idée que le "point manifest at checked-out
+      # source" de l'ancien workflow Flatpak. updpkgsums recalcule le sha256 tout seul.
+      - name: Point PKGBUILD at checked-out source (CI validation only)
+        run: |
+          cd packaging/aur
+          source PKGBUILD
+          mkdir -p "/tmp/src/PDF-Equilibrist-$pkgver"
+          cp -r "$GITHUB_WORKSPACE"/. "/tmp/src/PDF-Equilibrist-$pkgver/"
+          rm -rf "/tmp/src/PDF-Equilibrist-$pkgver/.git"
+          tar -czf "$pkgname-$pkgver.tar.gz" -C /tmp/src "PDF-Equilibrist-$pkgver"
+          sed -i "s#\"\$pkgname-\$pkgver.tar.gz::.*\"#\"\$pkgname-\$pkgver.tar.gz\"#" PKGBUILD
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+
+      - name: Regenerate checksums for the local source (updpkgsums)
+        run: su builder -c "cd packaging/aur && updpkgsums"
+
+      # --nodeps : les 3 dépendances AUR (python-pdf2docx/pdfplumber/pptx) ne sont
+      # volontairement pas construites ici (fragilité de dépôts tiers non liée à notre
+      # propre code) — ce job valide les mécanismes du PKGBUILD (sources, prepare,
+      # build, package), pas une exécution complète de l'app. Voir packaging/aur/README.md
+      # pour le test complet via yay, à faire manuellement avant chaque publication AUR.
+      - name: Build with makepkg (--nodeps, mechanics-only)
+        run: su builder -c "cd packaging/aur && makepkg --nodeps -f"
+
+      - name: Upload built package
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-equilibrist-pkg
+          path: packaging/aur/*.pkg.tar.zst
