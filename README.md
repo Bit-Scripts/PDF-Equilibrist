@@ -62,6 +62,11 @@ depuis l'interface :
 
 ## Installation
 
+📦 Pour installer la version exécutable Windows (`.exe`) sans installer Python :
+téléchargez le dernier installeur dans les [Releases](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest).
+
+### Installation depuis les sources (développeurs)
+
 1. Créez un environnement Python compatible (`>=3.12`).
 2. Installez les dépendances :
 
