@@ -76,9 +76,13 @@ jobs:
 
       - name: Commit bumped PKGBUILD to main
         run: |
+          echo "PWD=$(pwd)"
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          ls -la "$GITHUB_WORKSPACE/.git" || echo "NO .git AT GITHUB_WORKSPACE"
           # $GITHUB_WORKSPACE appartient maintenant à "builder" (chown de l'étape
           # précédente) alors que ce step tourne en root — Git refuse par défaut
           # d'opérer sur un dépôt dont il n'est pas propriétaire ("dubious ownership").
+          cd "$GITHUB_WORKSPACE"
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
