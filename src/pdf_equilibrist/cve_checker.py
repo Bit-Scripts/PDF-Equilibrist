@@ -39,8 +39,21 @@ def get_installed_packages() -> dict[str, str]:
     """
     packages: dict[str, str] = {}
 
-    own_site_packages = [sysconfig.get_paths()["purelib"]]
-    for dist in importlib.metadata.distributions(path=own_site_packages):
+    if getattr(sys, "frozen", False) or hasattr(sys, "_MEIPASS"):
+        # Exe PyInstaller : le .spec embarque explicitement les métadonnées
+        # (dist-info) de TOUS les paquets de l'environnement de build via
+        # copy_metadata() — il n'y a pas de venv --system-site-packages ici,
+        # donc pas de pollution à filtrer. Restreindre à sysconfig purelib()
+        # ne trouverait rien (les dist-info finissent à côté de l'exe, pas
+        # sous un dossier Lib/site-packages) — c'est ce qui causait le scan
+        # à ne remonter que PyQt6 (seul _SYSTEM_ONLY_DEPENDENCIES, cherché
+        # sans restriction de chemin).
+        distributions = importlib.metadata.distributions()
+    else:
+        own_site_packages = [sysconfig.get_paths()["purelib"]]
+        distributions = importlib.metadata.distributions(path=own_site_packages)
+
+    for dist in distributions:
         name = dist.metadata.get("Name", "")
         version = dist.metadata.get("Version", "")
         if name and version:
