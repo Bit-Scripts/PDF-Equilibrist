@@ -1,5 +1,5 @@
 Name:           pdf-equilibrist
-Version:        0.1.13
+Version:        0.1.14
 Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
@@ -140,6 +140,13 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Sun Jul 26 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.14-1
+- Fix CVE checker on frozen builds: the purelib-scoped dependency scan
+  (added to avoid --system-site-packages noise on Linux venv packages,
+  including this one) broke Windows' PyInstaller exe. Frozen builds now
+  fall back to the unrestricted scan; this COPR package was never
+  affected since it never takes the frozen code path.
+
 * Sun Jul 26 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.13-1
 - Explicitly declare the .desktop file id via QApplication.setDesktopFileName()
   (detected at runtime, same "pdf-equilibrist" id as the PPA package) —

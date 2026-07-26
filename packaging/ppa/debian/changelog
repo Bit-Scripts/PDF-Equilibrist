@@ -1,3 +1,14 @@
+pdf-equilibrist (0.1.14-1) noble; urgency=medium
+
+  * Fix CVE checker on frozen builds: the purelib-scoped dependency scan
+    (added to avoid --system-site-packages noise on Linux venv packages)
+    broke Windows' PyInstaller exe, which bundles dist-info metadata next
+    to the executable rather than under a Lib/site-packages tree. Frozen
+    builds now fall back to the unrestricted scan; this Linux package was
+    never affected (it never took the frozen code path).
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 26 Jul 2026 22:30:00 +0000
+
 pdf-equilibrist (0.1.13-3) noble; urgency=medium
 
   * Add debian/source/include-binaries for the two app-icon PNGs — the
