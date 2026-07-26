@@ -32,9 +32,7 @@ def is_flatpak() -> bool:
 _LINUX_UPDATE_COMMANDS = {
     "arch": "yay -Syu",
     "ubuntu": "sudo apt update && sudo apt install --only-upgrade pdf-equilibrist",
-    # Fedora (COPR) sera ajouté une fois ce canal publié — voir mémoire
-    # projet, même règle que pour le site web et le README : jamais une
-    # commande pour un canal qui n'existe pas encore.
+    "fedora": "sudo dnf update pdf-equilibrist",
 }
 
 
@@ -64,6 +62,8 @@ def linux_update_command() -> str | None:
         return _LINUX_UPDATE_COMMANDS["arch"]
     if "ubuntu" in ids:
         return _LINUX_UPDATE_COMMANDS["ubuntu"]
+    if "fedora" in ids:
+        return _LINUX_UPDATE_COMMANDS["fedora"]
     return None
 
 
