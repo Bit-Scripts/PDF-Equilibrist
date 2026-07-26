@@ -1,3 +1,11 @@
+pdf-equilibrist (0.1.13-3) noble; urgency=medium
+
+  * Add debian/source/include-binaries for the two app-icon PNGs — the
+    "3.0 (quilt)" source format refuses any binary file under debian/
+    unless explicitly whitelisted there.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 26 Jul 2026 15:40:00 +0000
+
 pdf-equilibrist (0.1.13-2) noble; urgency=medium
 
   * Fix debian/rules: clean up debian/venv-build on `dh_auto_clean` — left
