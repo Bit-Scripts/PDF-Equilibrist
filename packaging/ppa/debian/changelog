@@ -1,3 +1,48 @@
+pdf-equilibrist (0.1.13-1) noble; urgency=medium
+
+  * Explicitly declare the .desktop file id via QApplication.setDesktopFileName()
+    (detected at runtime: "pdf-equilibrist" for PPA, "io.github.BitScripts.PDFEquilibrist"
+    for AUR) — under GNOME/Wayland, the dock doesn't reliably match a window
+    to its .desktop entry via WM_CLASS/process name alone, unlike KDE.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 26 Jul 2026 15:20:00 +0000
+
+pdf-equilibrist (0.1.12-4) noble; urgency=medium
+
+  * Install the app icon under /usr/share/icons/hicolor/<size>/apps/
+    instead of the legacy /usr/share/pixmaps/ fallback — the GNOME/Ubuntu
+    dock resolves dock/taskbar icons poorly from pixmaps alone. Same
+    approach already used by the AUR package.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 26 Jul 2026 15:10:00 +0000
+
+pdf-equilibrist (0.1.12-3) noble; urgency=medium
+
+  * Fix debian/rules: install the launcher/.desktop from debian/ (the
+    directory actually used for this build), not packaging/ppa/debian/
+    (a stale copy frozen inside the upstream source tarball) — the -2
+    launcher fix never actually took effect because of this.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 26 Jul 2026 15:00:00 +0000
+
+pdf-equilibrist (0.1.12-2) noble; urgency=medium
+
+  * Fix launcher: exec the venv's own pip-generated entry-point script
+    instead of `python3 -m pdf_equilibrist.main` — the latter made the
+    process (and its WM_CLASS) show up as "python3", breaking the
+    taskbar/dock icon association with the .desktop file.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 26 Jul 2026 14:45:00 +0000
+
+pdf-equilibrist (0.1.12-1) noble; urgency=medium
+
+  * Fix update checker: bundled venv now injects __version__ correctly,
+    and offers the apt upgrade command instead of the Windows installer.
+  * Fix CVE scanner scope: only the app's own dependencies, not every
+    package visible via --system-site-packages.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 26 Jul 2026 14:30:00 +0000
+
 pdf-equilibrist (0.1.11-1) noble; urgency=medium
 
   * Initial release.

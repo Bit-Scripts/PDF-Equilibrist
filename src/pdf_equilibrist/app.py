@@ -29,6 +29,8 @@ et non au niveau du module. Cela permet à ``main.py`` d'afficher le splash
 avant que PyQt6 ne charge tous les modules UI, ce qui accélère le rendu
 de la barre de progression.
 """
+from pathlib import Path
+
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QIcon
 
@@ -217,6 +219,17 @@ def create_app(app: QApplication) -> QApplication:
     from pdf_equilibrist.utils import resource_path
 
     app.setApplicationName("PDF Equilibrist")
+
+    # Sous GNOME/Wayland (Ubuntu), l'association fenêtre → icône du dock ne
+    # passe pas par le WM_CLASS X11 classique (qui suffit sous KDE/Arch) —
+    # il faut déclarer explicitement le fichier .desktop correspondant.
+    # L'AUR (io.github.BitScripts.PDFEquilibrist) et le PPA (pdf-equilibrist)
+    # n'utilisent pas le même nom : on détecte lequel est réellement installé
+    # plutôt que d'en figer un des deux en dur.
+    for _desktop_id in ("pdf-equilibrist", "io.github.BitScripts.PDFEquilibrist"):
+        if Path(f"/usr/share/applications/{_desktop_id}.desktop").exists():
+            app.setDesktopFileName(_desktop_id)
+            break
 
     # Charger l'icône depuis les assets (compatible dev + exe PyInstaller)
     logo = resource_path("assets/logo/PDF-Equilibrist-logo.png")

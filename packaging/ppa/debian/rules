@@ -45,11 +45,21 @@ override_dh_auto_install:
 	# Chemins absolus corrects une fois le paquet installé (pas le chroot de build)
 	sed -i "1s|^#!.*|#!/usr/lib/$(PACKAGE)/venv/bin/python3|" $(VENV)/bin/pdf-equilibrist || true
 
-	install -Dm755 packaging/ppa/debian/pdf-equilibrist.sh $(PKGROOT)/usr/bin/pdf-equilibrist
-	install -Dm644 packaging/ppa/debian/pdf-equilibrist.desktop \
+	# "debian/..." et non "packaging/ppa/debian/..." : ce dernier pointerait vers
+	# la copie figée dans le tarball amont (celle du tag Git), pas vers le
+	# dossier debian/ réellement utilisé pour CE build — un bug qui a fait
+	# qu'une correction du lanceur n'a jamais été prise en compte au premier
+	# essai (voir mémoire projet).
+	install -Dm755 debian/pdf-equilibrist.sh $(PKGROOT)/usr/bin/pdf-equilibrist
+	install -Dm644 debian/pdf-equilibrist.desktop \
 		$(PKGROOT)/usr/share/applications/pdf-equilibrist.desktop
-	install -Dm644 assets/logo/PDF-Equilibrist-logo.png \
-		$(PKGROOT)/usr/share/pixmaps/pdf-equilibrist.png
+	# hicolor plutôt que /usr/share/pixmaps/ (repli historique) : le dock
+	# GNOME/Ubuntu résout mal les icônes en pixmaps seul — même choix que
+	# le paquet AUR, qui utilise déjà cette structure de thème standard.
+	install -Dm644 debian/pdf-equilibrist-128.png \
+		$(PKGROOT)/usr/share/icons/hicolor/128x128/apps/pdf-equilibrist.png
+	install -Dm644 debian/pdf-equilibrist-256.png \
+		$(PKGROOT)/usr/share/icons/hicolor/256x256/apps/pdf-equilibrist.png
 	# resource_path() (src/pdf_equilibrist/utils.py) résout les assets sous
 	# {sys.prefix}/share/pdf-equilibrist/assets/ — au runtime, sys.prefix DANS
 	# le venv privé vaut /usr/lib/pdf-equilibrist/venv, PAS /usr (contrairement
