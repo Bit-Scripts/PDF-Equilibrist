@@ -79,6 +79,13 @@ sudo apt update
 sudo apt install pdf-equilibrist
 ```
 
+🐧 Sur Fedora et dérivées, disponible via COPR :
+
+```bash
+sudo dnf copr enable paullux/PDF-Equilibrist
+sudo dnf install pdf-equilibrist
+```
+
 ### Installation depuis les sources (développeurs)
 
 1. Créez un environnement Python compatible (`>=3.12`).
