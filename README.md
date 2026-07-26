@@ -71,6 +71,14 @@ téléchargez le dernier installeur dans les [Releases](https://github.com/Bit-S
 yay -S pdf-equilibrist
 ```
 
+🐧 Sur Ubuntu et dérivées, disponible via un PPA :
+
+```bash
+sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
+sudo apt update
+sudo apt install pdf-equilibrist
+```
+
 ### Installation depuis les sources (développeurs)
 
 1. Créez un environnement Python compatible (`>=3.12`).
