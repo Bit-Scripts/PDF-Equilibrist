@@ -1,3 +1,12 @@
+pdf-equilibrist (0.1.13-2) noble; urgency=medium
+
+  * Fix debian/rules: clean up debian/venv-build on `dh_auto_clean` — left
+    in place, it made `dpkg-source -b` (needed for the real Launchpad
+    source-only upload) refuse the package ("unwanted binary file") on
+    every leftover .so/.pyc from a prior local build.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 26 Jul 2026 15:35:00 +0000
+
 pdf-equilibrist (0.1.13-1) noble; urgency=medium
 
   * Explicitly declare the .desktop file id via QApplication.setDesktopFileName()

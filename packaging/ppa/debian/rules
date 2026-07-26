@@ -10,6 +10,14 @@ export PYBUILD_NAME=pdf_equilibrist
 %:
 	dh $@
 
+# dh_clean standard ne connaît pas ce dossier custom : sans ce nettoyage,
+# un `dpkg-source -b` ultérieur (upload source pour Launchpad) refuse le
+# paquet ("unwanted binary file", des centaines de .so/.pyc dans le venv
+# de build restés là depuis un précédent `debian/rules build`).
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf debian/venv-build
+
 # Les builders Launchpad n'ont pas d'accès réseau (contrairement à makepkg/AUR) :
 # les dépendances non empaquetées pour Ubuntu (pdf2docx, pdfplumber, python-pptx
 # et leurs propres sous-dépendances) sont installées hors-ligne depuis le

@@ -1,2 +1,8 @@
 packaging/aur/PKGBUILD text eol=lf
 packaging/aur/.SRCINFO text eol=lf
+packaging/ppa/debian/rules text eol=lf
+packaging/ppa/debian/pdf-equilibrist.sh text eol=lf
+packaging/ppa/debian/control text eol=lf
+packaging/ppa/debian/changelog text eol=lf
+packaging/ppa/debian/copyright text eol=lf
+packaging/ppa/debian/source/format text eol=lf
