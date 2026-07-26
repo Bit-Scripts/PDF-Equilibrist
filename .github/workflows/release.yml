@@ -107,6 +107,7 @@ jobs:
 
             - **Windows** : téléchargez `PDF-Equilibrist-Setup.exe` ci-dessous.
             - **Arch Linux et dérivées** : `yay -S pdf-equilibrist` ([AUR](https://aur.archlinux.org/packages/pdf-equilibrist))
+            - **Ubuntu et dérivées** : `sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist && sudo apt update && sudo apt install pdf-equilibrist` ([PPA](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist))
           append_body: true
           generate_release_notes: true
           draft: false
