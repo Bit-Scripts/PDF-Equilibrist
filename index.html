@@ -168,18 +168,23 @@ sudo apt install pdf-equilibrist</code></pre>
 </footer>
 
 <script>
-  const archToggle = document.getElementById('arch-toggle');
-  const archDrawer = document.getElementById('arch-drawer');
-  archToggle.addEventListener('click', () => {
-    const isOpen = archDrawer.classList.toggle('open');
-    archToggle.setAttribute('aria-expanded', String(isOpen));
-  });
+  const drawers = [
+    { toggle: document.getElementById('arch-toggle'), drawer: document.getElementById('arch-drawer') },
+    { toggle: document.getElementById('ubuntu-toggle'), drawer: document.getElementById('ubuntu-drawer') },
+  ];
 
-  const ubuntuToggle = document.getElementById('ubuntu-toggle');
-  const ubuntuDrawer = document.getElementById('ubuntu-drawer');
-  ubuntuToggle.addEventListener('click', () => {
-    const isOpen = ubuntuDrawer.classList.toggle('open');
-    ubuntuToggle.setAttribute('aria-expanded', String(isOpen));
+  drawers.forEach(({ toggle, drawer }) => {
+    toggle.addEventListener('click', () => {
+      const wasOpen = drawer.classList.contains('open');
+      drawers.forEach(({ toggle: t, drawer: d }) => {
+        d.classList.remove('open');
+        t.setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) {
+        drawer.classList.add('open');
+        toggle.setAttribute('aria-expanded', 'true');
+      }
+    });
   });
 </script>
 
