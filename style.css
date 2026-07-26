@@ -87,19 +87,28 @@ img { max-width: 100%; display: block; }
 .btn-secondary { background: var(--bg-2); color: var(--text); border: 1px solid var(--border); }
 .btn-secondary:hover { border-color: var(--accent); text-decoration: none; }
 button.btn-primary { border: none; cursor: pointer; font-family: inherit; }
-.btn-arch:hover { background: var(--accent-dim); text-decoration: none; }
 
 .arch-drawer {
   max-width: 420px;
-  margin: -28px auto 48px;
-  padding: 16px 20px;
+  margin: 0 auto;
+  padding: 0 20px;
   background: var(--bg-2);
-  border: 1px solid var(--border);
+  border: 1px solid transparent;
   border-radius: var(--radius);
   text-align: center;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease, margin 0.4s ease;
+}
+.arch-drawer.open {
+  max-height: 160px;
+  opacity: 1;
+  padding: 16px 20px;
+  margin: -28px auto 48px;
+  border-color: var(--border);
 }
 .arch-drawer pre { margin: 0 0 10px; text-align: left; }
-.arch-drawer[hidden] { display: none; }
 
 .hero-shot { border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin: 0 auto; max-width: 900px; }
 

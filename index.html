@@ -46,7 +46,7 @@
     <a class="btn btn-secondary" href="docs/">Documentation</a>
   </div>
 
-  <div class="arch-drawer" id="arch-drawer" hidden>
+  <div class="arch-drawer" id="arch-drawer">
     <pre><code>yay -S pdf-equilibrist</code></pre>
     <a href="https://aur.archlinux.org/packages/pdf-equilibrist">Voir le paquet sur l'AUR</a>
   </div>
@@ -157,9 +157,8 @@
   const archToggle = document.getElementById('arch-toggle');
   const archDrawer = document.getElementById('arch-drawer');
   archToggle.addEventListener('click', () => {
-    const isHidden = archDrawer.hasAttribute('hidden');
-    archDrawer.toggleAttribute('hidden', !isHidden);
-    archToggle.setAttribute('aria-expanded', String(isHidden));
+    const isOpen = archDrawer.classList.toggle('open');
+    archToggle.setAttribute('aria-expanded', String(isOpen));
   });
 </script>
 
