@@ -43,12 +43,20 @@
   <div class="cta-row">
     <a class="btn btn-primary" href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Télécharger (Windows)</a>
     <button class="btn btn-primary" type="button" id="arch-toggle" aria-expanded="false" aria-controls="arch-drawer">Installation ArchLinux</button>
+    <button class="btn btn-primary" type="button" id="ubuntu-toggle" aria-expanded="false" aria-controls="ubuntu-drawer">Installation Ubuntu</button>
     <a class="btn btn-secondary" href="docs/">Documentation</a>
   </div>
 
   <div class="arch-drawer" id="arch-drawer">
     <pre><code>yay -S pdf-equilibrist</code></pre>
     <a href="https://aur.archlinux.org/packages/pdf-equilibrist">Voir le paquet sur l'AUR</a>
+  </div>
+
+  <div class="arch-drawer" id="ubuntu-drawer">
+    <pre><code>sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
+sudo apt update
+sudo apt install pdf-equilibrist</code></pre>
+    <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist">Voir le PPA sur Launchpad</a>
   </div>
 
   <div class="hero-shot">
@@ -137,6 +145,12 @@
       🐧 Sur Arch Linux et dérivées, disponible sur l'AUR :
     </p>
     <pre><code>yay -S pdf-equilibrist</code></pre>
+    <p class="lead">
+      🐧 Sur Ubuntu et dérivées, disponible via un PPA :
+    </p>
+    <pre><code>sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
+sudo apt update
+sudo apt install pdf-equilibrist</code></pre>
     <h3 style="font-size:1.1rem;color:var(--text)">Installation depuis les sources (développeurs)</h3>
     <p style="color:var(--text-dim)">1. Créez un environnement Python compatible (&gt;=3.12).<br>2. Installez les dépendances :</p>
     <pre><code>python -m pip install -r requirements.txt</code></pre>
@@ -159,6 +173,13 @@
   archToggle.addEventListener('click', () => {
     const isOpen = archDrawer.classList.toggle('open');
     archToggle.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  const ubuntuToggle = document.getElementById('ubuntu-toggle');
+  const ubuntuDrawer = document.getElementById('ubuntu-drawer');
+  ubuntuToggle.addEventListener('click', () => {
+    const isOpen = ubuntuDrawer.classList.toggle('open');
+    ubuntuToggle.setAttribute('aria-expanded', String(isOpen));
   });
 </script>
 

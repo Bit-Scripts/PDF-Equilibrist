@@ -109,6 +109,8 @@ button.btn-primary { border: none; cursor: pointer; font-family: inherit; }
   border-color: var(--border);
 }
 .arch-drawer pre { margin: 0 0 10px; text-align: left; }
+#ubuntu-drawer { max-width: 480px; }
+#ubuntu-drawer.open { max-height: 230px; }
 
 .hero-shot { border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin: 0 auto; max-width: 900px; }
 
