@@ -32,6 +32,14 @@ Thumbs.db
 # Installer output
 installer/Output/
 
+# PPA packaging build artifacts (régénérés, pas commités — voir packaging/ppa/README.md)
+packaging/ppa/vendor/
+packaging/ppa/*.deb
+packaging/ppa/*.buildinfo
+packaging/ppa/*.changes
+packaging/ppa/upload-server.js
+packaging/ppa/cve_report.txt
+
 # Bytecode and caches
 *.pyc
 *.pyo

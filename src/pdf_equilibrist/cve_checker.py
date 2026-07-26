@@ -4,6 +4,7 @@ import importlib.metadata
 import json
 import os
 import sys
+import sysconfig
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -13,15 +14,45 @@ OSV_API_URL = "https://api.osv.dev/v1/query"
 PACKAGE_ECOSYSTEM = "PyPI"
 _MAX_WORKERS = 8
 
+# Dépendances volontairement fournies par le système plutôt que vendorisées
+# dans le venv privé (AUR/PPA) — absentes du scan restreint ci-dessous,
+# vérifiées explicitement à part. Voir packaging/aur/PKGBUILD et
+# packaging/ppa/debian/rules : PyQt6 vient toujours du système (BaseApp/
+# python3-pyqt6), jamais d'un wheel embarqué.
+_SYSTEM_ONLY_DEPENDENCIES = ("PyQt6",)
+
 
 def get_installed_packages() -> dict[str, str]:
-    """Retourne {nom_normalisé: version} pour tous les paquets installés."""
+    """
+    Retourne {nom_normalisé: version} pour les paquets pertinents pour
+    PDF-Equilibrist.
+
+    Sur un paquet système Linux (AUR, PPA…), l'app tourne dans un venv créé
+    avec ``--system-site-packages`` (nécessaire pour voir PyQt6, fourni par
+    le système plutôt que vendorisé). Balayer tout ``sys.path`` par défaut
+    remonterait alors aussi les paquets système sans rapport avec l'app —
+    ex. ceux d'``apt``/``unattended-upgrades`` — comme "vulnérabilités de
+    PDF-Equilibrist", ce qu'ils ne sont pas. On limite donc le scan aux
+    site-packages propres à cet interpréteur (le venv, ou l'installation
+    complète en dev/PyInstaller), puis on vérifie à part les dépendances
+    volontairement système (cf. ``_SYSTEM_ONLY_DEPENDENCIES``).
+    """
     packages: dict[str, str] = {}
-    for dist in importlib.metadata.distributions():
+
+    own_site_packages = [sysconfig.get_paths()["purelib"]]
+    for dist in importlib.metadata.distributions(path=own_site_packages):
         name = dist.metadata.get("Name", "")
         version = dist.metadata.get("Version", "")
         if name and version:
             packages[name] = version
+
+    for name in _SYSTEM_ONLY_DEPENDENCIES:
+        if name not in packages:
+            try:
+                packages[name] = importlib.metadata.version(name)
+            except importlib.metadata.PackageNotFoundError:
+                pass
+
     return packages
 
 

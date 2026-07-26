@@ -1,0 +1,32 @@
+Source: pdf-equilibrist
+Section: editors
+Priority: optional
+Maintainer: Paul Woisard <paulwoisard@gmail.com>
+Build-Depends: debhelper-compat (= 13),
+               python3,
+               python3-venv,
+               python3-pip,
+               python3-pyqt6
+Standards-Version: 4.6.2
+Homepage: https://github.com/Bit-Scripts/PDF-Equilibrist
+Rules-Requires-Root: no
+
+Package: pdf-equilibrist
+Architecture: amd64
+Depends: ${misc:Depends},
+         python3,
+         python3-pyqt6,
+         python3-pyqt6.qtsvg
+Description: Free and open-source desktop PDF editor
+ PDF-Equilibrist is a free, open-source desktop PDF editor built with
+ Python (PyQt6 + PyMuPDF). It runs entirely locally: no cloud, no
+ telemetry, no account required.
+ .
+ Features: text editing, annotations, watermarks, signatures/stamps,
+ page management, conversion to/from Word/Excel/PowerPoint/images,
+ local OCR, and AES-256 encryption/decryption.
+ .
+ Most Python dependencies not packaged for Ubuntu (pdf2docx, pdfplumber,
+ python-pptx and their own sub-dependencies) are bundled in a private
+ virtual environment under /usr/lib/pdf-equilibrist/venv, built offline
+ from vendored wheels — Launchpad's build farm has no network access.

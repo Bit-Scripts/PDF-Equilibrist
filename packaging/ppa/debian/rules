@@ -1,0 +1,77 @@
+#!/usr/bin/make -f
+
+PACKAGE := pdf-equilibrist
+PKGROOT := debian/$(PACKAGE)
+VENV := $(PKGROOT)/usr/lib/$(PACKAGE)/venv
+WHEELHOUSE := packaging/ppa/vendor/wheelhouse
+
+export PYBUILD_NAME=pdf_equilibrist
+
+%:
+	dh $@
+
+# Les builders Launchpad n'ont pas d'accès réseau (contrairement à makepkg/AUR) :
+# les dépendances non empaquetées pour Ubuntu (pdf2docx, pdfplumber, python-pptx
+# et leurs propres sous-dépendances) sont installées hors-ligne depuis le
+# wheelhouse vendorisé sous packaging/ppa/vendor/wheelhouse — voir
+# packaging/ppa/README.md pour la procédure de régénération. PyQt6 reste un
+# paquet système (--system-site-packages) plutôt que vendorisé : c'est ce que
+# fait déjà l'AUR (BaseApp) et ça évite d'embarquer Qt en double.
+override_dh_auto_build:
+	# Aligne __version__ sur le changelog debian — même logique que le sed du
+	# PKGBUILD AUR (prepare()) : sans ça, l'app se pense en v0.1.0 (valeur
+	# statique de src/pdf_equilibrist/__init__.py) et le vérificateur de MAJ
+	# affiche "nouvelle version disponible" pour la version qu'on vient
+	# d'installer soi-même.
+	sed -i "s/^__version__ = \".*\"/__version__ = \"$$(dpkg-parsechangelog -SVersion | cut -d- -f1)\"/" \
+		src/pdf_equilibrist/__init__.py
+	python3 -m venv --system-site-packages $(CURDIR)/debian/venv-build
+	# --no-deps + liste explicite de TOUS les wheels du wheelhouse (pas
+	# seulement les paquets top-level) : avec --system-site-packages, pip
+	# considère une dépendance transitive "déjà satisfaite" si une machine
+	# de build a le paquet système équivalent (ex. numpy) — et l'installe
+	# alors nulle part dans le venv. Sur une machine cible sans ce paquet
+	# système, l'app crashe au démarrage (ModuleNotFoundError). En listant
+	# tous les wheels explicitement avec --no-deps, chacun est forcé dans le
+	# venv, sans dépendre de ce qui traîne déjà sur la machine de build.
+	$(CURDIR)/debian/venv-build/bin/pip install --no-index --no-deps \
+		--find-links=$(WHEELHOUSE) \
+		$(WHEELHOUSE)/*.whl
+	$(CURDIR)/debian/venv-build/bin/pip install --no-index --no-build-isolation --no-deps .
+
+override_dh_auto_install:
+	mkdir -p $(dir $(VENV))
+	cp -r $(CURDIR)/debian/venv-build $(VENV)
+	# Chemins absolus corrects une fois le paquet installé (pas le chroot de build)
+	sed -i "1s|^#!.*|#!/usr/lib/$(PACKAGE)/venv/bin/python3|" $(VENV)/bin/pdf-equilibrist || true
+
+	install -Dm755 packaging/ppa/debian/pdf-equilibrist.sh $(PKGROOT)/usr/bin/pdf-equilibrist
+	install -Dm644 packaging/ppa/debian/pdf-equilibrist.desktop \
+		$(PKGROOT)/usr/share/applications/pdf-equilibrist.desktop
+	install -Dm644 assets/logo/PDF-Equilibrist-logo.png \
+		$(PKGROOT)/usr/share/pixmaps/pdf-equilibrist.png
+	# resource_path() (src/pdf_equilibrist/utils.py) résout les assets sous
+	# {sys.prefix}/share/pdf-equilibrist/assets/ — au runtime, sys.prefix DANS
+	# le venv privé vaut /usr/lib/pdf-equilibrist/venv, PAS /usr (contrairement
+	# au paquet AUR qui installe en site-packages système directement). Les
+	# assets doivent donc vivre dans le venv lui-même, pas sous usr/share/ du
+	# paquet — sinon resource_path() ne les trouve jamais.
+	mkdir -p $(VENV)/share/pdf-equilibrist
+	cp -r assets $(VENV)/share/pdf-equilibrist/assets
+
+override_dh_shlibdeps:
+	# Les .so embarqués (PyMuPDF, Pillow, lxml, opencv…) vivent dans le venv
+	# privé — dh_shlibdeps standard fausserait les dépendances système.
+	dh_shlibdeps --exclude=$(PACKAGE)/venv || true
+
+override_dh_strip:
+	# Idem : ne pas strip les binaires du venv vendorisé (wheels manylinux
+	# déjà optimisées, et dh_strip s'embrouille sur les .so hors paquets apt).
+	dh_strip --exclude=$(PACKAGE)/venv
+
+override_dh_dwz:
+	# dwz échoue sur les .so des wheels manylinux vendorisées (sections ELF
+	# non standard, pas de .debug_info — normal pour des binaires prébuilt
+	# tiers) : on saute complètement l'extraction de symboles de debug plutôt
+	# que de la limiter, --exclude ne suffit pas à éviter le crash ici.
+	true

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import tempfile
 import urllib.error
 import urllib.request
@@ -26,6 +27,44 @@ def is_flatpak() -> bool:
     ``.exe`` Windows sans équivalent Flatpak).
     """
     return os.path.exists("/.flatpak-info") or "FLATPAK_ID" in os.environ
+
+
+_LINUX_UPDATE_COMMANDS = {
+    "arch": "yay -Syu",
+    "ubuntu": "sudo apt update && sudo apt install --only-upgrade pdf-equilibrist",
+    # Fedora (COPR) sera ajouté une fois ce canal publié — voir mémoire
+    # projet, même règle que pour le site web et le README : jamais une
+    # commande pour un canal qui n'existe pas encore.
+}
+
+
+def linux_update_command() -> str | None:
+    """
+    Retourne la commande de mise à jour du gestionnaire de paquets Linux
+    détecté (ex. ``"yay -Syu"`` sur Arch), ou ``None`` si aucun canal connu
+    n'est identifié.
+
+    Sur un paquet système Linux (AUR, PPA, COPR…), le vérificateur maison ne
+    doit jamais proposer l'installeur ``.exe`` Windows en réponse — inutile et
+    trompeur (voir ``find_installer_asset`` / ``UpdateDialog``). La vraie mise
+    à jour se fait via le gestionnaire de paquets ; ``None`` signale à l'appelant
+    de masquer toute action de mise à jour plutôt que d'en proposer une fausse.
+    """
+    if sys.platform == "win32" or is_flatpak():
+        return None
+    try:
+        os_release = Path("/etc/os-release").read_text(encoding="utf-8")
+    except OSError:
+        return None
+    ids: set[str] = set()
+    for line in os_release.splitlines():
+        if line.startswith("ID=") or line.startswith("ID_LIKE="):
+            ids.update(line.split("=", 1)[1].strip().strip('"').split())
+    if "arch" in ids:
+        return _LINUX_UPDATE_COMMANDS["arch"]
+    if "ubuntu" in ids:
+        return _LINUX_UPDATE_COMMANDS["ubuntu"]
+    return None
 
 
 def _normalize_repo(repo: str) -> tuple[str, str]:

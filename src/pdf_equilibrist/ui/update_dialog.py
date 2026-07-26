@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QHBoxLayout, QPushButton,
-    QProgressBar, QFrame,
+    QProgressBar, QFrame, QLineEdit, QApplication,
 )
 from PyQt6.QtCore import QThread, pyqtSignal, Qt
 from PyQt6.QtGui import QPixmap
@@ -133,6 +133,23 @@ class UpdateDialog(QDialog):
 
         layout.addWidget(_sep())
 
+        # ── Commande de mise à jour Linux (AUR, etc.) ─────────────────────────
+        # Masquée par défaut : affichée seulement si une nouvelle version existe
+        # ET qu'on tourne sur un paquet système Linux connu (jamais l'exe Windows
+        # à la place, voir update.linux_update_command()).
+        self._linux_cmd_row = QHBoxLayout()
+        self._linux_cmd_edit = QLineEdit()
+        self._linux_cmd_edit.setReadOnly(True)
+        self._btn_copy_cmd = QPushButton("Copier")
+        self._linux_cmd_row.addWidget(QLabel("Mise à jour :"))
+        self._linux_cmd_row.addWidget(self._linux_cmd_edit)
+        self._linux_cmd_row.addWidget(self._btn_copy_cmd)
+        self._linux_cmd_widget = QFrame()
+        self._linux_cmd_widget.setLayout(self._linux_cmd_row)
+        self._linux_cmd_widget.setVisible(False)
+        layout.addWidget(self._linux_cmd_widget)
+        self._btn_copy_cmd.clicked.connect(self._copy_linux_command)
+
         # ── Boutons ───────────────────────────────────────────────────────────
         btn_row = QHBoxLayout()
         btn_row.addStretch()
@@ -171,8 +188,28 @@ class UpdateDialog(QDialog):
         tag = release.get("tag_name") or release.get("name")
         self._lbl.setText(f"Nouvelle version disponible : {tag}")
         self._btn_open_page.setEnabled(True)
-        asset = updater.find_installer_asset(release)
-        self._btn_download.setEnabled(bool(asset))
+
+        linux_cmd = updater.linux_update_command()
+        if linux_cmd is not None:
+            # Paquet système Linux connu (AUR…) : la commande du gestionnaire
+            # de paquets remplace le téléchargement de l'exe Windows, inutile
+            # et trompeur ici.
+            self._linux_cmd_edit.setText(linux_cmd)
+            self._linux_cmd_widget.setVisible(True)
+            self._btn_download.setEnabled(False)
+            self._btn_download.setVisible(False)
+        elif os.name != "nt":
+            # Linux non reconnu (pas encore de PPA/COPR, ou distro inconnue) :
+            # ni exe Windows ni commande fiable à proposer, on masque juste
+            # l'action au lieu de télécharger un installeur inutilisable.
+            self._btn_download.setEnabled(False)
+            self._btn_download.setVisible(False)
+        else:
+            asset = updater.find_installer_asset(release)
+            self._btn_download.setEnabled(bool(asset))
+
+    def _copy_linux_command(self):
+        QApplication.clipboard().setText(self._linux_cmd_edit.text())
 
     def _on_error(self, msg: str):
         self._progress.setRange(0, 1)
