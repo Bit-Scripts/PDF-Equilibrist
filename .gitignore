@@ -19,6 +19,7 @@ PDF Equilibrist.zip
 
 # PyInstaller
 *.spec
+!packaging/copr/pdf-equilibrist.spec
 
 # Logs and temp files
 *.log
@@ -39,6 +40,11 @@ packaging/ppa/*.buildinfo
 packaging/ppa/*.changes
 packaging/ppa/upload-server.js
 packaging/ppa/cve_report.txt
+
+# COPR packaging build artifacts (régénérés, pas commités — voir packaging/copr/README.md)
+packaging/copr/vendor/
+packaging/copr/*.rpm
+packaging/copr/*.src.rpm
 
 # Bytecode and caches
 *.pyc
