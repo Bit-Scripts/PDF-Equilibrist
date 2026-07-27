@@ -29,6 +29,10 @@ a { color: var(--accent); text-decoration: none; }
 @media (hover: hover) and (pointer: fine) {
   a:hover { text-decoration: underline; }
 }
+/* Le retour arrière restaure aussi le focus sur le lien tapé avant de quitter
+   la page — sans ça, le soulignement par défaut du :focus reste visible même
+   une fois le :hover neutralisé ci-dessus. */
+a:focus { text-decoration: none; }
 
 img { max-width: 100%; display: block; }
 
