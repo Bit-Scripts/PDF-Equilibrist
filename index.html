@@ -220,18 +220,6 @@ sudo dnf install pdf-equilibrist</code></pre>
 
   document.getElementById('windows-download').addEventListener('click', closeAllDrawers);
   document.getElementById('docs-link').addEventListener('click', closeAllDrawers);
-
-  // Sur mobile, :hover reste "collé" après un tap (simulation tactile) tant que
-  // l'utilisateur ne touche pas ailleurs — CSS seul ne peut pas limiter ça dans
-  // le temps, donc on force le retrait de l'effet après 1s via une classe dédiée.
-  document.querySelectorAll('.btn').forEach(btn => {
-    let fadeTimer = null;
-    btn.addEventListener('touchstart', () => {
-      btn.classList.add('tap-active');
-      clearTimeout(fadeTimer);
-      fadeTimer = setTimeout(() => btn.classList.remove('tap-active'), 1000);
-    }, { passive: true });
-  });
 </script>
 
 </body>
