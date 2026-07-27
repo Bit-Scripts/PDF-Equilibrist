@@ -81,6 +81,7 @@ img { max-width: 100%; display: block; }
   font-weight: 600;
   font-size: 0.95rem;
   font-family: inherit;
+  text-decoration: none;
 }
 .cta-row .btn { min-width: 218px; text-align: center; }
 .btn-primary { background: var(--accent); color: #10240a; }
@@ -91,8 +92,8 @@ img { max-width: 100%; display: block; }
    s'applique pendant l'appui et se retire tout seul au relâchement du doigt —
    pas besoin de JS ni de minuteur arbitraire. */
 @media (hover: hover) and (pointer: fine) {
-  .btn-primary:hover { background: var(--accent-dim); text-decoration: none; }
-  .btn-secondary:hover { border-color: var(--accent); text-decoration: none; }
+  .btn-primary:hover { background: var(--accent-dim); }
+  .btn-secondary:hover { border-color: var(--accent); }
 }
 @media (pointer: coarse) {
   .btn-primary:active { background: var(--accent-dim); }
