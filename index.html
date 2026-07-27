@@ -41,11 +41,11 @@
   </div>
 
   <div class="cta-row">
-    <a class="btn btn-primary" href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Télécharger (Windows)</a>
+    <a class="btn btn-primary" id="windows-download" href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Télécharger (Windows)</a>
     <button class="btn btn-primary" type="button" id="arch-toggle" aria-expanded="false" aria-controls="arch-drawer">Installation ArchLinux</button>
     <button class="btn btn-primary" type="button" id="ubuntu-toggle" aria-expanded="false" aria-controls="ubuntu-drawer">Installation Ubuntu</button>
     <button class="btn btn-primary" type="button" id="fedora-toggle" aria-expanded="false" aria-controls="fedora-drawer">Installation Fedora</button>
-    <a class="btn btn-secondary" href="docs/">Documentation</a>
+    <a class="btn btn-secondary" id="docs-link" href="docs/">Documentation</a>
   </div>
 
   <div class="arch-drawer" id="arch-drawer">
@@ -199,6 +199,16 @@ sudo dnf install pdf-equilibrist</code></pre>
       }
     });
   });
+
+  const closeAllDrawers = () => {
+    drawers.forEach(({ toggle, drawer }) => {
+      drawer.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  };
+
+  document.getElementById('windows-download').addEventListener('click', closeAllDrawers);
+  document.getElementById('docs-link').addEventListener('click', closeAllDrawers);
 </script>
 
 </body>
