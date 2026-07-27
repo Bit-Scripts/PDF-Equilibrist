@@ -22,7 +22,13 @@ html, body {
 }
 
 a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+/* Écrans tactiles : le :hover simulé au tap reste "collé" jusqu'au tap suivant
+   ailleurs (particulièrement visible après un retour arrière, où le navigateur
+   restaure l'état de la page telle qu'elle était en la quittant) — on le
+   restreint donc aux pointeurs fins (souris), même logique que pour .btn. */
+@media (hover: hover) and (pointer: fine) {
+  a:hover { text-decoration: underline; }
+}
 
 img { max-width: 100%; display: block; }
 
