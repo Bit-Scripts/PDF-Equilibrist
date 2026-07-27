@@ -73,7 +73,7 @@ img { max-width: 100%; display: block; }
 .badges img { height: 20px; }
 
 .cta-row { display: flex; gap: 14px; justify-content: center; align-items: flex-start; flex-wrap: wrap; margin-bottom: 48px; }
-.cta-item { display: flex; flex-direction: column; align-items: center; }
+.cta-item { display: flex; flex-direction: column; align-items: center; position: relative; }
 .btn {
   display: inline-block;
   padding: 12px 26px;
@@ -90,8 +90,13 @@ img { max-width: 100%; display: block; }
 button.btn-primary { border: none; cursor: pointer; font-family: inherit; }
 
 .arch-drawer {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
   max-width: 420px;
-  margin: 0 auto;
+  margin: 0;
   padding: 0 20px;
   background: var(--bg-2);
   border: 1px solid transparent;
@@ -106,7 +111,7 @@ button.btn-primary { border: none; cursor: pointer; font-family: inherit; }
   max-height: 160px;
   opacity: 1;
   padding: 16px 20px;
-  margin: 12px auto 0;
+  margin-top: 12px;
   border-color: var(--border);
 }
 .arch-drawer pre { margin: 0 0 10px; text-align: left; }
