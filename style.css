@@ -72,7 +72,8 @@ img { max-width: 100%; display: block; }
 .badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 32px; }
 .badges img { height: 20px; }
 
-.cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+.cta-row { display: flex; gap: 14px; justify-content: center; align-items: flex-start; flex-wrap: wrap; margin-bottom: 48px; }
+.cta-item { display: flex; flex-direction: column; align-items: center; }
 .btn {
   display: inline-block;
   padding: 12px 26px;
@@ -105,12 +106,19 @@ button.btn-primary { border: none; cursor: pointer; font-family: inherit; }
   max-height: 160px;
   opacity: 1;
   padding: 16px 20px;
-  margin: -28px auto 48px;
+  margin: 12px auto 0;
   border-color: var(--border);
 }
 .arch-drawer pre { margin: 0 0 10px; text-align: left; }
 #ubuntu-drawer { max-width: 480px; }
 #ubuntu-drawer.open { max-height: 230px; }
+
+@media (max-width: 560px) {
+  .arch-drawer,
+  #ubuntu-drawer {
+    max-width: calc(100vw - 48px);
+  }
+}
 
 .hero-shot { border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin: 0 auto; max-width: 900px; }
 

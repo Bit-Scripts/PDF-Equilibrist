@@ -41,29 +41,40 @@
   </div>
 
   <div class="cta-row">
-    <a class="btn btn-primary" id="windows-download" href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Télécharger (Windows)</a>
-    <button class="btn btn-primary" type="button" id="arch-toggle" aria-expanded="false" aria-controls="arch-drawer">Installation ArchLinux</button>
-    <button class="btn btn-primary" type="button" id="ubuntu-toggle" aria-expanded="false" aria-controls="ubuntu-drawer">Installation Ubuntu</button>
-    <button class="btn btn-primary" type="button" id="fedora-toggle" aria-expanded="false" aria-controls="fedora-drawer">Installation Fedora</button>
-    <a class="btn btn-secondary" id="docs-link" href="docs/">Documentation</a>
-  </div>
+    <div class="cta-item">
+      <a class="btn btn-primary" id="windows-download" href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Télécharger (Windows)</a>
+    </div>
 
-  <div class="arch-drawer" id="arch-drawer">
-    <pre><code>yay -S pdf-equilibrist</code></pre>
-    <a href="https://aur.archlinux.org/packages/pdf-equilibrist">Voir le paquet sur l'AUR</a>
-  </div>
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="arch-toggle" aria-expanded="false" aria-controls="arch-drawer">Installation ArchLinux</button>
+      <div class="arch-drawer" id="arch-drawer">
+        <pre><code>yay -S pdf-equilibrist</code></pre>
+        <a href="https://aur.archlinux.org/packages/pdf-equilibrist">Voir le paquet sur l'AUR</a>
+      </div>
+    </div>
 
-  <div class="arch-drawer" id="ubuntu-drawer">
-    <pre><code>sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="ubuntu-toggle" aria-expanded="false" aria-controls="ubuntu-drawer">Installation Ubuntu</button>
+      <div class="arch-drawer" id="ubuntu-drawer">
+        <pre><code>sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
 sudo apt update
 sudo apt install pdf-equilibrist</code></pre>
-    <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist">Voir le PPA sur Launchpad</a>
-  </div>
+        <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist">Voir le PPA sur Launchpad</a>
+      </div>
+    </div>
 
-  <div class="arch-drawer" id="fedora-drawer">
-    <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="fedora-toggle" aria-expanded="false" aria-controls="fedora-drawer">Installation Fedora</button>
+      <div class="arch-drawer" id="fedora-drawer">
+        <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
 sudo dnf install pdf-equilibrist</code></pre>
-    <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/">Voir le projet sur COPR</a>
+        <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/">Voir le projet sur COPR</a>
+      </div>
+    </div>
+
+    <div class="cta-item">
+      <a class="btn btn-secondary" id="docs-link" href="docs/">Documentation</a>
+    </div>
   </div>
 
   <div class="hero-shot">
