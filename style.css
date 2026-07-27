@@ -84,9 +84,17 @@ img { max-width: 100%; display: block; }
 }
 .cta-row .btn { min-width: 218px; text-align: center; }
 .btn-primary { background: var(--accent); color: #10240a; }
-.btn-primary:hover { background: var(--accent-dim); text-decoration: none; }
 .btn-secondary { background: var(--bg-2); color: var(--text); border: 1px solid var(--border); }
-.btn-secondary:hover { border-color: var(--accent); text-decoration: none; }
+/* Écrans tactiles : pas de vrai :hover — le navigateur le simule au tap et le
+   garde "collé" jusqu'au tap suivant ailleurs sur la page. On le restreint donc
+   aux pointeurs fins (souris), et on gère l'équivalent tactile via .tap-active
+   (JS, retiré après 1s) pour un assombrissement temporaire plutôt que figé. */
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover { background: var(--accent-dim); text-decoration: none; }
+  .btn-secondary:hover { border-color: var(--accent); text-decoration: none; }
+}
+.btn-primary.tap-active { background: var(--accent-dim); }
+.btn-secondary.tap-active { border-color: var(--accent); }
 button.btn-primary { border: none; cursor: pointer; font-family: inherit; }
 
 .arch-drawer {
