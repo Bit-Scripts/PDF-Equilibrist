@@ -3,6 +3,9 @@
 [![CI](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg)](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
+[![AUR](https://img.shields.io/aur/version/pdf-equilibrist)](https://aur.archlinux.org/packages/pdf-equilibrist)
+[![PPA Ubuntu](https://img.shields.io/badge/PPA-ubuntu-orange)](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist)
+[![COPR Fedora](https://img.shields.io/badge/COPR-fedora-blue)](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE.md)
 [![Bandit](https://img.shields.io/badge/Bandit-Passed-brightgreen.svg)](.)
 [![Dependencies](https://img.shields.io/badge/Dependencies-Clean-brightgreen.svg)](.)
@@ -62,16 +65,20 @@ depuis l'interface :
 
 ## Installation
 
-📦 Pour installer la version exécutable Windows (`.exe`) sans installer Python :
-téléchargez le dernier installeur dans les [Releases](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest).
+🌐 Site officiel : [pdf-equilibrist.org](https://pdf-equilibrist.org)
 
-🐧 Sur Arch Linux et dérivées, disponible sur l'AUR :
+📦 **Windows** — téléchargez le dernier installeur dans les [Releases GitHub](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest).
+
+🐧 **Arch Linux** (AUR) :
 
 ```bash
 yay -S pdf-equilibrist
+# ou : paru -S pdf-equilibrist
 ```
 
-🐧 Sur Ubuntu et dérivées, disponible via un PPA :
+→ [Page AUR](https://aur.archlinux.org/packages/pdf-equilibrist)
+
+🐧 **Ubuntu / Debian** (PPA) :
 
 ```bash
 sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
@@ -79,12 +86,16 @@ sudo apt update
 sudo apt install pdf-equilibrist
 ```
 
-🐧 Sur Fedora et dérivées, disponible via COPR :
+→ [Page Launchpad](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist)
+
+🐧 **Fedora** (COPR) :
 
 ```bash
 sudo dnf copr enable paullux/PDF-Equilibrist
 sudo dnf install pdf-equilibrist
 ```
+
+→ [Page COPR](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
 
 ### Installation depuis les sources (développeurs)
 
