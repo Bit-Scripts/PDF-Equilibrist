@@ -1,15 +1,21 @@
 # PDF-Equilibrist
 
-[![CI](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg)](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml)
+<div align="center">
+
+[![Website](https://img.shields.io/badge/site-pdf--equilibrist.org-6BBF4E)](https://pdf-equilibrist.org)
 [![Release](https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
 [![AUR](https://img.shields.io/aur/version/pdf-equilibrist)](https://aur.archlinux.org/packages/pdf-equilibrist)
 [![PPA Ubuntu](https://img.shields.io/badge/PPA-ubuntu-orange)](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist)
 [![COPR Fedora](https://img.shields.io/badge/COPR-fedora-blue)](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
+
+[![CI](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg)](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE.md)
 [![Bandit](https://img.shields.io/badge/Bandit-Passed-brightgreen.svg)](.)
 [![Dependencies](https://img.shields.io/badge/Dependencies-Clean-brightgreen.svg)](.)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen.svg)](.)
+
+</div>
 
 **PDF-Equilibrist** est un éditeur PDF de bureau, gratuit et open-source, construit en Python
 avec **PyQt6** et **PyMuPDF**. Il fonctionne entièrement en local — pas de cloud, pas de
