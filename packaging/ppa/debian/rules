@@ -4,6 +4,15 @@ PACKAGE := pdf-equilibrist
 PKGROOT := debian/$(PACKAGE)
 VENV := $(PKGROOT)/usr/lib/$(PACKAGE)/venv
 WHEELHOUSE := packaging/ppa/vendor/wheelhouse
+# cffi/charset_normalizer/fonttools/lxml/numpy/pillow sont des wheels C
+# liées à la version de CPython (contrairement aux 17 autres, py3-generic
+# ou abi3) — chaque série Ubuntu avec un Python différent (noble=3.12,
+# resolute=3.14…) a besoin de sa propre variante. Plutôt qu'une condition
+# sur la série dans ce Makefile, les deux dossiers sont toujours passés en
+# --find-links à pip (voir override_dh_auto_build) : pip choisit tout seul
+# le wheel dont l'ABI correspond à l'interpréteur système du chroot de
+# build — aucune branche conditionnelle nécessaire ici.
+WHEELHOUSE_VERSIONED := packaging/ppa/vendor/wheelhouse-resolute
 
 export PYBUILD_NAME=pdf_equilibrist
 
@@ -34,17 +43,23 @@ override_dh_auto_build:
 	sed -i "s/^__version__ = \".*\"/__version__ = \"$$(dpkg-parsechangelog -SVersion | cut -d- -f1)\"/" \
 		src/pdf_equilibrist/__init__.py
 	python3 -m venv --system-site-packages $(CURDIR)/debian/venv-build
-	# --no-deps + liste explicite de TOUS les wheels du wheelhouse (pas
+	# --no-deps + liste explicite de TOUS les paquets du wheelhouse (pas
 	# seulement les paquets top-level) : avec --system-site-packages, pip
 	# considère une dépendance transitive "déjà satisfaite" si une machine
 	# de build a le paquet système équivalent (ex. numpy) — et l'installe
 	# alors nulle part dans le venv. Sur une machine cible sans ce paquet
 	# système, l'app crashe au démarrage (ModuleNotFoundError). En listant
-	# tous les wheels explicitement avec --no-deps, chacun est forcé dans le
-	# venv, sans dépendre de ce qui traîne déjà sur la machine de build.
+	# tous les paquets explicitement avec --no-deps, chacun est forcé dans
+	# le venv, sans dépendre de ce qui traîne déjà sur la machine de build.
+	# Noms de paquets (pas de chemins de fichiers exacts) + double
+	# --find-links : pip résout tout seul la bonne variante d'ABI parmi les
+	# deux wheelhouses selon le Python de CE chroot de build.
 	$(CURDIR)/debian/venv-build/bin/pip install --no-index --no-deps \
-		--find-links=$(WHEELHOUSE) \
-		$(WHEELHOUSE)/*.whl
+		--find-links=$(WHEELHOUSE) --find-links=$(WHEELHOUSE_VERSIONED) \
+		cffi charset-normalizer cryptography et-xmlfile fire fonttools lxml \
+		numpy opencv-python-headless openpyxl pdf2docx pdfminer.six \
+		pdfplumber Pillow pycparser PyMuPDF pyparsing pypdfium2 \
+		python-docx python-pptx termcolor typing-extensions XlsxWriter
 	$(CURDIR)/debian/venv-build/bin/pip install --no-index --no-build-isolation --no-deps .
 
 override_dh_auto_install:

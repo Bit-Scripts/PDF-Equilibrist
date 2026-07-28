@@ -1,3 +1,41 @@
+pdf-equilibrist (0.1.14-4) resolute; urgency=medium
+
+  * Fix FAILEDTOBUILD on the previous resolute upload (-3): the
+    --find-links dual-wheelhouse pip resolution worked exactly as
+    designed (all 22 version-locked deps correctly resolved to their
+    cp314 wheels), but installing our own package failed with
+    "BackendUnavailable: Cannot import 'setuptools.build_meta'" —
+    python3-setuptools/python3-wheel were never listed in
+    debian/control's Build-Depends; noble's chroot happened to already
+    have them, resolute's fresh chroot did not. Added explicitly.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Tue, 28 Jul 2026 21:45:00 +0000
+
+pdf-equilibrist (0.1.14-3) resolute; urgency=medium
+
+  * Build for Ubuntu 26.04 LTS (resolute) — Python 3.14. Six wheelhouse
+    wheels are version-locked C extensions (cffi, charset_normalizer,
+    fonttools, lxml, numpy, pillow) and were regenerated for cp314 via
+    cross-platform `pip download`; the other 17 are py3-generic or abi3
+    and reused unchanged from the noble wheelhouse.
+    NOTE: this revision FAILEDTOBUILD, see -4 for the fix.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Tue, 28 Jul 2026 20:15:00 +0000
+
+pdf-equilibrist (0.1.14-2) oracular; urgency=medium
+
+  * Rebuild for Ubuntu 24.10 (oracular) ahead of noble's eventual EOL — same
+    Python 3.12 ABI as noble, no source or wheelhouse changes needed.
+    NOTE: oracular reached end-of-life 2025-07-10, this upload was a
+    mistake (not checked before building) and was likely rejected by
+    Launchpad since the series is archived — do not repeat for
+    non-LTS/EOL series without checking support status first. Plucky
+    (25.04) is also already EOL (2026-01-17) and should not be targeted
+    either. Only LTS series (noble, resolute, and future LTS releases)
+    are worth the ongoing multi-series maintenance effort.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Mon, 27 Jul 2026 21:00:00 +0000
+
 pdf-equilibrist (0.1.14-1) noble; urgency=medium
 
   * Fix CVE checker on frozen builds: the purelib-scoped dependency scan
