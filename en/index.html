@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF-Equilibrist — Open-source PDF editor, 100% local</title>
+<meta name="description" content="Free, open-source desktop PDF editor built in Python with PyQt6 and PyMuPDF. No cloud, no telemetry.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/images/PDF-Equilibrist.png">
+<link rel="stylesheet" href="style.css">
+<link rel="canonical" href="https://pdf-equilibrist.org/en/">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pdf-equilibrist.org/en/">
+<meta property="og:title" content="PDF-Equilibrist — Open-source PDF editor, 100% local">
+<meta property="og:description" content="Free, open-source desktop PDF editor built in Python with PyQt6 and PyMuPDF. Runs entirely locally — no cloud, no telemetry.">
+<meta property="og:image" content="https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png">
+<meta property="og:image:alt" content="PDF-Equilibrist logo — local open-source PDF editor">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="PDF-Equilibrist">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PDF-Equilibrist — Open-source PDF editor, 100% local">
+<meta name="twitter:description" content="Free, open-source desktop PDF editor built in Python with PyQt6 and PyMuPDF.">
+<meta name="twitter:image" content="https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png">
+<meta name="twitter:image:alt" content="PDF-Equilibrist logo — local open-source PDF editor">
+<meta name="indexnow-key" content="da89694506444512ad5a2b1ed7fd5753">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "PDF-Equilibrist",
+  "url": "https://pdf-equilibrist.org",
+  "sameAs": "https://github.com/Bit-Scripts/PDF-Equilibrist",
+  "codeRepository": "https://github.com/Bit-Scripts/PDF-Equilibrist",
+  "installUrl": [
+    "https://aur.archlinux.org/packages/pdf-equilibrist",
+    "https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist",
+    "https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"
+  ],
+  "description": "Open-source PDF editor running entirely locally for Windows and Linux.",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": ["Windows", "Linux"],
+  "softwareVersion": "0.1.14",
+  "screenshot": "https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png",
+  "image": "https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png",
+  "downloadUrl": "https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest",
+  "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Bit-Scripts",
+    "url": "https://bit-scripts.github.io/",
+    "sameAs": ["https://github.com/Bit-Scripts"]
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does PDF‑Equilibrist send my files to the Internet?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. All processing is performed locally on your machine. No file ever leaves your workstation." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is PDF‑Equilibrist free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes, completely free and open source, distributed under the GNU GPL v3 license." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does PDF‑Equilibrist replace Adobe Acrobat?",
+      "acceptedAnswer": { "@type": "Answer", "text": "For many common uses — editing, annotation, conversion, protection — yes. It requires no subscription or account." }
+    },
+    {
+      "@type": "Question",
+      "name": "Which operating systems are supported?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Windows (.exe installer), Arch Linux (AUR), Ubuntu (PPA) and Fedora (COPR)." }
+    },
+    {
+      "@type": "Question",
+      "name": "Are administrator rights required to install it?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. The Windows installer installs in the user profile without UAC elevation." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the source code auditable?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. The code is published on GitHub and dependencies are automatically checked against known vulnerabilities." }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="brand">
+    <img src="assets/logo/PDF-Equilibrist-logo.png" alt="PDF-Equilibrist logo — local open-source PDF editor">
+    PDF-Equilibrist
+  </div>
+  <nav>
+    <a href="#apropos">About</a>
+    <a href="#fonctionnalites">Features</a>
+    <a href="#securite">Security</a>
+    <a href="docs/">Documentation</a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a>
+  </nav>
+</div>
+
+<div class="hero">
+  <img class="logo" src="assets/logo/PDF-Equilibrist-logo.png" alt="PDF-Equilibrist logo — free PDF editing software">
+  <h1>PDF-Equilibrist</h1>
+  <p class="tagline">Free, open-source desktop PDF editor built in Python with PyQt6 and PyMuPDF. Runs entirely locally — no cloud, no telemetry, no account required.</p>
+  <p class="tagline">PDF‑Equilibrist is available for Windows, Arch Linux (AUR), Ubuntu (PPA) and Fedora (COPR).</p>
+
+  <div class="badges">
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist"><img src="https://img.shields.io/badge/GitHub-source-181717?logo=github&logoColor=white" alt="GitHub"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"><img src="https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600" alt="Release"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?cacheSeconds=3600" alt="Downloads"></a>
+    <a href="https://aur.archlinux.org/packages/pdf-equilibrist"><img src="https://img.shields.io/aur/version/pdf-equilibrist" alt="AUR"></a>
+    <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/PPA-ubuntu-orange" alt="PPA Ubuntu"></a>
+    <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/COPR-fedora-blue" alt="COPR Fedora"></a>
+  </div>
+  <div class="badges">
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml"><img src="https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+    <img src="https://img.shields.io/badge/license-GPLv3-blue.svg" alt="License">
+    <img src="https://img.shields.io/badge/Bandit-Passed-brightgreen.svg" alt="Bandit">
+    <img src="https://img.shields.io/badge/Dependencies-Clean-brightgreen.svg" alt="Dependencies">
+    <img src="https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen.svg" alt="Privacy">
+  </div>
+
+  <div class="cta-row">
+    <div class="cta-item">
+      <a class="btn btn-primary" id="windows-download" href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Download (Windows)</a>
+    </div>
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="arch-toggle" aria-expanded="false" aria-controls="arch-drawer">Install on ArchLinux</button>
+      <div class="arch-drawer" id="arch-drawer">
+        <pre><code>yay -S pdf-equilibrist</code></pre>
+        <a href="https://aur.archlinux.org/packages/pdf-equilibrist">View package on AUR</a>
+      </div>
+    </div>
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="ubuntu-toggle" aria-expanded="false" aria-controls="ubuntu-drawer">Install on Ubuntu</button>
+      <div class="arch-drawer" id="ubuntu-drawer">
+        <pre><code>sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
+sudo apt update
+sudo apt install pdf-equilibrist</code></pre>
+        <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist">View PPA on Launchpad</a>
+      </div>
+    </div>
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="fedora-toggle" aria-expanded="false" aria-controls="fedora-drawer">Install on Fedora</button>
+      <div class="arch-drawer" id="fedora-drawer">
+        <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
+sudo dnf install pdf-equilibrist</code></pre>
+        <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/">View project on COPR</a>
+      </div>
+    </div>
+    <div class="cta-item">
+      <a class="btn btn-secondary" id="docs-link" href="docs/">Documentation</a>
+    </div>
+  </div>
+
+  <div class="hero-shot">
+    <img src="assets/images/PDF-Equilibrist.png" alt="PDF-Equilibrist screenshot: dark interface with tabs Display, Edit, Convert, Annotate, Pages, Protect">
+  </div>
+</div>
+
+<section id="apropos">
+  <div class="container">
+    <h2>Why PDF‑Equilibrist?</h2>
+    <p>Online PDF tools are convenient, but they require uploading your documents to third-party servers — sometimes sensitive, always outside your control. PDF‑Equilibrist takes the opposite approach: all processing stays on your machine.</p>
+    <p>Designed for environments where data confidentiality is non-negotiable — medical practices, law firms, SMEs, public administrations — it requires no Internet connection, no user account, and no subscription.</p>
+    <p>Built on proven libraries (PyMuPDF, PyQt6), it delivers the essential features of a professional PDF editor in a modern, responsive interface.</p>
+    <ul>
+      <li>🔒 100% local — your files never leave your machine</li>
+      <li>🚫 No telemetry, no account, no subscription</li>
+      <li>🛡️ Built-in AES‑256 encryption</li>
+      <li>✅ No administrator rights required for installation</li>
+      <li>🔍 Open and auditable source code</li>
+    </ul>
+  </div>
+</section>
+
+<section id="fonctionnalites">
+  <div class="container">
+    <h2>Features</h2>
+    <p class="lead">Everything you need to read, edit, convert, annotate and protect your PDF documents.</p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <img src="assets/images/feature-afficher.png" alt="Display feature: zoom, rotation, multi-tab navigation in PDF-Equilibrist">
+        <div class="body">
+          <h3>Display</h3>
+          <p>Zoom, rotation, multi-tab and multi-page navigation.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-modifier.png" alt="Edit feature: text editing, watermark and stamp in PDF-Equilibrist">
+        <div class="body">
+          <h3>Edit</h3>
+          <p>Text editing, watermarks, signatures and stamps.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-annoter.png" alt="Annotation feature: highlight, strikethrough, underline in PDF-Equilibrist">
+        <div class="body">
+          <h3>Annotate</h3>
+          <p>Highlight, strikethrough, underline, text boxes.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-page.png" alt="Pages feature: insert, split, merge PDF pages in PDF-Equilibrist">
+        <div class="body">
+          <h3>Pages</h3>
+          <p>Insert, split, merge, reverse.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-convertir.png" alt="Convert feature: export to Word, Excel, PowerPoint, image from PDF-Equilibrist">
+        <div class="body">
+          <h3>Convert</h3>
+          <p>Word, Excel, PowerPoint, images, Office → PDF, image → PDF, local OCR, batch processing.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-proteger.png" alt="Protect feature: AES-256 encryption and decryption in PDF-Equilibrist">
+        <div class="body">
+          <h3>Protect</h3>
+          <p>AES-256 encryption and decryption.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="securite">
+  <div class="container">
+    <h2>Security & Privacy</h2>
+    <p class="lead">Unlike online PDF tools that send your files to third-party servers, PDF-Equilibrist runs all processing 100% locally.</p>
+    <div class="security-box">
+      <ul>
+        <li><strong>SAST analysis of the source code</strong> via <a href="https://bandit.readthedocs.io/">Bandit</a>.</li>
+        <li><strong>Dependency checking</strong> against known vulnerabilities via the <a href="https://osv.dev/">OSV</a> API.</li>
+        <li>The audit tool is built into the application, accessible in one click.</li>
+      </ul>
+      <img src="assets/images/Outil-Analyse-Security.png" alt="Security analysis tool built into PDF-Equilibrist: Bandit audit and OSV dependency check">
+    </div>
+  </div>
+</section>
+
+<section id="installation">
+  <div class="container">
+    <h2>Installation</h2>
+    <p class="lead">📦 To install the Windows executable (.exe) without installing Python, download the latest installer from the <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Releases</a>.</p>
+    <p class="lead">🐧 On Arch Linux and derivatives, available on the AUR:</p>
+    <pre><code>yay -S pdf-equilibrist</code></pre>
+    <p class="lead">🐧 On Ubuntu and derivatives, available via a PPA:</p>
+    <pre><code>sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
+sudo apt update
+sudo apt install pdf-equilibrist</code></pre>
+    <p class="lead">🐧 On Fedora and derivatives, available via COPR:</p>
+    <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
+sudo dnf install pdf-equilibrist</code></pre>
+    <h3 style="font-size:1.1rem;color:var(--text)">Install from source (developers)</h3>
+    <p style="color:var(--text-dim)">1. Create a compatible Python environment (>=3.12).<br>2. Install dependencies:</p>
+    <pre><code>python -m pip install -r requirements.txt</code></pre>
+    <p style="color:var(--text-dim)">3. Run the application:</p>
+    <pre><code>python src/pdf_equilibrist/main.py</code></pre>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <h2>Frequently Asked Questions</h2>
+    <h3>Does PDF‑Equilibrist send my files to the Internet?</h3>
+    <p>No. All processing is performed locally on your machine. No file ever leaves your workstation.</p>
+    <h3>Is PDF‑Equilibrist free?</h3>
+    <p>Yes, completely free and open source, distributed under the GNU GPL v3 license.</p>
+    <h3>Does PDF‑Equilibrist replace Adobe Acrobat?</h3>
+    <p>For many common uses — editing, annotation, conversion, protection — yes. It requires no subscription or account.</p>
+    <h3>Which operating systems are supported?</h3>
+    <p>Windows (.exe installer), Arch Linux (AUR), Ubuntu (PPA) and Fedora (COPR).</p>
+    <h3>Are administrator rights required to install it?</h3>
+    <p>No. The Windows installer installs in the user profile without UAC elevation.</p>
+    <h3>Is the source code auditable?</h3>
+    <p>Yes. The code is published on <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a> and dependencies are automatically checked against known vulnerabilities.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    GNU GPL v3.0 License (or later) —
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/blob/main/LICENSE.md">LICENSE.md</a>
+    · A project by <a href="https://bit-scripts.github.io/">Bit-Scripts</a>
+  </div>
+</footer>
+
+<script>
+  const drawers = [
+    { toggle: document.getElementById('arch-toggle'), drawer: document.getElementById('arch-drawer') },
+    { toggle: document.getElementById('ubuntu-toggle'), drawer: document.getElementById('ubuntu-drawer') },
+    { toggle: document.getElementById('fedora-toggle'), drawer: document.getElementById('fedora-drawer') },
+  ];
+
+  drawers.forEach(({ toggle, drawer }) => {
+    toggle.addEventListener('click', () => {
+      const wasOpen = drawer.classList.contains('open');
+      drawers.forEach(({ toggle: t, drawer: d }) => {
+        d.classList.remove('open');
+        t.setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) {
+        drawer.classList.add('open');
+        toggle.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  const closeAllDrawers = () => {
+    drawers.forEach(({ toggle, drawer }) => {
+      drawer.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  };
+
+  document.getElementById('windows-download').addEventListener('click', closeAllDrawers);
+  document.getElementById('docs-link').addEventListener('click', closeAllDrawers);
+</script>
+
+</body>
+</html>

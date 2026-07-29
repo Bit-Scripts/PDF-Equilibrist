@@ -16,18 +16,17 @@
 <meta property="og:title" content="PDF-Equilibrist — Éditeur PDF open-source, 100% local">
 <meta property="og:description" content="Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Fonctionne entièrement en local — pas de cloud, pas de télémétrie.">
 <meta property="og:image" content="https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png">
-<meta property="og:image:alt" content="Logo PDF-Equilibrist">
+<meta property="og:image:alt" content="Logo PDF-Equilibrist — éditeur PDF open-source local">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="PDF-Equilibrist">
-
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="PDF-Equilibrist — Éditeur PDF open-source, 100% local">
 <meta name="twitter:description" content="Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF.">
 <meta name="twitter:image" content="https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png">
-<meta name="twitter:image:alt" content="Logo PDF-Equilibrist">
+<meta name="twitter:image:alt" content="Logo PDF-Equilibrist — éditeur PDF open-source local">
 <meta name="indexnow-key" content="da89694506444512ad5a2b1ed7fd5753">
 <script type="application/ld+json">
 {
@@ -86,13 +85,13 @@
     },
     {
       "@type": "Question",
-      "name": "Faut-il des droits administrateur pour installer PDF‑Equilibrist ?",
+      "name": "Faut-il des droits administrateur pour l'installer ?",
       "acceptedAnswer": { "@type": "Answer", "text": "Non. L'installeur Windows s'installe dans le profil utilisateur sans élévation UAC." }
     },
     {
       "@type": "Question",
       "name": "Le code source est-il auditable ?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Oui. Le code est publié sur GitHub et les dépendances sont analysées automatiquement contre les vulnérabilités connues via l'API OSV." }
+      "acceptedAnswer": { "@type": "Answer", "text": "Oui. Le code est publié sur GitHub et les dépendances sont analysées automatiquement contre les vulnérabilités connues." }
     }
   ]
 }
@@ -102,7 +101,7 @@
 
 <div class="topnav">
   <div class="brand">
-    <img src="assets/logo/PDF-Equilibrist-logo.png" alt="Logo PDF-Equilibrist">
+    <img src="assets/logo/PDF-Equilibrist-logo.png" alt="Logo PDF-Equilibrist — éditeur PDF open-source local">
     PDF-Equilibrist
   </div>
   <nav>
@@ -115,12 +114,9 @@
 </div>
 
 <div class="hero">
-  <img class="logo" src="assets/logo/PDF-Equilibrist-logo.png" alt="Logo PDF-Equilibrist — éditeur PDF open-source gratuit">
+  <img class="logo" src="assets/logo/PDF-Equilibrist-logo.png" alt="PDF-Equilibrist logo — logiciel d'édition PDF gratuit">
   <h1>PDF-Equilibrist</h1>
-  <p class="tagline">
-    Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF.
-    Il fonctionne entièrement en local — pas de cloud, pas de télémétrie, pas de compte requis.
-  </p>
+  <p class="tagline">Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Il fonctionne entièrement en local — pas de cloud, pas de télémétrie, pas de compte requis.</p>
   <p class="tagline">PDF‑Equilibrist est disponible pour Windows, Arch Linux (AUR), Ubuntu (PPA) et Fedora (COPR).</p>
 
   <div class="badges">
@@ -143,7 +139,6 @@
     <div class="cta-item">
       <a class="btn btn-primary" id="windows-download" href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Télécharger (Windows)</a>
     </div>
-
     <div class="cta-item">
       <button class="btn btn-primary" type="button" id="arch-toggle" aria-expanded="false" aria-controls="arch-drawer">Installation ArchLinux</button>
       <div class="arch-drawer" id="arch-drawer">
@@ -151,7 +146,6 @@
         <a href="https://aur.archlinux.org/packages/pdf-equilibrist">Voir le paquet sur l'AUR</a>
       </div>
     </div>
-
     <div class="cta-item">
       <button class="btn btn-primary" type="button" id="ubuntu-toggle" aria-expanded="false" aria-controls="ubuntu-drawer">Installation Ubuntu</button>
       <div class="arch-drawer" id="ubuntu-drawer">
@@ -161,7 +155,6 @@ sudo apt install pdf-equilibrist</code></pre>
         <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist">Voir le PPA sur Launchpad</a>
       </div>
     </div>
-
     <div class="cta-item">
       <button class="btn btn-primary" type="button" id="fedora-toggle" aria-expanded="false" aria-controls="fedora-drawer">Installation Fedora</button>
       <div class="arch-drawer" id="fedora-drawer">
@@ -170,37 +163,22 @@ sudo dnf install pdf-equilibrist</code></pre>
         <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/">Voir le projet sur COPR</a>
       </div>
     </div>
-
     <div class="cta-item">
       <a class="btn btn-secondary" id="docs-link" href="docs/">Documentation</a>
     </div>
   </div>
 
   <div class="hero-shot">
-    <img src="assets/images/PDF-Equilibrist.png" alt="Interface principale de PDF-Equilibrist — éditeur PDF open-source pour Windows et Linux">
+    <img src="assets/images/PDF-Equilibrist.png" alt="Capture d'écran de PDF-Equilibrist : interface sombre avec onglets Afficher, Modifier, Convertir, Annoter, Page, Protéger">
   </div>
 </div>
 
 <section id="apropos">
   <div class="container">
     <h2>Pourquoi PDF‑Equilibrist ?</h2>
-    <p>
-      Les outils PDF en ligne sont pratiques, mais ils envoient vos documents sur des serveurs
-      tiers — souvent sans que vous le sachiez. PDF‑Equilibrist a été conçu pour offrir une
-      alternative complète, gratuite et entièrement locale, sans compromis sur les fonctionnalités.
-    </p>
-    <p>
-      Conçu pour les environnements où la <strong>confidentialité des documents est critique</strong> —
-      cabinets juridiques, services RH, administrations, professions de santé — il ne quitte jamais
-      votre poste de travail. Aucune connexion réseau en fonctionnement normal, aucune télémétrie,
-      aucun compte requis.
-    </p>
-    <p>
-      Construit sur des bibliothèques open source éprouvées (<strong>PyMuPDF</strong>,
-      <strong>PyQt6</strong>), il est auditable à tout moment. Le code source est public,
-      les dépendances sont analysées automatiquement contre les vulnérabilités connues
-      (base OSV), et l'installation ne requiert pas de droits administrateur.
-    </p>
+    <p>Les outils PDF en ligne sont pratiques, mais ils imposent l'envoi de vos documents vers des serveurs tiers — parfois sensibles, toujours hors de votre contrôle. PDF‑Equilibrist prend le parti inverse : tout traitement reste sur votre machine.</p>
+    <p>Conçu pour les environnements où la confidentialité des données est non négociable — cabinets médicaux, études juridiques, PME, administrations — il ne nécessite ni connexion Internet, ni compte utilisateur, ni abonnement.</p>
+    <p>Construit sur des bibliothèques éprouvées (PyMuPDF, PyQt6), il offre les fonctionnalités essentielles d'un éditeur PDF professionnel dans une interface moderne et réactive.</p>
     <ul>
       <li>🔒 100 % local — vos fichiers ne quittent jamais votre machine</li>
       <li>🚫 Aucune télémétrie, aucun compte, aucun abonnement</li>
@@ -217,42 +195,42 @@ sudo dnf install pdf-equilibrist</code></pre>
     <p class="lead">Tout ce qu'il faut pour lire, modifier, convertir, annoter et protéger vos documents PDF.</p>
     <div class="feature-grid">
       <div class="feature-card">
-        <img src="assets/images/feature-afficher.png" alt="Fonctionnalité Affichage — zoom, rotation et navigation multi-onglets dans PDF-Equilibrist">
+        <img src="assets/images/feature-afficher.png" alt="Fonctionnalité Affichage : zoom, rotation, navigation multi-onglets dans PDF-Equilibrist">
         <div class="body">
           <h3>Affichage</h3>
           <p>Zoom, rotation, navigation multi-onglets et multi-pages.</p>
         </div>
       </div>
       <div class="feature-card">
-        <img src="assets/images/feature-modifier.png" alt="Fonctionnalité Édition — modification de texte, filigrane et signatures dans un PDF">
+        <img src="assets/images/feature-modifier.png" alt="Fonctionnalité Édition : modification de texte, filigrane et tampon dans PDF-Equilibrist">
         <div class="body">
           <h3>Édition</h3>
           <p>Modification de texte, filigrane, signatures et tampons.</p>
         </div>
       </div>
       <div class="feature-card">
-        <img src="assets/images/feature-annoter.png" alt="Fonctionnalité Annotation — surlignage, barré et soulignement sur PDF">
+        <img src="assets/images/feature-annoter.png" alt="Fonctionnalité Annotation : surlignage, barré, soulignement dans PDF-Equilibrist">
         <div class="body">
           <h3>Annotation</h3>
           <p>Surlignage, barré, soulignement, zones de texte.</p>
         </div>
       </div>
       <div class="feature-card">
-        <img src="assets/images/feature-page.png" alt="Fonctionnalité Pages — insertion, division, fusion et inversion de pages PDF">
+        <img src="assets/images/feature-page.png" alt="Fonctionnalité Pages : insertion, division, fusion de pages PDF dans PDF-Equilibrist">
         <div class="body">
           <h3>Pages</h3>
           <p>Insertion, division, fusion, inversion.</p>
         </div>
       </div>
       <div class="feature-card">
-        <img src="assets/images/feature-convertir.png" alt="Fonctionnalité Conversion — PDF vers Word, Excel, PowerPoint et images, avec OCR local">
+        <img src="assets/images/feature-convertir.png" alt="Fonctionnalité Conversion : export Word, Excel, PowerPoint, image depuis PDF-Equilibrist">
         <div class="body">
           <h3>Conversion</h3>
           <p>Word, Excel, PowerPoint, images, Office → PDF, image → PDF, OCR local, traitement par lot.</p>
         </div>
       </div>
       <div class="feature-card">
-        <img src="assets/images/feature-proteger.png" alt="Fonctionnalité Protection — chiffrement et déchiffrement AES-256 de fichiers PDF">
+        <img src="assets/images/feature-proteger.png" alt="Fonctionnalité Protection : chiffrement et déchiffrement AES-256 dans PDF-Equilibrist">
         <div class="body">
           <h3>Protection</h3>
           <p>Chiffrement et déchiffrement AES-256.</p>
@@ -264,18 +242,15 @@ sudo dnf install pdf-equilibrist</code></pre>
 
 <section id="securite">
   <div class="container">
-    <h2>Sécurité &amp; confidentialité</h2>
-    <p class="lead">
-      Contrairement aux outils PDF en ligne qui envoient vos fichiers sur des serveurs tiers,
-      PDF-Equilibrist exécute tous ses traitements à 100&nbsp;% en local.
-    </p>
+    <h2>Sécurité & confidentialité</h2>
+    <p class="lead">Contrairement aux outils PDF en ligne qui envoient vos fichiers sur des serveurs tiers, PDF-Equilibrist exécute tous ses traitements à 100 % en local.</p>
     <div class="security-box">
       <ul>
-        <li><strong>Analyse SAST du code source</strong> via <a href="https://github.com/PyCQA/bandit">Bandit</a>.</li>
+        <li><strong>Analyse SAST du code source</strong> via <a href="https://bandit.readthedocs.io/">Bandit</a>.</li>
         <li><strong>Vérification des dépendances</strong> contre les vulnérabilités connues via l'API <a href="https://osv.dev/">OSV</a>.</li>
         <li>L'outil d'audit est intégré à l'application, accessible en un clic.</li>
       </ul>
-      <img src="assets/images/Outil-Analyse-Security.png" alt="Outil d'analyse de sécurité PDF-Equilibrist — scan CVE des dépendances Python et audit SAST Bandit">
+      <img src="assets/images/Outil-Analyse-Security.png" alt="Outil d'analyse de sécurité intégré à PDF-Equilibrist : audit Bandit et vérification des dépendances OSV">
     </div>
   </div>
 </section>
@@ -283,28 +258,18 @@ sudo dnf install pdf-equilibrist</code></pre>
 <section id="installation">
   <div class="container">
     <h2>Installation</h2>
-    <p class="lead">
-      📦 Pour installer la version exécutable Windows (.exe) sans installer Python,
-      téléchargez le dernier installeur dans les
-      <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Releases</a>.
-    </p>
-    <p class="lead">
-      🐧 Sur Arch Linux et dérivées, disponible sur l'AUR :
-    </p>
+    <p class="lead">📦 Pour installer la version exécutable Windows (.exe) sans installer Python, téléchargez le dernier installeur dans les <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Releases</a>.</p>
+    <p class="lead">🐧 Sur Arch Linux et dérivées, disponible sur l'AUR :</p>
     <pre><code>yay -S pdf-equilibrist</code></pre>
-    <p class="lead">
-      🐧 Sur Ubuntu et dérivées, disponible via un PPA :
-    </p>
+    <p class="lead">🐧 Sur Ubuntu et dérivées, disponible via un PPA :</p>
     <pre><code>sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
 sudo apt update
 sudo apt install pdf-equilibrist</code></pre>
-    <p class="lead">
-      🐧 Sur Fedora et dérivées, disponible via COPR :
-    </p>
+    <p class="lead">🐧 Sur Fedora et dérivées, disponible via COPR :</p>
     <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
 sudo dnf install pdf-equilibrist</code></pre>
     <h3 style="font-size:1.1rem;color:var(--text)">Installation depuis les sources (développeurs)</h3>
-    <p style="color:var(--text-dim)">1. Créez un environnement Python compatible (&gt;=3.12).<br>2. Installez les dépendances :</p>
+    <p style="color:var(--text-dim)">1. Créez un environnement Python compatible (>=3.12).<br>2. Installez les dépendances :</p>
     <pre><code>python -m pip install -r requirements.txt</code></pre>
     <p style="color:var(--text-dim)">3. Exécutez l'application :</p>
     <pre><code>python src/pdf_equilibrist/main.py</code></pre>
@@ -314,22 +279,16 @@ sudo dnf install pdf-equilibrist</code></pre>
 <section id="faq">
   <div class="container">
     <h2>Questions fréquentes</h2>
-
     <h3>PDF‑Equilibrist envoie-t-il mes fichiers sur Internet ?</h3>
     <p>Non. Tous les traitements sont effectués localement sur votre machine. Aucun fichier ne quitte votre poste de travail.</p>
-
     <h3>PDF‑Equilibrist est-il gratuit ?</h3>
     <p>Oui, entièrement gratuit et open source, distribué sous licence GNU GPL v3.</p>
-
     <h3>PDF‑Equilibrist remplace-t-il Adobe Acrobat ?</h3>
     <p>Pour de nombreux usages courants — édition, annotation, conversion, protection — oui. Il ne nécessite ni abonnement ni compte.</p>
-
     <h3>Quels systèmes d'exploitation sont supportés ?</h3>
     <p>Windows (installeur .exe), Arch Linux (AUR), Ubuntu (PPA) et Fedora (COPR).</p>
-
     <h3>Faut-il des droits administrateur pour l'installer ?</h3>
     <p>Non. L'installeur Windows s'installe dans le profil utilisateur sans élévation UAC.</p>
-
     <h3>Le code source est-il auditable ?</h3>
     <p>Oui. Le code est publié sur <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a> et les dépendances sont analysées automatiquement contre les vulnérabilités connues.</p>
   </div>

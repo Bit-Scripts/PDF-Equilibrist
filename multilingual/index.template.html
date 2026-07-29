@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="{{html.lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{meta.title}}</title>
+<meta name="description" content="{{meta.description}}">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/images/PDF-Equilibrist.png">
+<link rel="stylesheet" href="style.css">
+<link rel="canonical" href="{{meta.canonical}}">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{meta.canonical}}">
+<meta property="og:title" content="{{meta.title}}">
+<meta property="og:description" content="{{og.description}}">
+<meta property="og:image" content="https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png">
+<meta property="og:image:alt" content="{{img.logo.alt}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="{{og.locale}}">
+<meta property="og:site_name" content="PDF-Equilibrist">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{meta.title}}">
+<meta name="twitter:description" content="{{twitter.description}}">
+<meta name="twitter:image" content="https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png">
+<meta name="twitter:image:alt" content="{{img.logo.alt}}">
+<meta name="indexnow-key" content="da89694506444512ad5a2b1ed7fd5753">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "PDF-Equilibrist",
+  "url": "https://pdf-equilibrist.org",
+  "sameAs": "https://github.com/Bit-Scripts/PDF-Equilibrist",
+  "codeRepository": "https://github.com/Bit-Scripts/PDF-Equilibrist",
+  "installUrl": [
+    "https://aur.archlinux.org/packages/pdf-equilibrist",
+    "https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist",
+    "https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"
+  ],
+  "description": "{{jsonld.description}}",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": ["Windows", "Linux"],
+  "softwareVersion": "0.1.14",
+  "screenshot": "https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png",
+  "image": "https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png",
+  "downloadUrl": "https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest",
+  "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Bit-Scripts",
+    "url": "https://bit-scripts.github.io/",
+    "sameAs": ["https://github.com/Bit-Scripts"]
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "{{faq.q1}}",
+      "acceptedAnswer": { "@type": "Answer", "text": "{{faq.a1}}" }
+    },
+    {
+      "@type": "Question",
+      "name": "{{faq.q2}}",
+      "acceptedAnswer": { "@type": "Answer", "text": "{{faq.a2}}" }
+    },
+    {
+      "@type": "Question",
+      "name": "{{faq.q3}}",
+      "acceptedAnswer": { "@type": "Answer", "text": "{{faq.a3}}" }
+    },
+    {
+      "@type": "Question",
+      "name": "{{faq.q4}}",
+      "acceptedAnswer": { "@type": "Answer", "text": "{{faq.a4}}" }
+    },
+    {
+      "@type": "Question",
+      "name": "{{faq.q5}}",
+      "acceptedAnswer": { "@type": "Answer", "text": "{{faq.a5}}" }
+    },
+    {
+      "@type": "Question",
+      "name": "{{faq.q6}}",
+      "acceptedAnswer": { "@type": "Answer", "text": "{{faq.a6.plain}}" }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="brand">
+    <img src="assets/logo/PDF-Equilibrist-logo.png" alt="{{img.logo.alt}}">
+    PDF-Equilibrist
+  </div>
+  <nav>
+    <a href="#apropos">{{nav.about}}</a>
+    <a href="#fonctionnalites">{{nav.features}}</a>
+    <a href="#securite">{{nav.security}}</a>
+    <a href="docs/">{{nav.docs}}</a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a>
+  </nav>
+</div>
+
+<div class="hero">
+  <img class="logo" src="assets/logo/PDF-Equilibrist-logo.png" alt="{{img.hero.alt}}">
+  <h1>PDF-Equilibrist</h1>
+  <p class="tagline">{{hero.tagline1}}</p>
+  <p class="tagline">{{hero.tagline2}}</p>
+
+  <div class="badges">
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist"><img src="https://img.shields.io/badge/GitHub-source-181717?logo=github&logoColor=white" alt="GitHub"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"><img src="https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600" alt="Release"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?cacheSeconds=3600" alt="Downloads"></a>
+    <a href="https://aur.archlinux.org/packages/pdf-equilibrist"><img src="https://img.shields.io/aur/version/pdf-equilibrist" alt="AUR"></a>
+    <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/PPA-ubuntu-orange" alt="PPA Ubuntu"></a>
+    <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/COPR-fedora-blue" alt="COPR Fedora"></a>
+  </div>
+  <div class="badges">
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml"><img src="https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+    <img src="https://img.shields.io/badge/license-GPLv3-blue.svg" alt="License">
+    <img src="https://img.shields.io/badge/Bandit-Passed-brightgreen.svg" alt="Bandit">
+    <img src="https://img.shields.io/badge/Dependencies-Clean-brightgreen.svg" alt="Dependencies">
+    <img src="https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen.svg" alt="Privacy">
+  </div>
+
+  <div class="cta-row">
+    <div class="cta-item">
+      <a class="btn btn-primary" id="windows-download" href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">{{cta.download.windows}}</a>
+    </div>
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="arch-toggle" aria-expanded="false" aria-controls="arch-drawer">{{cta.install.arch.btn}}</button>
+      <div class="arch-drawer" id="arch-drawer">
+        <pre><code>yay -S pdf-equilibrist</code></pre>
+        <a href="https://aur.archlinux.org/packages/pdf-equilibrist">{{cta.install.arch.link}}</a>
+      </div>
+    </div>
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="ubuntu-toggle" aria-expanded="false" aria-controls="ubuntu-drawer">{{cta.install.ubuntu.btn}}</button>
+      <div class="arch-drawer" id="ubuntu-drawer">
+        <pre><code>sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
+sudo apt update
+sudo apt install pdf-equilibrist</code></pre>
+        <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist">{{cta.install.ubuntu.link}}</a>
+      </div>
+    </div>
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="fedora-toggle" aria-expanded="false" aria-controls="fedora-drawer">{{cta.install.fedora.btn}}</button>
+      <div class="arch-drawer" id="fedora-drawer">
+        <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
+sudo dnf install pdf-equilibrist</code></pre>
+        <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/">{{cta.install.fedora.link}}</a>
+      </div>
+    </div>
+    <div class="cta-item">
+      <a class="btn btn-secondary" id="docs-link" href="docs/">{{cta.docs}}</a>
+    </div>
+  </div>
+
+  <div class="hero-shot">
+    <img src="assets/images/PDF-Equilibrist.png" alt="{{img.screenshot.alt}}">
+  </div>
+</div>
+
+<section id="apropos">
+  <div class="container">
+    <h2>{{apropos.title}}</h2>
+    <p>{{apropos.p1}}</p>
+    <p>{{apropos.p2}}</p>
+    <p>{{apropos.p3}}</p>
+    <ul>
+      <li>{{apropos.li1}}</li>
+      <li>{{apropos.li2}}</li>
+      <li>{{apropos.li3}}</li>
+      <li>{{apropos.li4}}</li>
+      <li>{{apropos.li5}}</li>
+    </ul>
+  </div>
+</section>
+
+<section id="fonctionnalites">
+  <div class="container">
+    <h2>{{features.title}}</h2>
+    <p class="lead">{{features.lead}}</p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <img src="assets/images/feature-afficher.png" alt="{{img.feature.display.alt}}">
+        <div class="body">
+          <h3>{{features.display.title}}</h3>
+          <p>{{features.display.desc}}</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-modifier.png" alt="{{img.feature.edit.alt}}">
+        <div class="body">
+          <h3>{{features.edit.title}}</h3>
+          <p>{{features.edit.desc}}</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-annoter.png" alt="{{img.feature.annotate.alt}}">
+        <div class="body">
+          <h3>{{features.annotate.title}}</h3>
+          <p>{{features.annotate.desc}}</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-page.png" alt="{{img.feature.pages.alt}}">
+        <div class="body">
+          <h3>{{features.pages.title}}</h3>
+          <p>{{features.pages.desc}}</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-convertir.png" alt="{{img.feature.convert.alt}}">
+        <div class="body">
+          <h3>{{features.convert.title}}</h3>
+          <p>{{features.convert.desc}}</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/images/feature-proteger.png" alt="{{img.feature.protect.alt}}">
+        <div class="body">
+          <h3>{{features.protect.title}}</h3>
+          <p>{{features.protect.desc}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="securite">
+  <div class="container">
+    <h2>{{security.title}}</h2>
+    <p class="lead">{{security.lead}}</p>
+    <div class="security-box">
+      <ul>
+        <li>{{security.li1}}</li>
+        <li>{{security.li2}}</li>
+        <li>{{security.li3}}</li>
+      </ul>
+      <img src="assets/images/Outil-Analyse-Security.png" alt="{{img.security.alt}}">
+    </div>
+  </div>
+</section>
+
+<section id="installation">
+  <div class="container">
+    <h2>{{install.title}}</h2>
+    <p class="lead">{{install.windows.lead}}</p>
+    <p class="lead">{{install.arch.lead}}</p>
+    <pre><code>yay -S pdf-equilibrist</code></pre>
+    <p class="lead">{{install.ubuntu.lead}}</p>
+    <pre><code>sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
+sudo apt update
+sudo apt install pdf-equilibrist</code></pre>
+    <p class="lead">{{install.fedora.lead}}</p>
+    <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
+sudo dnf install pdf-equilibrist</code></pre>
+    <h3 style="font-size:1.1rem;color:var(--text)">{{install.dev.title}}</h3>
+    <p style="color:var(--text-dim)">{{install.dev.step1}}</p>
+    <pre><code>python -m pip install -r requirements.txt</code></pre>
+    <p style="color:var(--text-dim)">{{install.dev.step3}}</p>
+    <pre><code>python src/pdf_equilibrist/main.py</code></pre>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <h2>{{faq.title}}</h2>
+    <h3>{{faq.q1}}</h3>
+    <p>{{faq.a1}}</p>
+    <h3>{{faq.q2}}</h3>
+    <p>{{faq.a2}}</p>
+    <h3>{{faq.q3}}</h3>
+    <p>{{faq.a3}}</p>
+    <h3>{{faq.q4}}</h3>
+    <p>{{faq.a4}}</p>
+    <h3>{{faq.q5}}</h3>
+    <p>{{faq.a5}}</p>
+    <h3>{{faq.q6}}</h3>
+    <p>{{faq.a6}}</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    {{footer.license}} —
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/blob/main/LICENSE.md">LICENSE.md</a>
+    · {{footer.project}} <a href="https://bit-scripts.github.io/">Bit-Scripts</a>
+  </div>
+</footer>
+
+<script>
+  const drawers = [
+    { toggle: document.getElementById('arch-toggle'), drawer: document.getElementById('arch-drawer') },
+    { toggle: document.getElementById('ubuntu-toggle'), drawer: document.getElementById('ubuntu-drawer') },
+    { toggle: document.getElementById('fedora-toggle'), drawer: document.getElementById('fedora-drawer') },
+  ];
+
+  drawers.forEach(({ toggle, drawer }) => {
+    toggle.addEventListener('click', () => {
+      const wasOpen = drawer.classList.contains('open');
+      drawers.forEach(({ toggle: t, drawer: d }) => {
+        d.classList.remove('open');
+        t.setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) {
+        drawer.classList.add('open');
+        toggle.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  const closeAllDrawers = () => {
+    drawers.forEach(({ toggle, drawer }) => {
+      drawer.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  };
+
+  document.getElementById('windows-download').addEventListener('click', closeAllDrawers);
+  document.getElementById('docs-link').addEventListener('click', closeAllDrawers);
+</script>
+
+</body>
+</html>
