@@ -102,6 +102,11 @@
   "base.url": "../",
   "docs.url": "../docs/en/",
 
+  "lang.fr.url": "../",
+  "lang.fr.class": "",
+  "lang.en.url": "#",
+  "lang.en.class": "lang-current",
+
   "docs.meta.title": "Documentation — PDF-Equilibrist",
   "docs.meta.description": "PDF-Equilibrist technical documentation: architecture, build, PDF operations, contribution and security.",
   "docs.base.url": "../../",

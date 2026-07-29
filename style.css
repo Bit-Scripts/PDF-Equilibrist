@@ -70,6 +70,52 @@ img { max-width: 100%; display: block; }
 }
 .topnav nav a:hover, .topnav nav a.active { color: var(--accent); text-decoration: none; }
 
+/* Sélecteur de langue */
+.lang-switch {
+  margin-left: 22px;
+  padding-left: 22px;
+  border-left: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.lang-switch a {
+  color: var(--text-dim);
+  padding: 2px 4px;
+}
+.lang-switch a:hover { color: var(--accent); text-decoration: none; }
+.lang-switch a.lang-current {
+  color: var(--accent);
+  pointer-events: none;
+}
+.lang-switch a + a::before { content: "·"; margin: 0 4px; color: var(--border); pointer-events: none; }
+
+/* Bandeau de suggestion de langue */
+.lang-banner {
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+}
+.lang-banner .container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 24px;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+.lang-banner .btn { padding: 6px 16px; font-size: 0.85rem; min-width: 0; }
+.lang-banner button {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.lang-banner button:hover { color: var(--text); }
+
 /* Hero */
 .hero {
   text-align: center;

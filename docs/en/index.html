@@ -20,7 +20,18 @@
     <a href="../../en/#fonctionnalites">Features</a>
     <a href="./" class="active">Documentation</a>
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a>
+    <span class="lang-switch">
+      <a href="../" class="">FR</a><a href="#" class="lang-current">EN</a>
+    </span>
   </nav>
+</div>
+
+<div class="lang-banner" id="lang-banner" hidden>
+  <div class="container">
+    <span id="lang-banner-msg"></span>
+    <a href="#" id="lang-banner-switch" class="btn btn-primary"></a>
+    <button type="button" id="lang-banner-close" aria-label="Close">×</button>
+  </div>
 </div>
 
 <div class="docs-layout">
@@ -88,6 +99,36 @@ contentEl.addEventListener("click", (e) => {
 
 window.addEventListener("hashchange", () => loadDoc(currentFile()));
 loadDoc(currentFile());
+
+// Bandeau de suggestion de langue — même logique que sur la page d'accueil.
+(function () {
+  var CUR = document.documentElement.lang;
+  var OTHER = CUR === "fr" ? "en" : "fr";
+  var TXT = {
+    fr: { avail: "Ce site est aussi disponible en français.", switchLabel: "Basculer en français" },
+    en: { avail: "This site is also available in English.", switchLabel: "Switch to English" },
+  };
+  try {
+    if (localStorage.getItem("langBannerDismissed") === "1") return;
+    var detected = ((navigator.language || "") + "").slice(0, 2).toLowerCase();
+    if (detected === CUR) return;
+
+    var otherLink = document.querySelector(".lang-switch a[href]:not(.lang-current)");
+    if (!otherLink) return;
+
+    var banner = document.getElementById("lang-banner");
+    document.getElementById("lang-banner-msg").textContent = TXT[OTHER].avail;
+    var switchLink = document.getElementById("lang-banner-switch");
+    switchLink.textContent = TXT[OTHER].switchLabel;
+    switchLink.href = otherLink.getAttribute("href");
+    banner.hidden = false;
+
+    document.getElementById("lang-banner-close").addEventListener("click", function () {
+      banner.hidden = true;
+      try { localStorage.setItem("langBannerDismissed", "1"); } catch (e) {}
+    });
+  } catch (e) { /* localStorage indisponible : pas de bandeau, pas grave */ }
+})();
 </script>
 
 </body>
