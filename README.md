@@ -15,76 +15,80 @@
 [![Dependencies](https://img.shields.io/badge/Dependencies-Clean-brightgreen.svg)](.)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen.svg)](.)
 
+**🇫🇷 [Lire en français](README.fr.md)**
+
 </div>
 
-**PDF-Equilibrist** est un éditeur PDF de bureau, gratuit et open-source, construit en Python
-avec **PyQt6** et **PyMuPDF**. Il fonctionne entièrement en local — pas de cloud, pas de
-télémétrie, pas de compte requis — et permet de lire, modifier, convertir, annoter et
-protéger vos documents PDF.
+> 🌍 This README is available in English. The application's interface itself is still
+> French-only for now — an English translation of the app is planned soon.
+
+**PDF-Equilibrist** is a free, open-source desktop PDF editor built in Python with
+**PyQt6** and **PyMuPDF**. It runs entirely locally — no cloud, no telemetry, no account
+required — and lets you read, edit, convert, annotate and protect your PDF documents.
 
 ![PDF-Equilibrist](assets/images/PDF-Equilibrist.png)
 
-## Fonctionnalités
+## Features
 
-### Affichage
-Zoom, rotation, navigation multi-onglets et multi-pages.
+### Display
+Zoom, rotation, multi-tab and multi-page navigation.
 
-![Affichage](assets/images/feature-afficher.png)
+![Display](assets/images/feature-afficher.png)
 
-### Édition
-Modification de texte, filigrane, signatures et tampons.
+### Edit
+Text editing, watermarks, signatures and stamps.
 
-![Édition](assets/images/feature-modifier.png)
+![Edit](assets/images/feature-modifier.png)
 
-### Annotation
-Surlignage, barré, soulignement, zones de texte.
+### Annotate
+Highlight, strikethrough, underline, text boxes.
 
-![Annotation](assets/images/feature-annoter.png)
+![Annotate](assets/images/feature-annoter.png)
 
 ### Pages
-Insertion, division, fusion, inversion.
+Insert, split, merge, reverse.
 
 ![Pages](assets/images/feature-page.png)
 
-### Conversion
-Word, Excel, PowerPoint, images, Office → PDF, image → PDF, OCR local, traitement par lot.
+### Convert
+Word, Excel, PowerPoint, images, Office → PDF, image → PDF, local OCR, batch processing.
 
-![Conversion](assets/images/feature-convertir.png)
+![Convert](assets/images/feature-convertir.png)
 
-### Protection
-Chiffrement et déchiffrement AES-256.
+### Protect
+AES-256 encryption and decryption.
 
-![Protection](assets/images/feature-proteger.png)
+![Protect](assets/images/feature-proteger.png)
 
-## Sécurité & confidentialité
+## Security & privacy
 
-Contrairement aux outils PDF en ligne qui envoient vos fichiers sur des serveurs tiers,
-PDF-Equilibrist exécute tous ses traitements à 100 % en local.
+Unlike online PDF tools that send your files to third-party servers, PDF-Equilibrist runs
+all its processing 100% locally.
 
-L'application embarque aussi son propre outil d'audit de sécurité, accessible en un clic
-depuis l'interface :
+The application also embeds its own security audit tool, accessible in one click from the
+interface:
 
-- **Analyse SAST du code source** via [Bandit](https://github.com/PyCQA/bandit).
-- **Vérification des dépendances** contre les vulnérabilités connues via l'API [OSV](https://osv.dev/).
+- **SAST analysis of the source code** via [Bandit](https://github.com/PyCQA/bandit).
+- **Dependency checking** against known vulnerabilities via the [OSV](https://osv.dev/) API.
 
-![Outil d'analyse de sécurité](assets/images/Outil-Analyse-Security.png)
+![Security analysis tool](assets/images/Outil-Analyse-Security.png)
 
 ## Installation
 
-🌐 Site officiel : [pdf-equilibrist.org](https://pdf-equilibrist.org)
+🌐 Official website: [pdf-equilibrist.org](https://pdf-equilibrist.org)
 
-📦 **Windows** — téléchargez le dernier installeur dans les [Releases GitHub](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest).
+📦 **Windows** — download the latest installer from the [GitHub Releases](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest).
 
-🐧 **Arch Linux** (AUR) :
+🐧 **Arch Linux** (AUR):
 
 ```bash
 yay -S pdf-equilibrist
-# ou : paru -S pdf-equilibrist
+# or: paru -S pdf-equilibrist
 ```
 
-→ [Page AUR](https://aur.archlinux.org/packages/pdf-equilibrist)
+→ [AUR page](https://aur.archlinux.org/packages/pdf-equilibrist)
 
-🐧 **Ubuntu / Debian** (PPA) :
+🐧 **Ubuntu / Debian** (PPA):
 
 ```bash
 sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist
@@ -92,42 +96,42 @@ sudo apt update
 sudo apt install pdf-equilibrist
 ```
 
-→ [Page Launchpad](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist)
+→ [Launchpad page](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist)
 
-🐧 **Fedora** (COPR) :
+🐧 **Fedora** (COPR):
 
 ```bash
 sudo dnf copr enable paullux/PDF-Equilibrist
 sudo dnf install pdf-equilibrist
 ```
 
-→ [Page COPR](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
+→ [COPR page](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
 
-### Installation depuis les sources (développeurs)
+### Installing from source (developers)
 
-1. Créez un environnement Python compatible (`>=3.12`).
-2. Installez les dépendances :
+1. Create a compatible Python environment (`>=3.12`).
+2. Install dependencies:
 
 ```powershell
 python -m pip install -r requirements.txt
 ```
 
-3. Exécutez l’application :
+3. Run the application:
 
 ```powershell
 python src/pdf_equilibrist/main.py
 ```
 
-## Construction et packaging
+## Building and packaging
 
-- Le script NSIS d’installation se trouve dans `installer/PDF-Equilibrist.nsi`.
-- Les artefacts compilés ne doivent pas être suivis dans le dépôt source.
-- Les sorties de build sont ignorées par `.gitignore`.
+- The NSIS install script lives in `installer/PDF-Equilibrist.nsi`.
+- Build artifacts must not be tracked in the source repository.
+- Build outputs are ignored via `.gitignore`.
 
 ## Documentation
 
-La documentation source se trouve dans le dossier `docs/`.
+Source documentation lives in the `docs/` folder.
 
-## Licence
+## License
 
-Ce projet est distribué sous licence GNU GPL v3.0 (ou ultérieure). Voir [LICENSE.md](LICENSE.md).
+This project is distributed under the GNU GPL v3.0 license (or later). See [LICENSE.md](LICENSE.md).
