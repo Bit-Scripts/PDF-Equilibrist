@@ -19,6 +19,7 @@ jobs:
           VERSION="${VERSION#v}"
           grep -q '"softwareVersion"' index.html || { echo "ERREUR : champ softwareVersion introuvable dans index.html"; exit 1; }
           sed -i "s/\"softwareVersion\": \"[^\"]*\"/\"softwareVersion\": \"$VERSION\"/" index.html
+          grep -q "\"softwareVersion\": \"$VERSION\"" index.html || { echo "ERREUR : remplacement de softwareVersion échoué"; exit 1; }
           echo "softwareVersion mis à jour : $VERSION"
 
       - name: Commit et push
