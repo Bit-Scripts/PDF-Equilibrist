@@ -107,6 +107,12 @@
   "lang.en.url": "#",
   "lang.en.class": "lang-current",
 
+  "site.fr.url": "https://pdf-equilibrist.org/",
+  "site.en.url": "https://pdf-equilibrist.org/en/",
+  "site.docs.fr.url": "https://pdf-equilibrist.org/docs/",
+  "site.docs.en.url": "https://pdf-equilibrist.org/docs/en/",
+  "docs.canonical": "https://pdf-equilibrist.org/docs/en/",
+
   "docs.meta.title": "Documentation — PDF-Equilibrist",
   "docs.meta.description": "PDF-Equilibrist technical documentation: architecture, build, PDF operations, contribution and security.",
   "docs.base.url": "../../",
