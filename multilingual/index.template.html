@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/assets/images/PDF-Equilibrist.png">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="{{base.url}}style.css">
 <link rel="canonical" href="{{meta.canonical}}">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
@@ -101,20 +101,20 @@
 
 <div class="topnav">
   <div class="brand">
-    <img src="assets/logo/PDF-Equilibrist-logo.png" alt="{{img.logo.alt}}">
+    <img src="{{base.url}}assets/logo/PDF-Equilibrist-logo.png" alt="{{img.logo.alt}}">
     PDF-Equilibrist
   </div>
   <nav>
     <a href="#apropos">{{nav.about}}</a>
     <a href="#fonctionnalites">{{nav.features}}</a>
     <a href="#securite">{{nav.security}}</a>
-    <a href="docs/">{{nav.docs}}</a>
+    <a href="{{docs.url}}">{{nav.docs}}</a>
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a>
   </nav>
 </div>
 
 <div class="hero">
-  <img class="logo" src="assets/logo/PDF-Equilibrist-logo.png" alt="{{img.hero.alt}}">
+  <img class="logo" src="{{base.url}}assets/logo/PDF-Equilibrist-logo.png" alt="{{img.hero.alt}}">
   <h1>PDF-Equilibrist</h1>
   <p class="tagline">{{hero.tagline1}}</p>
   <p class="tagline">{{hero.tagline2}}</p>
@@ -164,12 +164,12 @@ sudo dnf install pdf-equilibrist</code></pre>
       </div>
     </div>
     <div class="cta-item">
-      <a class="btn btn-secondary" id="docs-link" href="docs/">{{cta.docs}}</a>
+      <a class="btn btn-secondary" id="docs-link" href="{{docs.url}}">{{cta.docs}}</a>
     </div>
   </div>
 
   <div class="hero-shot">
-    <img src="assets/images/PDF-Equilibrist.png" alt="{{img.screenshot.alt}}">
+    <img src="{{base.url}}assets/images/PDF-Equilibrist.png" alt="{{img.screenshot.alt}}">
   </div>
 </div>
 
@@ -195,42 +195,42 @@ sudo dnf install pdf-equilibrist</code></pre>
     <p class="lead">{{features.lead}}</p>
     <div class="feature-grid">
       <div class="feature-card">
-        <img src="assets/images/feature-afficher.png" alt="{{img.feature.display.alt}}">
+        <img src="{{base.url}}assets/images/feature-afficher.png" alt="{{img.feature.display.alt}}">
         <div class="body">
           <h3>{{features.display.title}}</h3>
           <p>{{features.display.desc}}</p>
         </div>
       </div>
       <div class="feature-card">
-        <img src="assets/images/feature-modifier.png" alt="{{img.feature.edit.alt}}">
+        <img src="{{base.url}}assets/images/feature-modifier.png" alt="{{img.feature.edit.alt}}">
         <div class="body">
           <h3>{{features.edit.title}}</h3>
           <p>{{features.edit.desc}}</p>
         </div>
       </div>
       <div class="feature-card">
-        <img src="assets/images/feature-annoter.png" alt="{{img.feature.annotate.alt}}">
+        <img src="{{base.url}}assets/images/feature-annoter.png" alt="{{img.feature.annotate.alt}}">
         <div class="body">
           <h3>{{features.annotate.title}}</h3>
           <p>{{features.annotate.desc}}</p>
         </div>
       </div>
       <div class="feature-card">
-        <img src="assets/images/feature-page.png" alt="{{img.feature.pages.alt}}">
+        <img src="{{base.url}}assets/images/feature-page.png" alt="{{img.feature.pages.alt}}">
         <div class="body">
           <h3>{{features.pages.title}}</h3>
           <p>{{features.pages.desc}}</p>
         </div>
       </div>
       <div class="feature-card">
-        <img src="assets/images/feature-convertir.png" alt="{{img.feature.convert.alt}}">
+        <img src="{{base.url}}assets/images/feature-convertir.png" alt="{{img.feature.convert.alt}}">
         <div class="body">
           <h3>{{features.convert.title}}</h3>
           <p>{{features.convert.desc}}</p>
         </div>
       </div>
       <div class="feature-card">
-        <img src="assets/images/feature-proteger.png" alt="{{img.feature.protect.alt}}">
+        <img src="{{base.url}}assets/images/feature-proteger.png" alt="{{img.feature.protect.alt}}">
         <div class="body">
           <h3>{{features.protect.title}}</h3>
           <p>{{features.protect.desc}}</p>
@@ -250,7 +250,7 @@ sudo dnf install pdf-equilibrist</code></pre>
         <li>{{security.li2}}</li>
         <li>{{security.li3}}</li>
       </ul>
-      <img src="assets/images/Outil-Analyse-Security.png" alt="{{img.security.alt}}">
+      <img src="{{base.url}}assets/images/Outil-Analyse-Security.png" alt="{{img.security.alt}}">
     </div>
   </div>
 </section>

@@ -1,47 +1,47 @@
 <!doctype html>
-<html lang="fr">
+<html lang="{{html.lang}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Documentation — PDF-Equilibrist</title>
-<meta name="description" content="Documentation technique de PDF-Equilibrist : architecture, build, opérations PDF, contribution et sécurité.">
-<link rel="icon" href="../assets/logo/PDF-Equilibrist-logo.png">
-<link rel="stylesheet" href="../style.css">
+<title>{{docs.meta.title}}</title>
+<meta name="description" content="{{docs.meta.description}}">
+<link rel="icon" href="{{docs.base.url}}assets/logo/PDF-Equilibrist-logo.png">
+<link rel="stylesheet" href="{{docs.base.url}}style.css">
 </head>
 <body>
 
 <div class="topnav">
   <div class="brand">
-    <img src="../assets/logo/PDF-Equilibrist-logo.png" alt="Logo PDF-Equilibrist — éditeur PDF open-source local">
+    <img src="{{docs.base.url}}assets/logo/PDF-Equilibrist-logo.png" alt="{{img.logo.alt}}">
     PDF-Equilibrist
   </div>
   <nav>
-    <a href="../">Accueil</a>
-    <a href="../#fonctionnalites">Fonctionnalités</a>
-    <a href="./" class="active">Documentation</a>
+    <a href="{{docs.nav.home.url}}">{{nav.home}}</a>
+    <a href="{{docs.nav.features.url}}">{{nav.features}}</a>
+    <a href="./" class="active">{{nav.docs}}</a>
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a>
   </nav>
 </div>
 
 <div class="docs-layout">
   <aside class="docs-sidebar">
-    <h4>Documentation</h4>
+    <h4>{{nav.docs}}</h4>
     <div id="doc-links"></div>
   </aside>
   <main class="docs-content" id="doc-content">
-    <p class="docs-loading">Chargement…</p>
+    <p class="docs-loading">{{docs.loading}}</p>
   </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
 const DOCS = [
-  { file: "1.INDEX.md",        title: "1. Index" },
-  { file: "2.ARCHITECTURE.md", title: "2. Architecture" },
-  { file: "3.CONTRIBUTING.md", title: "3. Contributing" },
-  { file: "4.OPERATIONS.md",   title: "4. Opérations" },
-  { file: "5.BUILD.md",        title: "5. Build" },
-  { file: "6.SECURITE.md",     title: "6. Sécurité" },
+  { file: "1.INDEX.md",        title: "{{docs.file1.title}}" },
+  { file: "2.ARCHITECTURE.md", title: "{{docs.file2.title}}" },
+  { file: "3.CONTRIBUTING.md", title: "{{docs.file3.title}}" },
+  { file: "4.OPERATIONS.md",   title: "{{docs.file4.title}}" },
+  { file: "5.BUILD.md",        title: "{{docs.file5.title}}" },
+  { file: "6.SECURITE.md",     title: "{{docs.file6.title}}" },
 ];
 
 const linksEl = document.getElementById("doc-links");
@@ -62,17 +62,17 @@ function currentFile() {
 }
 
 async function loadDoc(file) {
-  contentEl.innerHTML = '<p class="docs-loading">Chargement…</p>';
+  contentEl.innerHTML = '<p class="docs-loading">{{docs.loading}}</p>';
   try {
     const res = await fetch(file);
     if (!res.ok) throw new Error(res.status);
     const md = await res.text();
     contentEl.innerHTML = marked.parse(md);
   } catch (err) {
-    contentEl.innerHTML = '<p class="docs-loading">Impossible de charger ' + file + ' (' + err + ')</p>';
+    contentEl.innerHTML = '<p class="docs-loading">{{docs.error.load}} ' + file + ' (' + err + ')</p>';
   }
   [...linksEl.children].forEach(a => a.classList.toggle("active", a.dataset.file === file));
-  document.title = "Documentation — PDF-Equilibrist";
+  document.title = "{{docs.meta.title}}";
 }
 
 contentEl.addEventListener("click", (e) => {

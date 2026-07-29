@@ -96,5 +96,23 @@
   "faq.a6.plain": "Yes. The code is published on GitHub and dependencies are automatically checked against known vulnerabilities.",
 
   "footer.license": "GNU GPL v3.0 License (or later)",
-  "footer.project": "A project by"
+  "footer.project": "A project by",
+
+  "nav.home": "Home",
+  "base.url": "../",
+  "docs.url": "../docs/en/",
+
+  "docs.meta.title": "Documentation — PDF-Equilibrist",
+  "docs.meta.description": "PDF-Equilibrist technical documentation: architecture, build, PDF operations, contribution and security.",
+  "docs.base.url": "../../",
+  "docs.nav.home.url": "../../en/",
+  "docs.nav.features.url": "../../en/#fonctionnalites",
+  "docs.loading": "Loading…",
+  "docs.error.load": "Failed to load",
+  "docs.file1.title": "1. Index",
+  "docs.file2.title": "2. Architecture",
+  "docs.file3.title": "3. Contributing",
+  "docs.file4.title": "4. Operations",
+  "docs.file5.title": "5. Build",
+  "docs.file6.title": "6. Security"
 }
