@@ -1,0 +1,23 @@
+name: Notify IndexNow (Bing)
+
+on:
+  push:
+    branches: [gh-pages]
+
+jobs:
+  indexnow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Soumettre les URLs à Bing IndexNow
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" -X POST https://api.indexnow.org/indexnow \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d '{
+              "host": "pdf-equilibrist.org",
+              "key": "da89694506444512ad5a2b1ed7fd5753",
+              "keyLocation": "https://pdf-equilibrist.org/da89694506444512ad5a2b1ed7fd5753.txt",
+              "urlList": [
+                "https://pdf-equilibrist.org/",
+                "https://pdf-equilibrist.org/docs/"
+              ]
+            }'
