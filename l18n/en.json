@@ -113,6 +113,9 @@
   "site.docs.en.url": "https://pdf-equilibrist.org/docs/en/",
   "docs.canonical": "https://pdf-equilibrist.org/docs/en/",
 
+  "app.notice.hidden": "",
+  "app.notice.text": "🌍 Please note: the application itself is still French-only for now — an English translation is planned soon.",
+
   "docs.meta.title": "Documentation — PDF-Equilibrist",
   "docs.meta.description": "PDF-Equilibrist technical documentation: architecture, build, PDF operations, contribution and security.",
   "docs.base.url": "../../",
