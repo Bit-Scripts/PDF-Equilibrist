@@ -17,6 +17,7 @@ jobs:
         run: |
           VERSION="${{ github.ref_name }}"
           VERSION="${VERSION#v}"
+          grep -q '"softwareVersion"' index.html || { echo "ERREUR : champ softwareVersion introuvable dans index.html"; exit 1; }
           sed -i "s/\"softwareVersion\": \"[^\"]*\"/\"softwareVersion\": \"$VERSION\"/" index.html
           echo "softwareVersion mis à jour : $VERSION"
 
