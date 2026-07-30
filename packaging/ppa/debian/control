@@ -20,7 +20,12 @@ Depends: ${misc:Depends},
          python3-pyqt6,
          python3-pyqt6.qtsvg,
          hicolor-icon-theme,
-         desktop-file-utils
+         desktop-file-utils,
+         fonts-noto-color-emoji
+# fonts-noto-color-emoji : le ribbon utilise des emojis couleur comme icônes
+# (🖨, 🖼, 🔒, 🌐…) — sans police d'emoji couleur installée, ces boutons
+# s'affichent comme des rectangles vides (glyphe manquant), pas juste en
+# noir et blanc. Trouvé en testant le paquet AUR de la 0.1.16.
 Description: Free and open-source desktop PDF editor
  PDF-Equilibrist is a free, open-source desktop PDF editor built with
  Python (PyQt6 + PyMuPDF). It runs entirely locally: no cloud, no

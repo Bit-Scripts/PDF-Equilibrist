@@ -64,6 +64,11 @@ Requires:       python3-fonttools
 Requires:       python3-pdfminer
 Requires:       hicolor-icon-theme
 Requires:       desktop-file-utils
+# Le ribbon utilise des emojis couleur comme icônes (🖨, 🖼, 🔒, 🌐…) — sans
+# police d'emoji couleur installée, ces boutons s'affichent comme des
+# rectangles vides (glyphe manquant), pas juste en noir et blanc. Trouvé en
+# testant le paquet AUR de la 0.1.16.
+Requires:       google-noto-color-emoji-fonts
 
 %description
 PDF-Equilibrist is a free, open-source desktop PDF editor built with
