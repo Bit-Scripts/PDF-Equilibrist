@@ -19,9 +19,6 @@
 
 </div>
 
-> 🌍 This README is available in English. The application's interface itself is still
-> French-only for now — an English translation of the app is planned soon.
-
 **PDF-Equilibrist** is a free, open-source desktop PDF editor built in Python with
 **PyQt6** and **PyMuPDF**. It runs entirely locally — no cloud, no telemetry, no account
 required — and lets you read, edit, convert, annotate and protect your PDF documents.

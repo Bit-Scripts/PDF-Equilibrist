@@ -19,9 +19,6 @@
 
 </div>
 
-> 🌍 Ce README est disponible en français. L'interface de l'application, elle, reste pour
-> l'instant 100 % en français — une traduction anglaise de l'application est prévue prochainement.
-
 **PDF-Equilibrist** est un éditeur PDF de bureau, gratuit et open-source, construit en Python
 avec **PyQt6** et **PyMuPDF**. Il fonctionne entièrement en local — pas de cloud, pas de
 télémétrie, pas de compte requis — et permet de lire, modifier, convertir, annoter et
