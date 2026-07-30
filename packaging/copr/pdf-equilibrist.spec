@@ -106,6 +106,16 @@ venv-build/bin/pip install --no-index --no-deps \
     %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} %{SOURCE14}
 venv-build/bin/pip install --no-index --no-build-isolation --no-deps .
 
+# pip n'est jamais invoqué au runtime (l'app n'installe rien elle-même) —
+# on le retire du venv livré plutôt que de courir après chaque nouvelle CVE
+# pip (le scanner CVE intégré à l'app le remontait alors qu'il ne sert à
+# rien une fois le paquet construit) : ensurepip embarque systématiquement
+# la version figée dans le Python système du chroot de build, jamais la
+# dernière corrigée en amont.
+rm -rf venv-build/bin/pip venv-build/bin/pip3 venv-build/bin/pip3.* \
+    venv-build/lib/python3.*/site-packages/pip \
+    venv-build/lib/python3.*/site-packages/pip-*.dist-info
+
 %install
 rm -rf %{buildroot}
 install -d %{buildroot}%{_libdir}/%{name}

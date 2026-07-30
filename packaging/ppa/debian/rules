@@ -61,6 +61,17 @@ override_dh_auto_build:
 		pdfplumber Pillow pycparser PyMuPDF pyparsing pypdfium2 \
 		python-docx python-pptx termcolor typing-extensions XlsxWriter
 	$(CURDIR)/debian/venv-build/bin/pip install --no-index --no-build-isolation --no-deps .
+	# pip n'est jamais invoqué au runtime (l'app n'installe rien elle-même) —
+	# on le retire du venv livré plutôt que de courir après chaque nouvelle
+	# CVE pip (le scanner CVE intégré à l'app le remontait alors qu'il ne
+	# sert à rien une fois le paquet construit) : ensurepip embarque
+	# systématiquement la version figée dans le Python système du chroot de
+	# build, jamais la dernière corrigée en amont.
+	rm -rf $(CURDIR)/debian/venv-build/bin/pip \
+		$(CURDIR)/debian/venv-build/bin/pip3 \
+		$(CURDIR)/debian/venv-build/bin/pip3.* \
+		$(CURDIR)/debian/venv-build/lib/python3.*/site-packages/pip \
+		$(CURDIR)/debian/venv-build/lib/python3.*/site-packages/pip-*.dist-info
 
 override_dh_auto_install:
 	mkdir -p $(dir $(VENV))
