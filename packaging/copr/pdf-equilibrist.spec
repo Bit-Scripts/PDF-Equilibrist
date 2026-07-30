@@ -1,6 +1,6 @@
 Name:           pdf-equilibrist
-Version:        0.1.14
-Release:        2%{?dist}
+Version:        0.1.15
+Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
 # Le venv privé n'a ni sources C à débugger (pur Python + wheels manylinux
@@ -150,6 +150,11 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.15-1
+- New upstream release: full English translation of the app UI (all
+  ribbon tabs, dialogs, menus, status bar), bilingual FR/EN NSIS
+  installer. No dependency changes — same wheelhouse as 0.1.14.
+
 * Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.14-2
 - Security: strip pip from the shipped venv (CVE-2026-3219, CVE-2026-6357,
   CVE-2026-8643). The app never invokes pip at runtime — python3 -m venv

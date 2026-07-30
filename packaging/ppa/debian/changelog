@@ -1,3 +1,19 @@
+pdf-equilibrist (0.1.15-2) resolute; urgency=medium
+
+  * New upstream release: full English translation of the app UI (all
+    ribbon tabs, dialogs, menus, status bar), bilingual FR/EN NSIS
+    installer. No dependency changes — same wheelhouse as 0.1.14.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 30 Jul 2026 22:00:00 +0000
+
+pdf-equilibrist (0.1.15-1) noble; urgency=medium
+
+  * New upstream release: full English translation of the app UI (all
+    ribbon tabs, dialogs, menus, status bar), bilingual FR/EN NSIS
+    installer. No dependency changes — same wheelhouse as 0.1.14.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 30 Jul 2026 22:00:00 +0000
+
 pdf-equilibrist (0.1.14-6) resolute; urgency=high
 
   * Security: strip pip from the shipped venv (CVE-2026-3219, CVE-2026-6357,
