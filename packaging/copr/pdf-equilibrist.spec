@@ -1,6 +1,6 @@
 Name:           pdf-equilibrist
 Version:        0.1.16
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
 # Le venv privé n'a ni sources C à débugger (pur Python + wheels manylinux
@@ -161,6 +161,14 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.16-2
+- Add google-noto-color-emoji-fonts as a Requires. The ribbon uses color
+  emoji as icons (🖨, 🖼, 🔒, 🌐…) — without a color emoji font, these
+  buttons render as blank rectangles (missing glyph). Rebuilt under a
+  new Release rather than reusing 0.1.16-1's NVR, since dnf only
+  compares version-release strings and wouldn't have offered this as
+  an upgrade to anyone who already had -1 installed.
+
 * Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.16-1
 - New upstream release: full English translation of the app UI (all
   ribbon tabs, dialogs, menus, status bar). Fixes app translations (.qm)
