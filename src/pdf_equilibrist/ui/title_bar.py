@@ -199,12 +199,20 @@ class TitleBar(QWidget):
         self._btn_new = QPushButton("+")
         self._btn_new.setFixedSize(32, 38)
         self._btn_new.setStyleSheet(_CTRL_BASE)
-        self._btn_new.setToolTip("Ouvrir un PDF (Ctrl+O)")
+        self._btn_new.setToolTip(self.tr("Ouvrir un PDF (Ctrl+O)"))
         self._btn_new.clicked.connect(self.new_tab_requested)
         layout.addWidget(self._btn_new)
 
         # Espace extensible = zone de drag (reçoit mousePressEvent)
         layout.addStretch(1)
+
+        # ── Bouton langue ─────────────────────────────────────────────────────
+        self._btn_lang = QPushButton("🌐")
+        self._btn_lang.setFixedSize(38, 30)
+        self._btn_lang.setStyleSheet(_CTRL_BASE)
+        self._btn_lang.setToolTip(self.tr("Langue / Language"))
+        self._btn_lang.clicked.connect(self._show_lang_menu)
+        layout.addWidget(self._btn_lang)
 
         # ── Contrôles fenêtre ─────────────────────────────────────────────────
         # Icônes PNG custom depuis assets/buttons/
@@ -226,9 +234,9 @@ class TitleBar(QWidget):
             btn.setIconSize(QSize(BTN_W - 10, BTN_H - 8))
             btn.setFixedSize(BTN_W, BTN_H)
 
-        self._btn_min.setToolTip("Réduire")
-        self._btn_max.setToolTip("Agrandir / Restaurer")
-        self._btn_close.setToolTip("Fermer")
+        self._btn_min.setToolTip(self.tr("Réduire"))
+        self._btn_max.setToolTip(self.tr("Agrandir / Restaurer"))
+        self._btn_close.setToolTip(self.tr("Fermer"))
         self._btn_min.setStyleSheet(_CTRL_BASE)
         self._btn_max.setStyleSheet(_CTRL_BASE)
         self._btn_close.setStyleSheet(_CLOSE_BTN)  # rouge au hover
@@ -352,3 +360,52 @@ class TitleBar(QWidget):
         """Double-clic sur la barre de titre → maximise/restaure la fenêtre."""
         if event.button() == Qt.MouseButton.LeftButton:
             self.maximize_requested.emit()
+
+    # ── Langue ────────────────────────────────────────────────────────────────
+
+    def _show_lang_menu(self):
+        from PyQt6.QtWidgets import QMenu
+        from PyQt6.QtGui import QAction
+        from pdf_equilibrist.i18n import SUPPORTED_LANGS, current_lang
+
+        menu = QMenu(self)
+        current = current_lang()
+        for code, name in SUPPORTED_LANGS.items():
+            action = QAction(name, self)
+            action.setCheckable(True)
+            action.setChecked(code == current)
+            action.triggered.connect(lambda _checked, c=code: self._apply_lang(c))
+            menu.addAction(action)
+
+        pos = self._btn_lang.mapToGlobal(
+            self._btn_lang.rect().bottomLeft()
+        )
+        menu.exec(pos)
+
+    def _apply_lang(self, lang: str):
+        from pdf_equilibrist.i18n import set_lang, current_lang
+        if lang == current_lang():
+            return
+        set_lang(lang)
+
+        from PyQt6.QtWidgets import QMessageBox
+        from PyQt6.QtCore import QProcess
+        import sys
+
+        msg = QMessageBox(self)
+        msg.setWindowTitle(self.tr("Langue modifiée"))
+        msg.setText(self.tr(
+            "Le changement de langue sera appliqué au prochain démarrage."
+        ))
+        msg.setIcon(QMessageBox.Icon.Information)
+        btn_now = msg.addButton(
+            self.tr("Redémarrer maintenant"),
+            QMessageBox.ButtonRole.AcceptRole,
+        )
+        msg.addButton(self.tr("Plus tard"), QMessageBox.ButtonRole.RejectRole)
+        msg.exec()
+
+        if msg.clickedButton() is btn_now:
+            QProcess.startDetached(sys.executable, sys.argv)
+            from PyQt6.QtWidgets import QApplication
+            QApplication.quit()

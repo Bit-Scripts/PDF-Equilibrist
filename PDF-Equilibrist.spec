@@ -20,6 +20,7 @@ block_cipher = None
 datas = [
     ("assets",              "assets"),
     ("src/pdf_equilibrist", "pdf_equilibrist"),
+    ("translations",        "translations"),
 ]
 datas += collect_data_files("fitz")
 datas += collect_data_files("paddleocr")

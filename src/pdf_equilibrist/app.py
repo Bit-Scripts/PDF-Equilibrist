@@ -33,6 +33,7 @@ from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QIcon
+from pdf_equilibrist.i18n import install_translator
 
 ACCENT = "#6BBF4E"
 
@@ -218,6 +219,7 @@ def create_app(app: QApplication) -> QApplication:
     """
     from pdf_equilibrist.utils import resource_path
 
+    install_translator(app)
     app.setApplicationName("PDF Equilibrist")
 
     # Sous GNOME/Wayland (Ubuntu), l'association fenêtre → icône du dock ne
