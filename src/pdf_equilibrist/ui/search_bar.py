@@ -37,7 +37,7 @@ class SearchBar(QWidget):
 
         # Champ de saisie
         self._input = QLineEdit()
-        self._input.setPlaceholderText("Rechercher dans le document…")
+        self._input.setPlaceholderText(self.tr("Rechercher dans le document…"))
         self._input.setStyleSheet("""
             QLineEdit {
                 background: #1E1E1E; color: #F0F0F0;
@@ -52,14 +52,14 @@ class SearchBar(QWidget):
         # Bouton précédent
         self._btn_prev = QToolButton()
         self._btn_prev.setText("▲")
-        self._btn_prev.setToolTip("Résultat précédent (Maj+Entrée)")
+        self._btn_prev.setToolTip(self.tr("Résultat précédent (Maj+Entrée)"))
         self._btn_prev.setStyleSheet(self._btn_style())
         layout.addWidget(self._btn_prev)
 
         # Bouton suivant
         self._btn_next = QToolButton()
         self._btn_next.setText("▼")
-        self._btn_next.setToolTip("Résultat suivant (Entrée)")
+        self._btn_next.setToolTip(self.tr("Résultat suivant (Entrée)"))
         self._btn_next.setStyleSheet(self._btn_style())
         layout.addWidget(self._btn_next)
 
@@ -73,7 +73,7 @@ class SearchBar(QWidget):
         # Bouton fermer
         btn_close = QToolButton()
         btn_close.setText("✕")
-        btn_close.setToolTip("Fermer (Échap)")
+        btn_close.setToolTip(self.tr("Fermer (Échap)"))
         btn_close.setStyleSheet(self._btn_style())
         layout.addWidget(btn_close)
 
@@ -142,7 +142,7 @@ class SearchBar(QWidget):
         total = sum(len(rects) for _, rects in self._results)
 
         if not self._results:
-            self._label.setText("Aucun résultat")
+            self._label.setText(self.tr("Aucun résultat"))
             self._label.setStyleSheet("color: #E05555; font-size: 11px; min-width: 80px;")
             self._cur = -1
             return
@@ -175,7 +175,6 @@ class SearchBar(QWidget):
         if total is None:
             total = sum(len(r) for _, r in self._results)
         pages = len(self._results)
-        self._label.setText(
-            f"{total} résultat{'s' if total > 1 else ''} "
-            f"sur {pages} page{'s' if pages > 1 else ''}"
-        )
+        results_txt = self.tr("{0} résultat").format(total) if total <= 1 else self.tr("{0} résultats").format(total)
+        pages_txt = self.tr("{0} page").format(pages) if pages <= 1 else self.tr("{0} pages").format(pages)
+        self._label.setText(self.tr("{0} sur {1}").format(results_txt, pages_txt))

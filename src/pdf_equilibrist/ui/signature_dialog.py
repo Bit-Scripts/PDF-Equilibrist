@@ -79,7 +79,7 @@ class SignatureDialog(QDialog):
 
     def __init__(self, doc: fitz.Document, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Signature / Tampon")
+        self.setWindowTitle(self.tr("Signature / Tampon"))
         self.setStyleSheet(DIALOG_STYLE)
         self.setMinimumWidth(420)
         self._doc    = doc
@@ -89,13 +89,13 @@ class SignatureDialog(QDialog):
 
         # ── Tabs ─────────────────────────────────────────────────────────────
         tabs = QTabWidget()
-        tabs.addTab(self._make_stamp_tab(), "Tampons prédéfinis")
-        tabs.addTab(self._make_image_tab(), "Signature PNG")
+        tabs.addTab(self._make_stamp_tab(), self.tr("Tampons prédéfinis"))
+        tabs.addTab(self._make_image_tab(), self.tr("Signature PNG"))
         layout.addWidget(tabs)
 
         # ── Position ─────────────────────────────────────────────────────────
         pos_row = QHBoxLayout()
-        pos_row.addWidget(QLabel("Page :"))
+        pos_row.addWidget(QLabel(self.tr("Page :")))
         self._spin_page = QSpinBox()
         self._spin_page.setRange(1, len(doc))
         self._spin_page.setValue(1)
@@ -119,7 +119,7 @@ class SignatureDialog(QDialog):
         # ── Boutons ───────────────────────────────────────────────────────────
         btn_row = QHBoxLayout()
         btn_row.addStretch()
-        cancel = QPushButton("Annuler")
+        cancel = QPushButton(self.tr("Annuler"))
         cancel.clicked.connect(self.reject)
         btn_row.addWidget(cancel)
         layout.addLayout(btn_row)
@@ -133,9 +133,9 @@ class SignatureDialog(QDialog):
         grid.setSpacing(8)
         grid.setContentsMargins(12, 12, 12, 12)
         for i, (label, color, pdf_text) in enumerate(STAMPS):
-            btn = _StampBtn(label, color)
+            btn = _StampBtn(self.tr(label), color)
             btn.clicked.connect(
-                lambda _, c=color, t=pdf_text: self._apply_stamp(c, t))
+                lambda _, c=color, t=pdf_text: self._apply_stamp(c, self.tr(t)))
             grid.addWidget(btn, i // 2, i % 2)
         return w
 
@@ -158,7 +158,7 @@ class SignatureDialog(QDialog):
         layout = QVBoxLayout(w)
         layout.setContentsMargins(12, 12, 12, 12)
 
-        self._img_preview = QLabel("Aucune image sélectionnée")
+        self._img_preview = QLabel(self.tr("Aucune image sélectionnée"))
         self._img_preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._img_preview.setFixedHeight(120)
         self._img_preview.setStyleSheet(
@@ -167,17 +167,17 @@ class SignatureDialog(QDialog):
 
         self._img_path: str | None = None
 
-        btn_pick = QPushButton("📁  Choisir une image PNG / JPG…")
+        btn_pick = QPushButton(self.tr("📁  Choisir une image PNG / JPG…"))
         btn_pick.clicked.connect(self._pick_image)
         layout.addWidget(btn_pick)
 
         size_row = QHBoxLayout()
-        size_row.addWidget(QLabel("Largeur :"))
+        size_row.addWidget(QLabel(self.tr("Largeur :")))
         self._spin_w = QSpinBox()
         self._spin_w.setRange(10, 500)
         self._spin_w.setValue(150)
         size_row.addWidget(self._spin_w)
-        size_row.addWidget(QLabel("px   Hauteur :"))
+        size_row.addWidget(QLabel(self.tr("px   Hauteur :")))
         self._spin_h = QSpinBox()
         self._spin_h.setRange(10, 500)
         self._spin_h.setValue(80)
@@ -185,7 +185,7 @@ class SignatureDialog(QDialog):
         size_row.addStretch()
         layout.addLayout(size_row)
 
-        self._btn_insert_img = QPushButton("Insérer la signature")
+        self._btn_insert_img = QPushButton(self.tr("Insérer la signature"))
         self._btn_insert_img.setObjectName("primary")
         self._btn_insert_img.setEnabled(False)
         self._btn_insert_img.clicked.connect(self._apply_image)
@@ -195,8 +195,8 @@ class SignatureDialog(QDialog):
 
     def _pick_image(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Choisir une signature", "",
-            "Images (*.png *.jpg *.jpeg *.bmp)")
+            self, self.tr("Choisir une signature"), "",
+            self.tr("Images (*.png *.jpg *.jpeg *.bmp)"))
         if path:
             self._img_path = path
             pix = QPixmap(path).scaledToHeight(

@@ -135,6 +135,11 @@ class _ThumbList(QListWidget):
 class ThumbnailPanel(QWidget):
     page_selected = pyqtSignal(int)
     width_changed  = pyqtSignal(int)   # nouvelle largeur après rebuild
+    open_pdf_requested = pyqtSignal(str)   # dépose PDF alors qu'aucun document n'est ouvert
+    # → passe par MainWindow._open_document (nouvel onglet), même pattern que
+    #   viewer.open_pdf_requested pour les liens GOTOR. self.document.open(path)
+    #   en direct ici mutait le Document "vide" du splash sans jamais créer
+    #   d'onglet ni l'ajouter à MainWindow._documents.
 
     def __init__(self, document: Document, viewer, parent=None):
         super().__init__(parent)
@@ -149,7 +154,7 @@ class ThumbnailPanel(QWidget):
         layout.setContentsMargins(4, 8, 4, 8)
         layout.setSpacing(4)
 
-        title = QLabel("Pages")
+        title = QLabel(self.tr("Pages"))
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet(
             f"color: {ACCENT}; font-size: 11px; font-weight: bold;")
@@ -354,15 +359,16 @@ class ThumbnailPanel(QWidget):
         self._list.setCurrentRow((n - 1) if to == -1 else to)
 
     def _on_pdf_insert(self, path: str, insert_before: int):
-        # Aucun document ouvert → ouvrir directement
+        # Aucun document ouvert → passer par MainWindow pour créer un vrai
+        # onglet (voir la note sur open_pdf_requested plus haut).
         if not self.document.is_open:
-            self.document.open(path)
+            self.open_pdf_requested.emit(path)
             return
         try:
             src = fitz.open(path)
         except Exception as e:
             from pdf_equilibrist.ui.dialogs import show_error
-            show_error(self, "Insertion PDF", f"Impossible d'ouvrir :\n{e}")
+            show_error(self, self.tr("Insertion PDF"), self.tr("Impossible d'ouvrir :\n{0}").format(e))
             return
         doc      = self.document.fitz_doc
         n_before = len(doc)
@@ -390,33 +396,33 @@ class ThumbnailPanel(QWidget):
             QMenu::separator {{ height:1px; background:#3A3A3A; margin:3px 0; }}
         """)
 
-        up = QAction(f"↑  Monter  ({row+1}/{n} → {row}/{n})", self)
+        up = QAction(self.tr("↑  Monter  ({0}/{1} → {2}/{3})").format(row+1, n, row, n), self)
         up.setEnabled(row > 0)
         up.triggered.connect(lambda _=False, r=row: self._move_page(r, r - 1))
         menu.addAction(up)
 
-        dn = QAction(f"↓  Descendre  ({row+1}/{n} → {row+2}/{n})", self)
+        dn = QAction(self.tr("↓  Descendre  ({0}/{1} → {2}/{3})").format(row+1, n, row+2, n), self)
         dn.setEnabled(row < n - 1)
         dn.triggered.connect(lambda _=False, r=row: self._move_page(r, r + 1))
         menu.addAction(dn)
 
         menu.addSeparator()
 
-        cw = QAction("↻  Rotation horaire", self)
+        cw = QAction(self.tr("↻  Rotation horaire"), self)
         cw.triggered.connect(lambda _=False, r=row: self._rotate(r, 90))
         menu.addAction(cw)
 
-        ccw = QAction("↺  Rotation antihoraire", self)
+        ccw = QAction(self.tr("↺  Rotation antihoraire"), self)
         ccw.triggered.connect(lambda _=False, r=row: self._rotate(r, -90))
         menu.addAction(ccw)
 
         menu.addSeparator()
 
-        dup = QAction(f"⧉  Dupliquer la page {row+1}", self)
+        dup = QAction(self.tr("⧉  Dupliquer la page {0}").format(row+1), self)
         dup.triggered.connect(lambda _=False, r=row: self._duplicate(r))
         menu.addAction(dup)
 
-        dl = QAction(f"🗑  Supprimer la page {row+1}", self)
+        dl = QAction(self.tr("🗑  Supprimer la page {0}").format(row+1), self)
         dl.triggered.connect(lambda _=False, r=row: self._delete(r))
         menu.addAction(dl)
 
@@ -455,7 +461,7 @@ class ThumbnailPanel(QWidget):
     def _delete(self, row: int):
         if len(self.document.fitz_doc) <= 1:
             from pdf_equilibrist.ui.dialogs import show_error
-            show_error(self, "Supprimer", "Impossible de supprimer la seule page.")
+            show_error(self, self.tr("Supprimer"), self.tr("Impossible de supprimer la seule page."))
             return
         self.document.fitz_doc.delete_page(row)
         self.document.changed.emit()

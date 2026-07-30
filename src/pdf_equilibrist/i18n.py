@@ -4,7 +4,9 @@ i18n.py — Internationalisation de PDF-Equilibrist
 Charge le traducteur Qt au démarrage selon la langue enregistrée dans QSettings.
 
 Workflow :
-1. ``install_translator(app)`` est appelé dans ``app.py`` avant la création de MainWindow.
+1. ``install_translator(app)`` est appelé dans ``main.py`` juste après la création de
+   la ``QApplication``, avant même le splash screen — sinon les tout premiers messages
+   affichés (progression du splash) resteraient toujours en français.
 2. L'utilisateur change la langue via le bouton 🌐 dans la TitleBar.
 3. La préférence est sauvegardée dans QSettings ("Bit-Scripts"/"PDF-Equilibrist").
 4. Un redémarrage applique le changement (le QTranslator doit être installé avant les widgets).

@@ -396,7 +396,7 @@ class PrintDialog(QDialog):
         self._page_sizes: list[QPageSize] = []
         self._devmode:    bytes | None     = None   # DEVMODE driver (agrafe, etc.)
 
-        self.setWindowTitle(f"Imprimer — {document.path.name}")
+        self.setWindowTitle(self.tr("Imprimer — {0}").format(document.path.name))
         self.resize(1150, 720)
         self.setMinimumSize(900, 600)
         self.setStyleSheet(_STYLE)
@@ -429,7 +429,7 @@ class PrintDialog(QDialog):
         vbox.setContentsMargins(0, 0, 0, 0)
 
         # Imprimante
-        grp = QGroupBox("Imprimante")
+        grp = QGroupBox(self.tr("Imprimante"))
         f   = QFormLayout(grp)
         f.setSpacing(5)
         self._cb_printer = QComboBox()
@@ -439,12 +439,12 @@ class PrintDialog(QDialog):
             self._cb_printer.addItem(n)
         if default in names:
             self._cb_printer.setCurrentText(default)
-        f.addRow("Nom :", self._cb_printer)
+        f.addRow(self.tr("Nom :"), self._cb_printer)
         self._cb_printer.currentTextChanged.connect(self._on_printer_changed)
-        self._btn_props = QPushButton("Propriétés avancées…")
+        self._btn_props = QPushButton(self.tr("Propriétés avancées…"))
         self._btn_props.setToolTip(
-            "Ouvre les propriétés natives de l'imprimante\n"
-            "(agrafe, perforation, format rouleau, découpe, …)"
+            self.tr("Ouvre les propriétés natives de l'imprimante\n"
+            "(agrafe, perforation, format rouleau, découpe, …)")
         )
         self._btn_props.clicked.connect(self._open_native_props)
         # Dialogue DocumentProperties Win32 — pas d'équivalent Qt/CUPS sur Linux/macOS
@@ -453,57 +453,57 @@ class PrintDialog(QDialog):
         vbox.addWidget(grp)
 
         # Copies
-        grp = QGroupBox("Copies")
+        grp = QGroupBox(self.tr("Copies"))
         f   = QFormLayout(grp)
         f.setSpacing(5)
         self._spin_copies = QSpinBox()
         self._spin_copies.setRange(1, 999)
-        f.addRow("Nombre :", self._spin_copies)
+        f.addRow(self.tr("Nombre :"), self._spin_copies)
         vbox.addWidget(grp)
 
         # Pages
-        grp = QGroupBox("Pages à imprimer")
+        grp = QGroupBox(self.tr("Pages à imprimer"))
         f   = QFormLayout(grp)
         f.setSpacing(5)
         self._cb_pages = QComboBox()
-        self._cb_pages.addItems(["Tout", "Pages personnalisées"])
-        f.addRow("Plage :", self._cb_pages)
+        self._cb_pages.addItems([self.tr("Tout"), self.tr("Pages personnalisées")])
+        f.addRow(self.tr("Plage :"), self._cb_pages)
         self._edit_range = QLineEdit()
-        self._edit_range.setPlaceholderText("ex: 1-3, 5, 8-10")
+        self._edit_range.setPlaceholderText(self.tr("ex: 1-3, 5, 8-10"))
         self._edit_range.setEnabled(False)
-        f.addRow("Numéros :", self._edit_range)
+        f.addRow(self.tr("Numéros :"), self._edit_range)
         self._cb_pages.currentIndexChanged.connect(
             lambda i: self._edit_range.setEnabled(i == 1))
         vbox.addWidget(grp)
 
         # Format papier
-        grp = QGroupBox("Format papier")
+        grp = QGroupBox(self.tr("Format papier"))
         f   = QFormLayout(grp)
         f.setSpacing(5)
         self._cb_paper = QComboBox()
-        f.addRow("Format :", self._cb_paper)
+        f.addRow(self.tr("Format :"), self._cb_paper)
         self._cb_paper.currentIndexChanged.connect(self._refresh_preview)
         vbox.addWidget(grp)
 
         # Orientation
-        grp = QGroupBox("Orientation")
+        grp = QGroupBox(self.tr("Orientation"))
         f   = QFormLayout(grp)
         f.setSpacing(5)
         self._cb_orient = QComboBox()
-        self._cb_orient.addItems(["Auto (par page)", "Portrait", "Paysage"])
+        self._cb_orient.addItems([self.tr("Auto (par page)"), self.tr("Portrait"), self.tr("Paysage")])
         f.addRow(self._cb_orient)
         self._cb_orient.currentIndexChanged.connect(self._refresh_preview)
         vbox.addWidget(grp)
 
         # Échelle
-        grp = QGroupBox("Échelle / Dimensionnement")
+        grp = QGroupBox(self.tr("Échelle / Dimensionnement"))
         f   = QFormLayout(grp)
         f.setSpacing(5)
         self._cb_scale = QComboBox()
         self._cb_scale.addItems([
-            "Ajuster (remplir le papier)",
-            "Réduire uniquement",
-            "100 % (rogner si déborde)",
+            self.tr("Ajuster (remplir le papier)"),
+            self.tr("Réduire uniquement"),
+            self.tr("100 % (rogner si déborde)"),
         ])
         self._cb_scale.setCurrentIndex(1)   # défaut : réduire
         f.addRow(self._cb_scale)
@@ -511,25 +511,25 @@ class PrintDialog(QDialog):
         vbox.addWidget(grp)
 
         # Recto/Verso
-        grp = QGroupBox("Recto / Verso")
+        grp = QGroupBox(self.tr("Recto / Verso"))
         f   = QFormLayout(grp)
         f.setSpacing(5)
         self._cb_duplex = QComboBox()
         self._cb_duplex.addItems([
-            "Désactivé",
-            "Retourner sur le bord long",
-            "Retourner sur le bord court",
+            self.tr("Désactivé"),
+            self.tr("Retourner sur le bord long"),
+            self.tr("Retourner sur le bord court"),
         ])
         self._cb_duplex.setCurrentIndex(1)   # défaut : bord long
         f.addRow(self._cb_duplex)
         vbox.addWidget(grp)
 
         # Couleur
-        grp = QGroupBox("Couleur")
+        grp = QGroupBox(self.tr("Couleur"))
         f   = QFormLayout(grp)
         f.setSpacing(5)
         self._cb_color = QComboBox()
-        self._cb_color.addItems(["Couleur", "Nuances de gris"])
+        self._cb_color.addItems([self.tr("Couleur"), self.tr("Nuances de gris")])
         f.addRow(self._cb_color)
         vbox.addWidget(grp)
 
@@ -537,7 +537,7 @@ class PrintDialog(QDialog):
 
         # Barre de progression (masquée jusqu'au lancement de l'impression)
         self._progress_bar   = QProgressBar()
-        self._progress_label = QLabel("Impression en cours…")
+        self._progress_label = QLabel(self.tr("Impression en cours…"))
         self._progress_bar.setTextVisible(False)
         self._progress_bar.setFixedHeight(8)
         self._progress_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -548,8 +548,8 @@ class PrintDialog(QDialog):
 
         btn_row = QHBoxLayout()
         btn_row.addStretch()
-        self._btn_cancel = QPushButton("Annuler")
-        self._btn_print  = QPushButton("Imprimer")
+        self._btn_cancel = QPushButton(self.tr("Annuler"))
+        self._btn_print  = QPushButton(self.tr("Imprimer"))
         self._btn_print.setObjectName("btn_print")
         self._btn_cancel.clicked.connect(self.reject)
         self._btn_print.clicked.connect(self._do_print)
@@ -582,11 +582,11 @@ class PrintDialog(QDialog):
 
         if devmode is not None:
             self._devmode = devmode
-            self._btn_props.setText("Propriétés avancées ✓")
+            self._btn_props.setText(self.tr("Propriétés avancées ✓"))
             self._btn_props.setToolTip(
-                "Réglages driver configurés (agrafe, finition…)\n"
+                self.tr("Réglages driver configurés (agrafe, finition…)\n"
                 "Ces réglages seront transmis directement au driver à l'impression.\n"
-                "Cliquer pour modifier."
+                "Cliquer pour modifier.")
             )
 
         self.raise_()
@@ -601,10 +601,10 @@ class PrintDialog(QDialog):
             self._printer.setDocName(self._doc.path.name)
         # Réinitialiser le DEVMODE : il est propre à chaque imprimante
         self._devmode = None
-        self._btn_props.setText("Propriétés avancées…")
+        self._btn_props.setText(self.tr("Propriétés avancées…"))
         self._btn_props.setToolTip(
-            "Ouvre les propriétés natives de l'imprimante\n"
-            "(agrafe, perforation, format rouleau, découpe, …)"
+            self.tr("Ouvre les propriétés natives de l'imprimante\n"
+            "(agrafe, perforation, format rouleau, découpe, …)")
         )
         self._populate_paper_sizes()
         self._refresh_preview()
@@ -715,15 +715,15 @@ class PrintDialog(QDialog):
         self._progress_bar.setMaximum(max(1, total))
         self._progress_bar.setValue(done)
         self._progress_label.setText(
-            f"Impression en cours… page {done}/{total}"
+            self.tr("Impression en cours… page {0}/{1}").format(done, total)
         )
 
     def _on_print_done(self, ok: bool):
         if not ok:
             from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.critical(self, "Erreur d'impression",
-                                 "Impossible de démarrer le travail d'impression.\n"
-                                 "Vérifiez que l'imprimante est disponible.")
+            QMessageBox.critical(self, self.tr("Erreur d'impression"),
+                                 self.tr("Impossible de démarrer le travail d'impression.\n"
+                                 "Vérifiez que l'imprimante est disponible."))
         self.accept()
 
 

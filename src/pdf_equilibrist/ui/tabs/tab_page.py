@@ -45,19 +45,19 @@ class TabPage(QWidget):
         layout.setSpacing(0)
 
         # ── Groupe Organisation ──────────────────────────────────────────────
-        self._btn_insert = RibbonButton("⊕", "Insérer")
-        self._btn_split  = RibbonButton("⊣⊢", "Diviser")
-        self._btn_merge  = RibbonButton("⊢⊣", "Fusion\nner")
-        self._btn_inv    = RibbonButton("⇅", "Inverser")
-        grp_org = RibbonGroup("Organisation")
+        self._btn_insert = RibbonButton("⊕", self.tr("Insérer"))
+        self._btn_split  = RibbonButton("⊣⊢", self.tr("Diviser"))
+        self._btn_merge  = RibbonButton("⊢⊣", self.tr("Fusion\nner"))
+        self._btn_inv    = RibbonButton("⇅", self.tr("Inverser"))
+        grp_org = RibbonGroup(self.tr("Organisation"))
         grp_org.add(self._btn_insert, self._btn_split,
                     self._btn_merge, self._btn_inv)
         layout.addWidget(grp_org)
 
         # ── Groupe Mise en page ──────────────────────────────────────────────
-        grp_layout = RibbonGroup("Mise en page")
-        grp_layout.add(RibbonButton("⊡", "Rogner"),
-                       RibbonButton("⬜", "Taille"))
+        grp_layout = RibbonGroup(self.tr("Mise en page"))
+        grp_layout.add(RibbonButton("⊡", self.tr("Rogner")),
+                       RibbonButton("⬜", self.tr("Taille")))
         layout.addWidget(grp_layout)
 
         layout.addStretch()
@@ -71,11 +71,11 @@ class TabPage(QWidget):
         if not self.document.is_open:
             return
         n     = len(self.document.fitz_doc)
-        after = ask_page_index(self, n, f"Insérer après la page (1–{n}) :")
+        after = ask_page_index(self, n, self.tr("Insérer après la page (1–{0}) :").format(n))
         if after is None:
             return
         src, _ = QFileDialog.getOpenFileName(
-            self, "PDF source (vide = page blanche)", "", "PDF (*.pdf)")
+            self, self.tr("PDF source (vide = page blanche)"), "", self.tr("PDF (*.pdf)"))
         self.document.checkpoint()
         insert_page(self.document.fitz_doc, after, Path(src) if src else None)
         self.document.changed.emit()
@@ -83,29 +83,29 @@ class TabPage(QWidget):
     def _split(self):
         if not self.document.is_open:
             return
-        out = QFileDialog.getExistingDirectory(self, "Dossier de sortie")
+        out = QFileDialog.getExistingDirectory(self, self.tr("Dossier de sortie"))
         if out:
             try:
                 paths = split_pdf(self.document.fitz_doc, Path(out))
-                show_info(self, "Diviser", f"{len(paths)} fichier(s) dans :\n{out}")
+                show_info(self, self.tr("Diviser"), self.tr("{0} fichier(s) dans :\n{1}").format(len(paths), out))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
     def _merge(self):
         files, _ = QFileDialog.getOpenFileNames(
-            self, "PDF à fusionner", "", "PDF (*.pdf)")
+            self, self.tr("PDF à fusionner"), "", self.tr("PDF (*.pdf)"))
         if not files:
             return
         out, _ = QFileDialog.getSaveFileName(
-            self, "PDF fusionné", "", "PDF (*.pdf)")
+            self, self.tr("PDF fusionné"), "", self.tr("PDF (*.pdf)"))
         if out:
             try:
                 merged = merge_pdfs([Path(f) for f in files])
                 merged.save(out)
                 merged.close()
-                show_info(self, "Fusionner", f"PDF fusionné :\n{out}")
+                show_info(self, self.tr("Fusionner"), self.tr("PDF fusionné :\n{0}").format(out))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
     def _invert(self):
         if not self.document.is_open:

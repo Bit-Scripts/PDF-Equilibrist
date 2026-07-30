@@ -247,10 +247,12 @@ class _PageLabel(QLabel):
         from PyQt6.QtWidgets import QMessageBox
         reply = QMessageBox.warning(
             self,
-            "Ouverture d'un fichier externe",
-            "Ce document PDF demande à ouvrir :\n\n"
-            f"{path}\n\n"
-            "N'acceptez que si vous faites confiance à ce document.",
+            self.tr("Ouverture d'un fichier externe"),
+            self.tr(
+                "Ce document PDF demande à ouvrir :\n\n"
+                "{0}\n\n"
+                "N'acceptez que si vous faites confiance à ce document."
+            ).format(path),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
@@ -316,7 +318,7 @@ class _WelcomePage(QWidget):
         p.drawText(
             self.rect().adjusted(0, cy + 90, 0, 0),
             Qt.AlignmentFlag.AlignHCenter,
-            "Glissez un PDF ici ou utilisez  Fichier › Ouvrir"
+            self.tr("Glissez un PDF ici ou utilisez  Fichier › Ouvrir")
         )
 
     def mousePressEvent(self, event):

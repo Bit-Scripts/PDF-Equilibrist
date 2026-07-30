@@ -161,6 +161,9 @@ class MainWindow(QWidget):
         self._thumbs.width_changed.connect(self._on_thumbs_width_changed)
         # Lien GOTOR dans un PDF → ouvrir dans un nouvel onglet
         self.viewer.open_pdf_requested.connect(self._open_document)
+        # PDF glissé sur le panneau miniatures alors qu'aucun onglet n'est
+        # ouvert → même chemin que File > Ouvrir (crée un vrai onglet)
+        self._thumbs.open_pdf_requested.connect(self._open_document)
 
         self._splitter = QSplitter(Qt.Orientation.Horizontal)
         self._splitter.addWidget(self._thumbs)
@@ -193,12 +196,12 @@ class MainWindow(QWidget):
         self._tab_proteger  = TabProteger(self._current_doc)
 
         for name, widget in [
-            ("Afficher",  self._tab_afficher),
-            ("Modifier",  self._tab_modifier),
-            ("Convertir", self._tab_convertir),
-            ("Annoter",   self._tab_annoter),
-            ("Page",      self._tab_page),
-            ("Protéger",  self._tab_proteger),
+            (self.tr("Afficher"),  self._tab_afficher),
+            (self.tr("Modifier"),  self._tab_modifier),
+            (self.tr("Convertir"), self._tab_convertir),
+            (self.tr("Annoter"),   self._tab_annoter),
+            (self.tr("Page"),      self._tab_page),
+            (self.tr("Protéger"),  self._tab_proteger),
         ]:
             self._ribbon_tabbar.addTab(name)
             widget.setStyleSheet("background: #2D2D2D;")
@@ -224,7 +227,7 @@ class MainWindow(QWidget):
         self._menu_bar = self._build_menu_bar()
 
         # ── Status bar ───────────────────────────────────────────────────────
-        self._status_file = QLabel("Aucun document ouvert")
+        self._status_file = QLabel(self.tr("Aucun document ouvert"))
         self._status_page = QLabel("")
         status = QWidget()
         status.setFixedHeight(22)
@@ -340,66 +343,66 @@ class MainWindow(QWidget):
             QMenu::separator { height:1px; background:#3A3A3A; margin:3px 0; }
         """)
 
-        fichier = mb.addMenu("Fichier")
+        fichier = mb.addMenu(self.tr("Fichier"))
 
-        act_open = QAction("Ouvrir…", self)
+        act_open = QAction(self.tr("Ouvrir…"), self)
         act_open.setShortcut(QKeySequence.StandardKey.Open)
         act_open.triggered.connect(self._open_file_dialog)
         fichier.addAction(act_open)
 
         # Sous-menu "Ouvrir récemment" — peuplé dynamiquement
-        self._recent_menu = fichier.addMenu("Ouvrir récemment")
+        self._recent_menu = fichier.addMenu(self.tr("Ouvrir récemment"))
         self._rebuild_recent_menu()
         fichier.addSeparator()
 
-        self._act_print = QAction("Imprimer…", self)
+        self._act_print = QAction(self.tr("Imprimer…"), self)
         self._act_print.setShortcut(QKeySequence.StandardKey.Print)
         self._act_print.triggered.connect(self._print)
         fichier.addAction(self._act_print)
         fichier.addSeparator()
 
-        self._act_save = QAction("Enregistrer", self)
+        self._act_save = QAction(self.tr("Enregistrer"), self)
         self._act_save.setShortcut(QKeySequence.StandardKey.Save)
         self._act_save.triggered.connect(self._save)
         fichier.addAction(self._act_save)
 
-        self._act_save_as = QAction("Enregistrer sous…", self)
+        self._act_save_as = QAction(self.tr("Enregistrer sous…"), self)
         self._act_save_as.setShortcut(QKeySequence("Ctrl+Shift+S"))
         self._act_save_as.triggered.connect(self._save_as)
         fichier.addAction(self._act_save_as)
         fichier.addSeparator()
 
-        self._act_close_doc = QAction("Fermer l'onglet", self)
+        self._act_close_doc = QAction(self.tr("Fermer l'onglet"), self)
         self._act_close_doc.setShortcut(QKeySequence("Ctrl+W"))
         self._act_close_doc.triggered.connect(
             lambda: self._close_tab(self._active_idx))
         fichier.addAction(self._act_close_doc)
         fichier.addSeparator()
 
-        act_quit = QAction("Quitter", self)
+        act_quit = QAction(self.tr("Quitter"), self)
         act_quit.setShortcut(QKeySequence.StandardKey.Quit)
         act_quit.triggered.connect(self.close)
         fichier.addAction(act_quit)
 
-        edition = mb.addMenu("Édition")
-        self._act_undo = QAction("Annuler", self)
+        edition = mb.addMenu(self.tr("Édition"))
+        self._act_undo = QAction(self.tr("Annuler"), self)
         self._act_undo.setShortcut(QKeySequence.StandardKey.Undo)
         self._act_undo.triggered.connect(self._undo)
         self._act_undo.setEnabled(False)
         edition.addAction(self._act_undo)
 
-        act_search = QAction("Rechercher…", self)
+        act_search = QAction(self.tr("Rechercher…"), self)
         act_search.setShortcut(QKeySequence.StandardKey.Find)
         act_search.triggered.connect(lambda: self._search_bar.toggle())
         edition.addAction(act_search)
 
         # ── Aide / Mises à jour / Sécurité ──────────────────────────────────
-        aide = mb.addMenu("Aide")
-        act_updates = QAction("Vérifier les mises à jour…", self)
+        aide = mb.addMenu(self.tr("Aide"))
+        act_updates = QAction(self.tr("Vérifier les mises à jour…"), self)
         act_updates.triggered.connect(self._check_for_updates)
         aide.addAction(act_updates)
 
-        act_cve = QAction("Vérifier les vulnérabilités CVE…", self)
+        act_cve = QAction(self.tr("Vérifier les vulnérabilités CVE…"), self)
         act_cve.triggered.connect(self._check_for_cves)
         aide.addAction(act_cve)
 
@@ -407,7 +410,7 @@ class MainWindow(QWidget):
 
         # Même fenêtre que "Vérifier les mises à jour" : elle affiche déjà le
         # logo, la version et les mises à jour dans un seul dialogue.
-        act_about = QAction("À propos de PDF-Equilibrist…", self)
+        act_about = QAction(self.tr("À propos de PDF-Equilibrist…"), self)
         act_about.triggered.connect(self._check_for_updates)
         aide.addAction(act_about)
 
@@ -446,8 +449,8 @@ class MainWindow(QWidget):
             # Ne doit pas empêcher l'application de fonctionner, mais on informe
             # l'utilisateur plutôt que d'échouer silencieusement.
             from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "Vérification des mises à jour",
-                                f"Impossible d'ouvrir le dialogue de mise à jour :\n{exc}")
+            QMessageBox.warning(self, self.tr("Vérification des mises à jour"),
+                                self.tr("Impossible d'ouvrir le dialogue de mise à jour :\n{0}").format(exc))
 
     def _check_for_cves(self):
         """Ouvre le dialogue de vérification CVE des dépendances."""
@@ -457,8 +460,8 @@ class MainWindow(QWidget):
             dlg.exec()
         except Exception as exc:
             from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "Vérification CVE",
-                                f"Impossible d'ouvrir le dialogue CVE :\n{exc}")
+            QMessageBox.warning(self, self.tr("Vérification CVE"),
+                                self.tr("Impossible d'ouvrir le dialogue CVE :\n{0}").format(exc))
 
     # ── Fichiers récents ──────────────────────────────────────────────────────
 
@@ -483,7 +486,7 @@ class MainWindow(QWidget):
         # Filtrer les fichiers qui n'existent plus sur le disque
         recents = [r for r in recents if Path(r).exists()]
         if not recents:
-            empty = QAction("(vide)", self)
+            empty = QAction(self.tr("(vide)"), self)
             empty.setEnabled(False)
             self._recent_menu.addAction(empty)
             return
@@ -496,7 +499,7 @@ class MainWindow(QWidget):
             act.triggered.connect(lambda checked=False, fp=path: self._open_document(fp))
             self._recent_menu.addAction(act)
         self._recent_menu.addSeparator()
-        act_clear = QAction("Effacer l'historique", self)
+        act_clear = QAction(self.tr("Effacer l'historique"), self)
         act_clear.triggered.connect(self._clear_recents)
         self._recent_menu.addAction(act_clear)
 
@@ -524,7 +527,7 @@ class MainWindow(QWidget):
     def _open_file_dialog(self):
         """Ouvre un dialogue de sélection de fichiers PDF (multi-sélection)."""
         paths, _ = QFileDialog.getOpenFileNames(
-            self, "Ouvrir un PDF", "", "Fichiers PDF (*.pdf)")
+            self, self.tr("Ouvrir un PDF"), "", self.tr("Fichiers PDF (*.pdf)"))
         for path in paths:
             self._open_document(path)
 
@@ -668,7 +671,8 @@ class MainWindow(QWidget):
             n = len(doc.fitz_doc)
             self._title_bar.set_tab_title(self._active_idx, doc.path.name)
             self._status_file.setText(str(doc.path))
-            self._status_page.setText(f"{n} page{'s' if n > 1 else ''}")
+            self._status_page.setText(
+                self.tr("{0} page").format(n) if n <= 1 else self.tr("{0} pages").format(n))
             self._set_ribbon_enabled(True)
             self._act_undo.setEnabled(doc.can_undo)
         else:
@@ -680,9 +684,10 @@ class MainWindow(QWidget):
         if doc.is_open:
             n = len(doc.fitz_doc)
             self._status_file.setText(str(doc.path))
-            self._status_page.setText(f"{n} page{'s' if n > 1 else ''}")
+            self._status_page.setText(
+                self.tr("{0} page").format(n) if n <= 1 else self.tr("{0} pages").format(n))
         else:
-            self._status_file.setText("Aucun document ouvert")
+            self._status_file.setText(self.tr("Aucun document ouvert"))
             self._status_page.setText("")
 
     # ── Sauvegarde ───────────────────────────────────────────────────────────
@@ -692,15 +697,15 @@ class MainWindow(QWidget):
         if self._current_doc.is_open:
             self._current_doc.save()
             self._status_file.setText(
-                f"Enregistré : {self._current_doc.path.name}")
+                self.tr("Enregistré : {0}").format(self._current_doc.path.name))
 
     def _save_as(self):
         """Sauvegarde le document actif sous un nouveau chemin (Ctrl+Shift+S)."""
         if not self._current_doc.is_open:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Enregistrer sous",
-            str(self._current_doc.path), "PDF (*.pdf)")
+            self, self.tr("Enregistrer sous"),
+            str(self._current_doc.path), self.tr("PDF (*.pdf)"))
         if path:
             self._current_doc.save(path)
 

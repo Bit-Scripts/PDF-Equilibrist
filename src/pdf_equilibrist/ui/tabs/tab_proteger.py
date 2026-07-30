@@ -40,10 +40,10 @@ class TabProteger(QWidget):
         layout.setContentsMargins(6, 0, 6, 0)
         layout.setSpacing(0)
 
-        self._btn_enc = RibbonButton("🔒", "Chiffrer")
-        self._btn_dec = RibbonButton("🔓", "Déchif\nfrer")
+        self._btn_enc = RibbonButton("🔒", self.tr("Chiffrer"))
+        self._btn_dec = RibbonButton("🔓", self.tr("Déchif\nfrer"))
 
-        grp = RibbonGroup("Protection")
+        grp = RibbonGroup(self.tr("Protection"))
         grp.add(self._btn_enc, self._btn_dec)
         layout.addWidget(grp)
         layout.addStretch()
@@ -59,28 +59,28 @@ class TabProteger(QWidget):
             return
         user_pw, owner_pw = result
         path, _ = QFileDialog.getSaveFileName(
-            self, "PDF chiffré",
-            str(self.document.path.with_stem(self.document.path.stem + "_chiffré")),
-            "PDF (*.pdf)")
+            self, self.tr("PDF chiffré"),
+            str(self.document.path.with_stem(self.document.path.stem + self.tr("_chiffré"))),
+            self.tr("PDF (*.pdf)"))
         if path:
             try:
                 encrypt(self.document.fitz_doc, Path(path), user_pw, owner_pw)
-                show_info(self, "Chiffrer", f"PDF chiffré :\n{path}")
+                show_info(self, self.tr("Chiffrer"), self.tr("PDF chiffré :\n{0}").format(path))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
     def _decrypt(self):
         if not self.document.is_open:
             return
         if not self.document.fitz_doc.is_encrypted:
-            show_info(self, "Déchiffrer", "Ce document n'est pas chiffré.")
+            show_info(self, self.tr("Déchiffrer"), self.tr("Ce document n'est pas chiffré."))
             return
-        pw = ask_password(self, "Déchiffrer")
+        pw = ask_password(self, self.tr("Déchiffrer"))
         if pw is None:
             return
         self.document.checkpoint()
         if decrypt(self.document.fitz_doc, pw):
             self.document.changed.emit()
-            show_info(self, "Déchiffrer", "Document déchiffré.")
+            show_info(self, self.tr("Déchiffrer"), self.tr("Document déchiffré."))
         else:
-            show_error(self, "Déchiffrer", "Mot de passe incorrect.")
+            show_error(self, self.tr("Déchiffrer"), self.tr("Mot de passe incorrect."))

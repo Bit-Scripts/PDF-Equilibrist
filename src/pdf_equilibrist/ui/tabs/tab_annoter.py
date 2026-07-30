@@ -36,24 +36,24 @@ class TabAnnoter(QWidget):
         layout.setSpacing(0)
 
         # ── Groupe Marquage texte ────────────────────────────────────────────
-        self._btn_hl  = RibbonButton("▬", "Surligner")
-        self._btn_str = RibbonButton("S̶", "Barrer")
-        self._btn_ul  = RibbonButton("U̲", "Souligner")
-        grp_mark = RibbonGroup("Marquage")
+        self._btn_hl  = RibbonButton("▬", self.tr("Surligner"))
+        self._btn_str = RibbonButton("S̶", self.tr("Barrer"))
+        self._btn_ul  = RibbonButton("U̲", self.tr("Souligner"))
+        grp_mark = RibbonGroup(self.tr("Marquage"))
         grp_mark.add(self._btn_hl, self._btn_str, self._btn_ul)
         layout.addWidget(grp_mark)
 
         # ── Groupe Annotation ────────────────────────────────────────────────
-        self._btn_tb = RibbonButton("T", "Zone\ntexte")
-        grp_annot = RibbonGroup("Annotation")
+        self._btn_tb = RibbonButton("T", self.tr("Zone\ntexte"))
+        grp_annot = RibbonGroup(self.tr("Annotation"))
         grp_annot.add(self._btn_tb)
         layout.addWidget(grp_annot)
 
         # ── Groupe À venir ───────────────────────────────────────────────────
-        grp_soon = RibbonGroup("À venir")
-        grp_soon.add(RibbonButton("✏", "Crayon"),
-                     RibbonButton("◻", "Forme"),
-                     RibbonButton("✒", "Signature"))
+        grp_soon = RibbonGroup(self.tr("À venir"))
+        grp_soon.add(RibbonButton("✏", self.tr("Crayon")),
+                     RibbonButton("◻", self.tr("Forme")),
+                     RibbonButton("✒", self.tr("Signature")))
         layout.addWidget(grp_soon)
 
         layout.addStretch()
@@ -82,7 +82,7 @@ class TabAnnoter(QWidget):
             btn.setEnabled(has_sel)
             btn.setToolTip(
                 "" if has_sel
-                else "Sélectionnez du texte en faisant glisser la souris sur la page"
+                else self.tr("Sélectionnez du texte en faisant glisser la souris sur la page")
             )
 
     # ── Annotation ────────────────────────────────────────────────────────────
@@ -91,8 +91,8 @@ class TabAnnoter(QWidget):
         if not self.document.is_open:
             return
         if not self._selection:
-            show_info(self, "Annoter",
-                      "Sélectionnez d'abord du texte en faisant glisser la souris sur la page.")
+            show_info(self, self.tr("Annoter"),
+                      self.tr("Sélectionnez d'abord du texte en faisant glisser la souris sur la page."))
             return
 
         page_index, quads = self._selection
@@ -114,7 +114,7 @@ class TabAnnoter(QWidget):
     def _textbox(self):
         if not self.document.is_open:
             return
-        text = ask_text_input(self, "Zone de texte", "Contenu :")
+        text = ask_text_input(self, self.tr("Zone de texte"), self.tr("Contenu :"))
         if not text:
             return
         try:
@@ -124,4 +124,4 @@ class TabAnnoter(QWidget):
                                   fitz.Rect(50, 50, 250, 100), text)
             self.document.changed.emit()
         except Exception as e:
-            show_error(self, "Zone de texte", str(e))
+            show_error(self, self.tr("Zone de texte"), str(e))

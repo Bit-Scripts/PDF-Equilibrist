@@ -42,14 +42,17 @@ QPushButton#primary {
 QPushButton#primary:hover { background: #7ED45F; }
 """
 
+# (clé interne stable, texte source à traduire) — la clé sert de point de
+# comparaison dans _Worker/_on_op_changed pour ne pas dépendre du texte
+# affiché, qui change selon la langue active.
 OPERATIONS = [
-    "Compresser",
-    "Ajouter un filigrane",
-    "Convertir en Word (.docx)",
-    "Convertir en Excel (.xlsx)",
-    "Convertir en PowerPoint (.pptx)",
-    "Convertir en Images (PNG)",
-    "Fusionner en un seul PDF",
+    ("compress",     "Compresser"),
+    ("watermark",    "Ajouter un filigrane"),
+    ("to_word",      "Convertir en Word (.docx)"),
+    ("to_excel",     "Convertir en Excel (.xlsx)"),
+    ("to_powerpoint","Convertir en PowerPoint (.pptx)"),
+    ("to_images",    "Convertir en Images (PNG)"),
+    ("merge",        "Fusionner en un seul PDF"),
 ]
 
 
@@ -76,20 +79,20 @@ class _Worker(QThread):
         files = self.files
 
         # Cas spécial : fusion
-        if self.operation == "Fusionner en un seul PDF":
+        if self.operation == "merge":
             try:
                 merged = fitz.open()
                 for f in files:
                     src = fitz.open(f)
                     merged.insert_pdf(src)
                     src.close()
-                out = self.output_dir / "fusionné.pdf"
+                out = self.output_dir / self.tr("fusionné.pdf")
                 merged.save(str(out))
                 merged.close()
-                self.progress.emit(len(files), f"✓ Fusionné → {out.name}")
+                self.progress.emit(len(files), self.tr("✓ Fusionné → {0}").format(out.name))
                 ok = len(files)
             except Exception as e:
-                self.progress.emit(len(files), f"✗ Erreur fusion : {e}")
+                self.progress.emit(len(files), self.tr("✗ Erreur fusion : {0}").format(e))
                 errors = 1
             self.finished.emit(ok, errors)
             return
@@ -99,38 +102,38 @@ class _Worker(QThread):
             try:
                 doc = fitz.open(f)
 
-                if self.operation == "Compresser":
+                if self.operation == "compress":
                     out = self.output_dir / f"{name}_compressé.pdf"
                     compress(doc, out)
 
-                elif self.operation == "Ajouter un filigrane":
+                elif self.operation == "watermark":
                     add_watermark(doc, self.watermark_text or "CONFIDENTIEL")
                     out = self.output_dir / f"{name}_filigrane.pdf"
                     doc.save(str(out))
 
-                elif self.operation == "Convertir en Word (.docx)":
+                elif self.operation == "to_word":
                     out = self.output_dir / f"{name}.docx"
                     to_word(doc, Path(f), out)
 
-                elif self.operation == "Convertir en Excel (.xlsx)":
+                elif self.operation == "to_excel":
                     out = self.output_dir / f"{name}.xlsx"
                     to_excel(doc, out)
 
-                elif self.operation == "Convertir en PowerPoint (.pptx)":
+                elif self.operation == "to_powerpoint":
                     out = self.output_dir / f"{name}.pptx"
                     to_powerpoint(doc, out)
 
-                elif self.operation == "Convertir en Images (PNG)":
+                elif self.operation == "to_images":
                     out_dir = self.output_dir / name
                     to_images(doc, out_dir, fmt="png")
                     out = out_dir
 
                 doc.close()
-                self.progress.emit(i + 1, f"✓ {Path(f).name}")
+                self.progress.emit(i + 1, self.tr("✓ {0}").format(Path(f).name))
                 ok += 1
 
             except Exception as e:
-                self.progress.emit(i + 1, f"✗ {Path(f).name} : {e}")
+                self.progress.emit(i + 1, self.tr("✗ {0} : {1}").format(Path(f).name, e))
                 errors += 1
 
         self.finished.emit(ok, errors)
@@ -139,7 +142,7 @@ class _Worker(QThread):
 class BatchDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Traitement par lot")
+        self.setWindowTitle(self.tr("Traitement par lot"))
         self.setStyleSheet(DIALOG_STYLE)
         self._worker: _Worker | None = None
 
@@ -147,15 +150,15 @@ class BatchDialog(QDialog):
         layout.setSpacing(10)
 
         # ── Fichiers ──────────────────────────────────────────────────────────
-        layout.addWidget(QLabel("Fichiers PDF à traiter :"))
+        layout.addWidget(QLabel(self.tr("Fichiers PDF à traiter :")))
         self._file_list = QListWidget()
         self._file_list.setFixedHeight(140)
         layout.addWidget(self._file_list)
 
         btn_row = QHBoxLayout()
-        btn_add = QPushButton("➕  Ajouter des fichiers…")
+        btn_add = QPushButton(self.tr("➕  Ajouter des fichiers…"))
         btn_add.clicked.connect(self._add_files)
-        btn_clear = QPushButton("🗑  Vider la liste")
+        btn_clear = QPushButton(self.tr("🗑  Vider la liste"))
         btn_clear.clicked.connect(self._file_list.clear)
         btn_row.addWidget(btn_add)
         btn_row.addWidget(btn_clear)
@@ -168,13 +171,14 @@ class BatchDialog(QDialog):
         layout.addWidget(sep)
 
         # ── Opération ────────────────────────────────────────────────────────
-        layout.addWidget(QLabel("Opération :"))
+        layout.addWidget(QLabel(self.tr("Opération :")))
         self._combo_op = QComboBox()
-        self._combo_op.addItems(OPERATIONS)
-        self._combo_op.currentTextChanged.connect(self._on_op_changed)
+        for key, label in OPERATIONS:
+            self._combo_op.addItem(self.tr(label), key)
+        self._combo_op.currentIndexChanged.connect(self._on_op_changed)
         layout.addWidget(self._combo_op)
 
-        self._wm_label = QLabel("Texte du filigrane :")
+        self._wm_label = QLabel(self.tr("Texte du filigrane :"))
         self._wm_input = QLineEdit("CONFIDENTIEL")
         self._wm_label.hide()
         self._wm_input.hide()
@@ -182,10 +186,10 @@ class BatchDialog(QDialog):
         layout.addWidget(self._wm_input)
 
         # ── Dossier de sortie ─────────────────────────────────────────────────
-        layout.addWidget(QLabel("Dossier de sortie :"))
+        layout.addWidget(QLabel(self.tr("Dossier de sortie :")))
         out_row = QHBoxLayout()
         self._out_edit = QLineEdit()
-        self._out_edit.setPlaceholderText("Choisir un dossier…")
+        self._out_edit.setPlaceholderText(self.tr("Choisir un dossier…"))
         btn_out = QPushButton("📁")
         btn_out.setFixedWidth(36)
         btn_out.clicked.connect(self._pick_output)
@@ -211,31 +215,33 @@ class BatchDialog(QDialog):
         # ── Boutons ───────────────────────────────────────────────────────────
         action_row = QHBoxLayout()
         action_row.addStretch()
-        self._btn_close = QPushButton("Fermer")
+        self._btn_close = QPushButton(self.tr("Fermer"))
         self._btn_close.clicked.connect(self.reject)
-        self._btn_run = QPushButton("▶  Lancer le traitement")
+        self._btn_run = QPushButton(self.tr("▶  Lancer le traitement"))
         self._btn_run.setObjectName("primary")
         self._btn_run.clicked.connect(self._run)
         action_row.addWidget(self._btn_close)
         action_row.addWidget(self._btn_run)
         layout.addLayout(action_row)
 
+        self._on_op_changed(self._combo_op.currentIndex())
+
     # ── Helpers ───────────────────────────────────────────────────────────────
 
     def _add_files(self):
         files, _ = QFileDialog.getOpenFileNames(
-            self, "Ajouter des PDFs", "", "Fichiers PDF (*.pdf)")
+            self, self.tr("Ajouter des PDFs"), "", self.tr("Fichiers PDF (*.pdf)"))
         for f in files:
             if not self._file_list.findItems(f, Qt.MatchFlag.MatchExactly):
                 self._file_list.addItem(QListWidgetItem(f))
 
     def _pick_output(self):
-        d = QFileDialog.getExistingDirectory(self, "Dossier de sortie")
+        d = QFileDialog.getExistingDirectory(self, self.tr("Dossier de sortie"))
         if d:
             self._out_edit.setText(d)
 
-    def _on_op_changed(self, op: str):
-        show_wm = op == "Ajouter un filigrane"
+    def _on_op_changed(self, index: int):
+        show_wm = self._combo_op.itemData(index) == "watermark"
         self._wm_label.setVisible(show_wm)
         self._wm_input.setVisible(show_wm)
 
@@ -243,11 +249,11 @@ class BatchDialog(QDialog):
         files = [self._file_list.item(i).text()
                  for i in range(self._file_list.count())]
         if not files:
-            self._log.append("⚠ Aucun fichier sélectionné.")
+            self._log.append(self.tr("⚠ Aucun fichier sélectionné."))
             return
         out = self._out_edit.text().strip()
         if not out:
-            self._log.append("⚠ Choisissez un dossier de sortie.")
+            self._log.append(self.tr("⚠ Choisissez un dossier de sortie."))
             return
 
         self._btn_run.setEnabled(False)
@@ -256,7 +262,7 @@ class BatchDialog(QDialog):
         self._log.clear()
 
         self._worker = _Worker(
-            files, self._combo_op.currentText(), out,
+            files, self._combo_op.currentData(), out,
             self._wm_input.text()
         )
         self._worker.progress.connect(self._on_progress)
@@ -269,6 +275,6 @@ class BatchDialog(QDialog):
 
     def _on_finished(self, ok: int, errors: int):
         self._log.append(
-            f"\n── Terminé : {ok} réussi(s), {errors} erreur(s) ──")
+            self.tr("\n── Terminé : {0} réussi(s), {1} erreur(s) ──").format(ok, errors))
         self._btn_run.setEnabled(True)
-        self._btn_close.setText("Fermer")
+        self._btn_close.setText(self.tr("Fermer"))

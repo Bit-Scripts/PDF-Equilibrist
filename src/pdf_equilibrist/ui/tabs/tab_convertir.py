@@ -46,42 +46,42 @@ class TabConvertir(QWidget):
         # ── Groupe PDF → Office ──────────────────────────────────────────────
         self._btn_word = RibbonButton("W", "Word")
         self._btn_xl   = RibbonButton("X", "Excel")
-        self._btn_ppt  = RibbonButton("P", "Power\nPoint")
-        grp_office = RibbonGroup("PDF → Office")
+        self._btn_ppt  = RibbonButton("P", self.tr("Power\nPoint"))
+        grp_office = RibbonGroup(self.tr("PDF → Office"))
         grp_office.add(self._btn_word, self._btn_xl, self._btn_ppt)
         layout.addWidget(grp_office)
 
         # ── Groupe PDF → Image ───────────────────────────────────────────────
-        self._btn_img = RibbonButton("🖼", "Image")
-        grp_img = RibbonGroup("PDF → Image")
+        self._btn_img = RibbonButton("🖼", self.tr("Image"))
+        grp_img = RibbonGroup(self.tr("PDF → Image"))
         grp_img.add(self._btn_img)
         layout.addWidget(grp_img)
 
         # ── Groupe PDF → Markdown ────────────────────────────────────────────
         self._btn_md = RibbonButton("M↓", "Markdown")
-        grp_md = RibbonGroup("PDF → Texte")
+        grp_md = RibbonGroup(self.tr("PDF → Texte"))
         grp_md.add(self._btn_md)
         layout.addWidget(grp_md)
 
         # ── Groupe OCR → ... ─────────────────────────────────────────────────
-        self._btn_ocr_pdf  = RibbonButton("🔍📄", "OCR →\nPDF")
-        self._btn_ocr_md   = RibbonButton("🔍M↓", "OCR →\nMarkdown")
-        self._btn_ocr_word = RibbonButton("🔍W",  "OCR →\nWord")
-        self._btn_ocr_xl   = RibbonButton("🔍X",  "OCR →\nExcel")
+        self._btn_ocr_pdf  = RibbonButton("🔍📄", self.tr("OCR →\nPDF"))
+        self._btn_ocr_md   = RibbonButton("🔍M↓", self.tr("OCR →\nMarkdown"))
+        self._btn_ocr_word = RibbonButton("🔍W",  self.tr("OCR →\nWord"))
+        self._btn_ocr_xl   = RibbonButton("🔍X",  self.tr("OCR →\nExcel"))
         grp_ocr = RibbonGroup("OCR → ...")
         grp_ocr.add(self._btn_ocr_pdf, self._btn_ocr_md, self._btn_ocr_word, self._btn_ocr_xl)
         layout.addWidget(grp_ocr)
 
         # ── Groupe → PDF ─────────────────────────────────────────────────────
-        self._btn_office2pdf = RibbonButton("🏢", "Office\nen PDF")
-        self._btn_img2pdf    = RibbonButton("📄", "Image\nen PDF")
-        grp_topdf = RibbonGroup("→ PDF")
+        self._btn_office2pdf = RibbonButton("🏢", self.tr("Office\nen PDF"))
+        self._btn_img2pdf    = RibbonButton("📄", self.tr("Image\nen PDF"))
+        grp_topdf = RibbonGroup(self.tr("→ PDF"))
         grp_topdf.add(self._btn_office2pdf, self._btn_img2pdf)
         layout.addWidget(grp_topdf)
 
         # ── Traitement par lot ────────────────────────────────────────────────
-        self._btn_batch = RibbonButton("⚙", "Traitement\npar lot")
-        grp_batch = RibbonGroup("Lot")
+        self._btn_batch = RibbonButton("⚙", self.tr("Traitement\npar lot"))
+        grp_batch = RibbonGroup(self.tr("Lot"))
         grp_batch.add(self._btn_batch)
         layout.addWidget(grp_batch)
 
@@ -104,16 +104,16 @@ class TabConvertir(QWidget):
         if not self.document.is_open:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Vers Markdown",
-            str(self.document.path.with_suffix(".md")), "Markdown (*.md)")
+            self, self.tr("Vers Markdown"),
+            str(self.document.path.with_suffix(".md")), self.tr("Markdown (*.md)"))
         if path:
             try:
                 convert.to_markdown(self.document.fitz_doc, Path(path))
-                show_info(self, "Conversion", f"Markdown enregistré :\n{path}")
+                show_info(self, self.tr("Conversion"), self.tr("Markdown enregistré :\n{0}").format(path))
             except ValueError as e:
-                show_error(self, "Conversion impossible", str(e))
+                show_error(self, self.tr("Conversion impossible"), str(e))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
     # ── Helpers OCR ──────────────────────────────────────────────────────────
 
@@ -150,7 +150,7 @@ class TabConvertir(QWidget):
                     self.error.emit(str(e))
 
         n = len(self.document.fitz_doc)
-        dlg = QProgressDialog("Initialisation OCR…", "Annuler", 0, n, self)
+        dlg = QProgressDialog(self.tr("Initialisation OCR…"), self.tr("Annuler"), 0, n, self)
         dlg.setWindowTitle(title)
         dlg.setWindowModality(Qt.WindowModality.WindowModal)
         dlg.setMinimumWidth(380)
@@ -169,7 +169,7 @@ class TabConvertir(QWidget):
 
         def _on_error(msg):
             dlg.close()
-            show_error(self, "OCR — Erreur", msg)
+            show_error(self, self.tr("OCR — Erreur"), msg)
 
         worker.progress.connect(_on_progress)
         worker.finished.connect(_on_done)
@@ -182,8 +182,8 @@ class TabConvertir(QWidget):
             return
         stem = self.document.path.stem
         path, _ = QFileDialog.getSaveFileName(
-            self, "OCR → PDF cherchable",
-            str(self.document.path.with_stem(stem + "_OCR")), "PDF (*.pdf)")
+            self, self.tr("OCR → PDF cherchable"),
+            str(self.document.path.with_stem(stem + "_OCR")), self.tr("PDF (*.pdf)"))
         if not path:
             return
 
@@ -196,17 +196,17 @@ class TabConvertir(QWidget):
                 fitz_doc.save(str(tmp_path))
                 shutil.copy2(tmp_path, path)
                 tmp_path.unlink(missing_ok=True)
-                show_info(self, "OCR → PDF", f"PDF cherchable enregistré :\n{path}")
+                show_info(self, self.tr("OCR → PDF"), self.tr("PDF cherchable enregistré :\n{0}").format(path))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
-        self._run_ocr_then("OCR → PDF", _convert)
+        self._run_ocr_then(self.tr("OCR → PDF"), _convert)
 
     def _ocr_to_markdown(self):
         path, _ = QFileDialog.getSaveFileName(
-            self, "OCR → Markdown",
+            self, self.tr("OCR → Markdown"),
             str(self.document.path.with_suffix(".md")) if self.document.is_open else "",
-            "Markdown (*.md)")
+            self.tr("Markdown (*.md)"))
         if not path:
             return
 
@@ -214,86 +214,86 @@ class TabConvertir(QWidget):
             try:
                 from pdf_equilibrist.operations.ocr import ocr_to_markdown
                 ocr_to_markdown(fitz_doc, Path(path))
-                show_info(self, "OCR → Markdown", f"Markdown enregistré :\n{path}")
+                show_info(self, self.tr("OCR → Markdown"), self.tr("Markdown enregistré :\n{0}").format(path))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
-        self._run_ocr_then("OCR → Markdown", _convert)
+        self._run_ocr_then(self.tr("OCR → Markdown"), _convert)
 
     def _ocr_to_word(self):
         if not self.document.is_open:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "OCR → Word",
-            str(self.document.path.with_suffix(".docx")), "Word (*.docx)")
+            self, self.tr("OCR → Word"),
+            str(self.document.path.with_suffix(".docx")), self.tr("Word (*.docx)"))
         if not path:
             return
 
         def _convert(fitz_doc):
             try:
                 convert.to_word(fitz_doc, self.document.path, Path(path))
-                show_info(self, "OCR → Word", f"Word enregistré :\n{path}")
+                show_info(self, self.tr("OCR → Word"), self.tr("Word enregistré :\n{0}").format(path))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
-        self._run_ocr_then("OCR → Word", _convert)
+        self._run_ocr_then(self.tr("OCR → Word"), _convert)
 
     def _ocr_to_excel(self):
         if not self.document.is_open:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "OCR → Excel",
-            str(self.document.path.with_suffix(".xlsx")), "Excel (*.xlsx)")
+            self, self.tr("OCR → Excel"),
+            str(self.document.path.with_suffix(".xlsx")), self.tr("Excel (*.xlsx)"))
         if not path:
             return
 
         def _convert(fitz_doc):
             try:
                 convert.to_excel(fitz_doc, Path(path))
-                show_info(self, "OCR → Excel", f"Excel enregistré :\n{path}")
+                show_info(self, self.tr("OCR → Excel"), self.tr("Excel enregistré :\n{0}").format(path))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
-        self._run_ocr_then("OCR → Excel", _convert)
+        self._run_ocr_then(self.tr("OCR → Excel"), _convert)
 
     def _to_word(self):
         if not self.document.is_open:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Vers Word",
-            str(self.document.path.with_suffix(".docx")), "Word (*.docx)")
+            self, self.tr("Vers Word"),
+            str(self.document.path.with_suffix(".docx")), self.tr("Word (*.docx)"))
         if path:
             try:
                 convert.to_word(self.document.fitz_doc, self.document.path, Path(path))
-                show_info(self, "Conversion", f"Word enregistré :\n{path}")
+                show_info(self, self.tr("Conversion"), self.tr("Word enregistré :\n{0}").format(path))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
     def _to_excel(self):
         if not self.document.is_open:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Vers Excel",
-            str(self.document.path.with_suffix(".xlsx")), "Excel (*.xlsx)")
+            self, self.tr("Vers Excel"),
+            str(self.document.path.with_suffix(".xlsx")), self.tr("Excel (*.xlsx)"))
         if path:
             try:
                 convert.to_excel(self.document.fitz_doc, Path(path))
-                show_info(self, "Conversion", f"Excel enregistré :\n{path}")
+                show_info(self, self.tr("Conversion"), self.tr("Excel enregistré :\n{0}").format(path))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
     def _to_ppt(self):
         if not self.document.is_open:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Vers PowerPoint",
-            str(self.document.path.with_suffix(".pptx")), "PowerPoint (*.pptx)")
+            self, self.tr("Vers PowerPoint"),
+            str(self.document.path.with_suffix(".pptx")), self.tr("PowerPoint (*.pptx)"))
         if path:
             try:
                 convert.to_powerpoint(self.document.fitz_doc, Path(path))
-                show_info(self, "Conversion", f"PowerPoint enregistré :\n{path}")
+                show_info(self, self.tr("Conversion"), self.tr("PowerPoint enregistré :\n{0}").format(path))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
     def _to_images(self):
         if not self.document.is_open:
@@ -301,15 +301,15 @@ class TabConvertir(QWidget):
         fmt = ask_image_format(self)
         if not fmt:
             return
-        output_dir = QFileDialog.getExistingDirectory(self, "Dossier de sortie")
+        output_dir = QFileDialog.getExistingDirectory(self, self.tr("Dossier de sortie"))
         if output_dir:
             try:
                 paths = convert.to_images(self.document.fitz_doc,
                                           Path(output_dir), fmt=fmt)
-                show_info(self, "Conversion",
-                          f"{len(paths)} image(s) dans :\n{output_dir}")
+                show_info(self, self.tr("Conversion"),
+                          self.tr("{0} image(s) dans :\n{1}").format(len(paths), output_dir))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))
 
     def _batch(self):
         from pdf_equilibrist.ui.batch_dialog import BatchDialog
@@ -319,19 +319,19 @@ class TabConvertir(QWidget):
     def _office_to_pdf(self):
         engine = detect_office_engine()
         if engine is None:
-            show_error(self, "Office en PDF",
-                       "Aucun moteur trouvé.\n"
-                       "Installez Microsoft Office ou LibreOffice.")
+            show_error(self, self.tr("Office en PDF"),
+                       self.tr("Aucun moteur trouvé.\n"
+                       "Installez Microsoft Office ou LibreOffice."))
             return
         label = "Microsoft Office" if engine == "msoffice" else "LibreOffice"
 
         files, _ = QFileDialog.getOpenFileNames(
-            self, "Fichiers Office à convertir", "",
-            "Office (*.docx *.xlsx *.pptx *.doc *.xls *.ppt *.odt *.ods *.odp)"
+            self, self.tr("Fichiers Office à convertir"), "",
+            self.tr("Office (*.docx *.xlsx *.pptx *.doc *.xls *.ppt *.odt *.ods *.odp)")
         )
         if not files:
             return
-        out_dir = QFileDialog.getExistingDirectory(self, "Dossier de sortie")
+        out_dir = QFileDialog.getExistingDirectory(self, self.tr("Dossier de sortie"))
         if not out_dir:
             return
 
@@ -345,24 +345,24 @@ class TabConvertir(QWidget):
             except Exception as e:
                 errors.append(f"{src.name} : {e}")
 
-        msg = f"Moteur : {label}\n{ok} fichier(s) converti(s)."
+        msg = self.tr("Moteur : {0}\n{1} fichier(s) converti(s).").format(label, ok)
         if errors:
-            msg += "\n\nErreurs :\n" + "\n".join(errors)
-            show_error(self, "Office en PDF", msg)
+            msg += "\n\n" + self.tr("Erreurs :") + "\n" + "\n".join(errors)
+            show_error(self, self.tr("Office en PDF"), msg)
         else:
-            show_info(self, "Office en PDF", msg)
+            show_info(self, self.tr("Office en PDF"), msg)
 
     def _image_to_pdf(self):
         files, _ = QFileDialog.getOpenFileNames(
-            self, "Choisir des images", "",
-            "Images (*.png *.jpg *.jpeg *.bmp *.tiff)")
+            self, self.tr("Choisir des images"), "",
+            self.tr("Images (*.png *.jpg *.jpeg *.bmp *.tiff)"))
         if not files:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Enregistrer le PDF", "", "PDF (*.pdf)")
+            self, self.tr("Enregistrer le PDF"), "", self.tr("PDF (*.pdf)"))
         if path:
             try:
                 convert.image_to_pdf([Path(f) for f in files], Path(path))
-                show_info(self, "Conversion", f"PDF créé :\n{path}")
+                show_info(self, self.tr("Conversion"), self.tr("PDF créé :\n{0}").format(path))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))

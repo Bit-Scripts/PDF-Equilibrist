@@ -39,7 +39,15 @@ def main():
     # ── Phase 1 : QApplication et splash ─────────────────────────────────────
     # QApplication DOIT être créée avant tout widget Qt (y compris le splash).
     from PyQt6.QtWidgets import QApplication
+    from PyQt6.QtCore import QCoreApplication
     app = QApplication(sys.argv)
+
+    # Installé avant le splash (et non dans create_app(), plus tardif) pour
+    # que le tout premier écran visible respecte déjà la langue choisie —
+    # sinon les messages de progression ci-dessous resteraient toujours en
+    # français même avec l'anglais sélectionné.
+    from pdf_equilibrist.i18n import install_translator
+    install_translator(app)
 
     from pdf_equilibrist.ui.splash_screen import SplashScreen
     splash = SplashScreen()
@@ -49,28 +57,28 @@ def main():
     # ── Phase 2 : chargement progressif des modules ───────────────────────────
     try:
         # PyMuPDF est la bibliothèque la plus lourde (~20 Mo) — chargée en premier
-        splash.set_progress(5, "Chargement de PyMuPDF…")
+        splash.set_progress(5, QCoreApplication.translate("main","Chargement de PyMuPDF…"))
         import fitz                                             # noqa: F401
 
-        splash.set_progress(20, "Chargement de PyQt6…")
+        splash.set_progress(20, QCoreApplication.translate("main","Chargement de PyQt6…"))
         from PyQt6.QtCore import Qt                             # noqa: F401
 
         # Bibliothèques de conversion Office/tableur — plusieurs Mo chacune
-        splash.set_progress(35, "Chargement des convertisseurs…")
+        splash.set_progress(35, QCoreApplication.translate("main","Chargement des convertisseurs…"))
         import pdf2docx                                         # noqa: F401
         import pdfplumber                                       # noqa: F401
         import openpyxl                                         # noqa: F401
         import pptx                                             # noqa: F401
 
         # Chargement de l'UI (importe tous les modules PyQt6 de l'application)
-        splash.set_progress(55, "Chargement de l'interface…")
+        splash.set_progress(55, QCoreApplication.translate("main","Chargement de l'interface…"))
         from pdf_equilibrist.app import create_app
 
         # Création et affichage de la fenêtre principale
-        splash.set_progress(75, "Initialisation de la fenêtre…")
+        splash.set_progress(75, QCoreApplication.translate("main","Initialisation de la fenêtre…"))
         create_app(app)
 
-        splash.set_progress(95, "Prêt !")
+        splash.set_progress(95, QCoreApplication.translate("main","Prêt !"))
         app.processEvents()
 
     except Exception:
@@ -79,8 +87,8 @@ def main():
         splash.hide()
         from PyQt6.QtWidgets import QMessageBox
         box = QMessageBox()
-        box.setWindowTitle("Erreur au démarrage")
-        box.setText("PDF Equilibrist n'a pas pu démarrer.")
+        box.setWindowTitle(QCoreApplication.translate("main","Erreur au démarrage"))
+        box.setText(QCoreApplication.translate("main","PDF Equilibrist n'a pas pu démarrer."))
         box.setDetailedText(err)
         box.setIcon(QMessageBox.Icon.Critical)
         box.exec()

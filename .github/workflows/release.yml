@@ -64,17 +64,30 @@ jobs:
       - name: Compile translations (.ts → .qm)
         shell: pwsh
         run: |
+          # pyqt5-tools n'a pas toujours de wheel prête pour la version de Python
+          # du runner (rencontré le 2026-07-30 en local) — pyside6-essentials est
+          # un repli fiable pour le même binaire lrelease, compatible avec ce
+          # format .ts/.qm Qt6. Le générateur Python minimaliste de
+          # compile_translations.py est un DERNIER recours non fiable (a déjà
+          # produit un .qm corrompu qui fait planter QTranslator.load()) — ne
+          # doit jamais être la seule option en silence.
           pip install pyqt5-tools --quiet
           $lrelease = Get-ChildItem (python -c "import site; print(site.getsitepackages()[0])") `
             -Recurse -Filter "lrelease.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $lrelease) {
+            Write-Host "pyqt5-tools sans lrelease utilisable — tentative pyside6-essentials"
+            pip install pyside6-essentials --quiet
+            $lrelease = Get-ChildItem (python -c "import site; print(site.getsitepackages()[0])") `
+              -Recurse -Filter "pyside6-lrelease.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          }
           if ($lrelease) {
             Write-Host "lrelease: $($lrelease.FullName)"
             Get-ChildItem translations -Filter "*.ts" | ForEach-Object {
-              & $lrelease.FullName $_.FullName
+              & $lrelease.FullName $_.FullName -qm $_.FullName.Replace(".ts", ".qm")
             }
           } else {
-            Write-Host "lrelease non trouvé — compilation Python de secours"
-            python tools/compile_translations.py
+            Write-Error "Aucun lrelease trouvé (ni pyqt5-tools ni pyside6-essentials) — le générateur Python de secours n'est pas assez fiable pour produire un .qm valide, voir tools/compile_translations.py"
+            exit 1
           }
 
       - name: Build PyInstaller bundle

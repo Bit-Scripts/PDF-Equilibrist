@@ -51,7 +51,7 @@ class SplashScreen(QWidget):
         ov.setContentsMargins(14, 6, 14, 10)
         ov.setSpacing(5)
 
-        self._status = QLabel("Initialisation…")
+        self._status = QLabel(self.tr("Initialisation…"))
         self._status.setStyleSheet(
             f"color: {ACCENT}; font-family:'Segoe UI'; font-size:11px;"
             "background:transparent;")

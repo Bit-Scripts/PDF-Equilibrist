@@ -60,7 +60,7 @@ def _sep(parent=None) -> QFrame:
 class UpdateDialog(QDialog):
     def __init__(self, parent=None, repo: str | None = None):
         super().__init__(parent)
-        self.setWindowTitle("À propos de PDF-Equilibrist")
+        self.setWindowTitle(self.tr("À propos de PDF-Equilibrist"))
         self.setMinimumWidth(460)
         self.setModal(True)
 
@@ -87,13 +87,13 @@ class UpdateDialog(QDialog):
         name_lbl.setTextFormat(Qt.TextFormat.RichText)
         name_lbl.setStyleSheet("font-size: 15px; font-weight: bold;")
         about_text.addWidget(name_lbl)
-        desc_lbl = QLabel("Éditeur PDF de bureau — © 2026 PDF Equilibrist — Licence GPLv3")
+        desc_lbl = QLabel(self.tr("Éditeur PDF de bureau — © 2026 PDF Equilibrist — Licence GPLv3"))
         desc_lbl.setStyleSheet(f"color: {_GRAY}; font-size: 11px;")
         about_text.addWidget(desc_lbl)
         about_row.addLayout(about_text)
         about_row.addStretch()
 
-        btn_github = QPushButton("Dépôt GitHub")
+        btn_github = QPushButton(self.tr("Dépôt GitHub"))
         btn_github.clicked.connect(self._open_github)
         about_row.addWidget(btn_github)
         layout.addLayout(about_row)
@@ -101,7 +101,7 @@ class UpdateDialog(QDialog):
         layout.addWidget(_sep())
 
         # ── Vérification de version ───────────────────────────────────────────
-        self._lbl = QLabel("Vérification des nouvelles versions…")
+        self._lbl = QLabel(self.tr("Vérification des nouvelles versions…"))
         layout.addWidget(self._lbl)
 
         self._progress = QProgressBar()
@@ -111,12 +111,12 @@ class UpdateDialog(QDialog):
         # ── Statistiques de téléchargement ────────────────────────────────────
         layout.addWidget(_sep())
 
-        stats_title = QLabel("Téléchargements")
+        stats_title = QLabel(self.tr("Téléchargements"))
         stats_title.setStyleSheet(f"color: {_GRAY}; font-size: 11px;")
         layout.addWidget(stats_title)
 
         row_current = QHBoxLayout()
-        row_current.addWidget(QLabel(f"Cette version (v{__version__}) :"))
+        row_current.addWidget(QLabel(self.tr("Cette version (v{0}) :").format(__version__)))
         self._lbl_current = QLabel("…")
         self._lbl_current.setStyleSheet(f"color: {_GREEN}; font-weight: bold;")
         self._lbl_current.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -124,7 +124,7 @@ class UpdateDialog(QDialog):
         layout.addLayout(row_current)
 
         row_total = QHBoxLayout()
-        row_total.addWidget(QLabel("Total toutes versions :"))
+        row_total.addWidget(QLabel(self.tr("Total toutes versions :")))
         self._lbl_total = QLabel("…")
         self._lbl_total.setStyleSheet(f"color: {_WHITE}; font-weight: bold;")
         self._lbl_total.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -140,8 +140,8 @@ class UpdateDialog(QDialog):
         self._linux_cmd_row = QHBoxLayout()
         self._linux_cmd_edit = QLineEdit()
         self._linux_cmd_edit.setReadOnly(True)
-        self._btn_copy_cmd = QPushButton("Copier")
-        self._linux_cmd_row.addWidget(QLabel("Mise à jour :"))
+        self._btn_copy_cmd = QPushButton(self.tr("Copier"))
+        self._linux_cmd_row.addWidget(QLabel(self.tr("Mise à jour :")))
         self._linux_cmd_row.addWidget(self._linux_cmd_edit)
         self._linux_cmd_row.addWidget(self._btn_copy_cmd)
         self._linux_cmd_widget = QFrame()
@@ -153,11 +153,11 @@ class UpdateDialog(QDialog):
         # ── Boutons ───────────────────────────────────────────────────────────
         btn_row = QHBoxLayout()
         btn_row.addStretch()
-        self._btn_open_page = QPushButton("Ouvrir la page de la release")
+        self._btn_open_page = QPushButton(self.tr("Ouvrir la page de la release"))
         self._btn_open_page.setEnabled(False)
-        self._btn_download = QPushButton("Télécharger et installer")
+        self._btn_download = QPushButton(self.tr("Télécharger et installer"))
         self._btn_download.setEnabled(False)
-        self._btn_close = QPushButton("Fermer")
+        self._btn_close = QPushButton(self.tr("Fermer"))
         btn_row.addWidget(self._btn_open_page)
         btn_row.addWidget(self._btn_download)
         btn_row.addWidget(self._btn_close)
@@ -182,11 +182,11 @@ class UpdateDialog(QDialog):
     def _on_result(self, release: object | None):
         self._progress.setRange(0, 1)
         if not release:
-            self._lbl.setText(f"v{__version__} — version la plus récente.")
+            self._lbl.setText(self.tr("v{0} — version la plus récente.").format(__version__))
             return
         self._release = release
         tag = release.get("tag_name") or release.get("name")
-        self._lbl.setText(f"Nouvelle version disponible : {tag}")
+        self._lbl.setText(self.tr("Nouvelle version disponible : {0}").format(tag))
         self._btn_open_page.setEnabled(True)
 
         linux_cmd = updater.linux_update_command()
@@ -213,7 +213,7 @@ class UpdateDialog(QDialog):
 
     def _on_error(self, msg: str):
         self._progress.setRange(0, 1)
-        self._lbl.setText(f"Erreur lors de la vérification : {msg}")
+        self._lbl.setText(self.tr("Erreur lors de la vérification : {0}").format(msg))
 
     def _on_stats(self, stats: dict):
         self._lbl_current.setText(f"{stats['current']:,}".replace(",", " "))
@@ -243,10 +243,10 @@ class UpdateDialog(QDialog):
             return
         target = updater.get_download_target(asset)
         try:
-            self._lbl.setText("Téléchargement en cours…")
+            self._lbl.setText(self.tr("Téléchargement en cours…"))
             self._progress.setRange(0, 0)
             updater.download_release_asset(asset, target)
-            self._lbl.setText(f"Téléchargé : {target}")
+            self._lbl.setText(self.tr("Téléchargé : {0}").format(target))
             try:
                 if os.name == "nt":
                     # Fichier qu'on vient nous-même de télécharger dans le temp
@@ -263,6 +263,6 @@ class UpdateDialog(QDialog):
                 import webbrowser
                 webbrowser.open(target.parent.as_uri())
         except Exception as e:
-            self._lbl.setText(f"Échec du téléchargement : {e}")
+            self._lbl.setText(self.tr("Échec du téléchargement : {0}").format(e))
         finally:
             self._progress.setRange(0, 1)

@@ -52,50 +52,50 @@ class TabModifier(QWidget):
         layout.setSpacing(0)
 
         # ── Groupe Edition texte ─────────────────────────────────────────────
-        self._btn_edit = RibbonButton("✎", "Modifier\ntexte")
-        self._btn_commit = RibbonButton("✔", "Valider")
+        self._btn_edit = RibbonButton("✎", self.tr("Modifier\ntexte"))
+        self._btn_commit = RibbonButton("✔", self.tr("Valider"))
         self._btn_commit.setStyleSheet(f"""
             QPushButton {{ background:{ACCENT}22; color:{ACCENT};
                 border:1px solid {ACCENT}; border-radius:5px;
                 padding:4px 6px 2px 6px; font-size:11px; }}
             QPushButton:hover {{ background:{ACCENT}44; }}
         """)
-        self._btn_cancel = RibbonButton("✘", "Annuler")
+        self._btn_cancel = RibbonButton("✘", self.tr("Annuler"))
         self._btn_commit.hide()
         self._btn_cancel.hide()
 
-        grp_edit = RibbonGroup("Édition texte")
+        grp_edit = RibbonGroup(self.tr("Édition texte"))
         grp_edit.add(self._btn_edit, self._btn_commit, self._btn_cancel)
         layout.addWidget(grp_edit)
 
         # ── Groupe Insertion ─────────────────────────────────────────────────
-        self._btn_text  = RibbonButton("T", "Ajouter\ntexte")
-        self._btn_image = RibbonButton("🖼", "Ajouter\nimage")
-        grp_ins = RibbonGroup("Insertion")
+        self._btn_text  = RibbonButton("T", self.tr("Ajouter\ntexte"))
+        self._btn_image = RibbonButton("🖼", self.tr("Ajouter\nimage"))
+        grp_ins = RibbonGroup(self.tr("Insertion"))
         grp_ins.add(self._btn_text, self._btn_image)
         layout.addWidget(grp_ins)
 
         # ── Groupe Mise en page ──────────────────────────────────────────────
-        self._btn_wm   = RibbonButton("◈", "Filigrane")
-        self._btn_comp = RibbonButton("⊟", "Compres\nser")
-        grp_page = RibbonGroup("Mise en page")
+        self._btn_wm   = RibbonButton("◈", self.tr("Filigrane"))
+        self._btn_comp = RibbonButton("⊟", self.tr("Compres\nser"))
+        grp_page = RibbonGroup(self.tr("Mise en page"))
         grp_page.add(self._btn_wm, self._btn_comp)
         layout.addWidget(grp_page)
 
         # ── Groupe OCR ───────────────────────────────────────────────────────
-        self._btn_ocr = RibbonButton("🔍", "Rendre\ncherchable")
+        self._btn_ocr = RibbonButton("🔍", self.tr("Rendre\ncherchable"))
         grp_ocr = RibbonGroup("OCR")
         grp_ocr.add(self._btn_ocr)
         layout.addWidget(grp_ocr)
 
         # ── Non câblés ───────────────────────────────────────────────────────
-        self._btn_sign = RibbonButton("✒", "Signature\n/ Tampon")
-        grp_sign = RibbonGroup("Signature")
+        self._btn_sign = RibbonButton("✒", self.tr("Signature\n/ Tampon"))
+        grp_sign = RibbonGroup(self.tr("Signature"))
         grp_sign.add(self._btn_sign)
         layout.addWidget(grp_sign)
 
-        grp_misc = RibbonGroup("À venir")
-        grp_misc.add(RibbonButton("🔗", "Lien"))
+        grp_misc = RibbonGroup(self.tr("À venir"))
+        grp_misc.add(RibbonButton("🔗", self.tr("Lien")))
         layout.addWidget(grp_misc)
         layout.addStretch()
 
@@ -121,10 +121,10 @@ class TabModifier(QWidget):
             if blocks:
                 self._edit_blocks[i] = blocks
         if not self._edit_blocks:
-            show_error(self, "Modifier", "Aucun texte extractible (PDF scanné ?).")
+            show_error(self, self.tr("Modifier"), self.tr("Aucun texte extractible (PDF scanné ?)."))
             return
         if self.viewer.enter_edit_mode(self._edit_blocks):
-            self._btn_edit.setText("✎\nActif")
+            self._btn_edit.setText(self.tr("✎\nActif"))
             self._btn_edit.setStyleSheet(f"""
                 QPushButton {{ background:{ACCENT}22; color:{ACCENT};
                     border:1px solid {ACCENT}; border-radius:5px;
@@ -136,7 +136,7 @@ class TabModifier(QWidget):
     def _commit(self):
         self._reset_edit_ui()
         self.viewer.exit_edit_mode()
-        show_info(self, "Modifications", "Terminé — Fichier › Enregistrer pour sauvegarder.")
+        show_info(self, self.tr("Modifications"), self.tr("Terminé — Fichier › Enregistrer pour sauvegarder."))
 
     def _cancel(self):
         self.viewer.exit_edit_mode()
@@ -144,7 +144,7 @@ class TabModifier(QWidget):
 
     def _reset_edit_ui(self):
         self._edit_blocks = {}
-        self._btn_edit.setText("✎\nModifier\ntexte")
+        self._btn_edit.setText(self.tr("✎\nModifier\ntexte"))
         self._btn_edit.setStyleSheet("")
         self._btn_commit.hide()
         self._btn_cancel.hide()
@@ -152,7 +152,7 @@ class TabModifier(QWidget):
     def _add_text(self):
         if not self.document.is_open:
             return
-        text = ask_text_input(self, "Ajouter du texte", "Texte à insérer :")
+        text = ask_text_input(self, self.tr("Ajouter du texte"), self.tr("Texte à insérer :"))
         if not text:
             return
         data = {"type": "text", "text": text,
@@ -164,8 +164,8 @@ class TabModifier(QWidget):
         if not self.document.is_open:
             return
         path, _ = QFileDialog.getOpenFileName(
-            self, "Choisir une image", "",
-            "Images (*.png *.jpg *.jpeg *.bmp *.tiff)")
+            self, self.tr("Choisir une image"), "",
+            self.tr("Images (*.png *.jpg *.jpeg *.bmp *.tiff)"))
         if not path:
             return
         data = {"type": "image", "path": path}
@@ -249,8 +249,8 @@ class TabModifier(QWidget):
                 except Exception as e:
                     self.error.emit(str(e))
 
-        dlg = QProgressDialog("Initialisation OCR…", "Annuler", 0, len(self.document.fitz_doc), self)
-        dlg.setWindowTitle("OCR — Rendre cherchable")
+        dlg = QProgressDialog(self.tr("Initialisation OCR…"), self.tr("Annuler"), 0, len(self.document.fitz_doc), self)
+        dlg.setWindowTitle(self.tr("OCR — Rendre cherchable"))
         dlg.setWindowModality(Qt.WindowModality.WindowModal)
         dlg.setMinimumWidth(380)
         dlg.show()
@@ -265,13 +265,13 @@ class TabModifier(QWidget):
             dlg.close()
             self.document.changed.emit()
             if n == 0:
-                show_info(self, "OCR", "Aucune page scannée détectée.\nLe document contient déjà une couche texte.")
+                show_info(self, "OCR", self.tr("Aucune page scannée détectée.\nLe document contient déjà une couche texte."))
             else:
-                show_info(self, "OCR", f"{n} page(s) rendue(s) cherchables.\nPensez à enregistrer le document.")
+                show_info(self, "OCR", self.tr("{0} page(s) rendue(s) cherchables.\nPensez à enregistrer le document.").format(n))
 
         def _on_error(msg):
             dlg.close()
-            show_error(self, "OCR — Erreur", msg)
+            show_error(self, self.tr("OCR — Erreur"), msg)
 
         self._ocr_worker.progress.connect(_on_progress)
         self._ocr_worker.finished.connect(_on_done)
@@ -283,12 +283,12 @@ class TabModifier(QWidget):
         if not self.document.is_open:
             return
         path, _ = QFileDialog.getSaveFileName(
-            self, "Enregistrer compressé",
-            str(self.document.path.with_stem(self.document.path.stem + "_compressé")),
-            "PDF (*.pdf)")
+            self, self.tr("Enregistrer compressé"),
+            str(self.document.path.with_stem(self.document.path.stem + self.tr("_compressé"))),
+            self.tr("PDF (*.pdf)"))
         if path:
             try:
                 compress(self.document.fitz_doc, Path(path))
-                show_info(self, "Compresser", f"Enregistré :\n{path}")
+                show_info(self, self.tr("Compresser"), self.tr("Enregistré :\n{0}").format(path))
             except Exception as e:
-                show_error(self, "Erreur", str(e))
+                show_error(self, self.tr("Erreur"), str(e))

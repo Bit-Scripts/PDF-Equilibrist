@@ -61,20 +61,20 @@ class TabAfficher(QWidget):
         self._btn_in = RibbonButton("+", "")
         self._btn_in.setFixedWidth(30)
 
-        grp_zoom = RibbonGroup("Zoom")
+        grp_zoom = RibbonGroup(self.tr("Zoom"))
         grp_zoom.add(self._btn_out, self._combo, self._btn_in)
         layout.addWidget(grp_zoom)
 
         # ── Groupe Rotation ──────────────────────────────────────────────────
-        self._btn_rot_l = RibbonButton("↺", "Gauche")
-        self._btn_rot_r = RibbonButton("↻", "Droite")
-        grp_rot = RibbonGroup("Rotation")
+        self._btn_rot_l = RibbonButton("↺", self.tr("Gauche"))
+        self._btn_rot_r = RibbonButton("↻", self.tr("Droite"))
+        grp_rot = RibbonGroup(self.tr("Rotation"))
         grp_rot.add(self._btn_rot_l, self._btn_rot_r)
         layout.addWidget(grp_rot)
 
         # ── Groupe Impression ────────────────────────────────────────────────
-        self._btn_print = RibbonButton("🖨", "Imprimer")
-        grp_print = RibbonGroup("Impression")
+        self._btn_print = RibbonButton("🖨", self.tr("Imprimer"))
+        grp_print = RibbonGroup(self.tr("Impression"))
         grp_print.add(self._btn_print)
         layout.addWidget(grp_print)
 

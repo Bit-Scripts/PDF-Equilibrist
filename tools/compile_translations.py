@@ -83,7 +83,23 @@ def _build_hashes(messages: list[tuple[str, str, str]], offsets: list[int]) -> b
 
 
 def compile_ts_python(ts_path: Path, qm_path: Path) -> bool:
-    """Compilation minimaliste .ts → .qm en Python pur."""
+    """
+    Compilation minimaliste .ts → .qm en Python pur — repli de dernier recours.
+
+    ATTENTION (2026-07-30) : ce writer binaire maison a produit un .qm
+    corrompu qui faisait planter QTranslator.load() (access violation), et
+    les traductions ne se chargeaient jamais même quand load() ne plantait
+    pas — les tags de section (_SECTION_HASHES/_SECTION_TRANSLATIONS/
+    _SECTION_CONTEXTS) ne correspondent probablement pas au format .qm réel
+    de Qt. Non corrigé faute de pouvoir revérifier le format exact avec
+    certitude — mieux vaut un repli visiblement absent qu'un faux correctif
+    silencieux. En pratique, préférer un vrai `lrelease` : soit via
+    `pip install pyqt5-tools` (utilisé en CI, mais sans wheel pour toutes
+    les versions de Python), soit via `pip install pyside6-essentials`
+    (fournit `pyside6-lrelease`, compatible avec ce format .ts/.qm Qt6 —
+    solution qui a fonctionné localement le 2026-07-30 quand pyqt5-tools
+    échouait à s'installer).
+    """
     try:
         tree = ET.parse(ts_path)
         root = tree.getroot()
