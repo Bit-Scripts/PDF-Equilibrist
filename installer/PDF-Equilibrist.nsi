@@ -49,14 +49,36 @@ SetCompressor   lzma
 
 !define MUI_FINISHPAGE_RUN      "$INSTDIR\${APP_EXE}"
 
+; Titres/textes personnalisés des pages Bienvenue/Fin : référencent des
+; LangString ($(...)) déclarées PLUS BAS dans ce fichier, après les pages —
+; ça ne pose aucun problème, $(...) est résolu à l'exécution de l'installeur,
+; pas au moment où ce !define est traité par le préprocesseur. Ce qui EST
+; obligatoire en revanche (voir plus bas) : que ces !define eux-mêmes
+; précèdent bien les !insertmacro MUI_PAGE_* qui les consomment.
+!define MUI_WELCOMEPAGE_TITLE   "$(WELCOME_TITLE)"
+!define MUI_WELCOMEPAGE_TEXT    "$(WELCOME_TEXT)"
+!define MUI_FINISHPAGE_RUN_TEXT "$(FINISH_RUN_TEXT)"
+
+; ── Pages installeur ──────────────────────────────────────────────────────────
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+
+; ── Pages désinstalleur ───────────────────────────────────────────────────────
+!insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
+
 ; ── Langues ───────────────────────────────────────────────────────────────────
-; Déclarées ici (après APP_NAME/APP_VERSION, avant toute référence $(...)) :
-; les constantes ${LANG_FRENCH}/${LANG_ENGLISH} utilisées par LangString
-; n'existent qu'une fois ces macros insérées, et LangString a lui-même besoin
-; de ${APP_NAME}/${APP_VERSION} déjà définis ci-dessus. Les chaînes MUI
-; natives (Suivant/Annuler, titres de page standard…) sont déjà traduites
+; NSIS exige que MUI_LANGUAGE soit inséré APRÈS toutes les macros
+; MUI_[UN]PAGE_* ci-dessus (avertissement du compilateur sinon — vérifié : les
+; ignorer casse silencieusement le rendu des bitmaps Bienvenue/Fin ET
+; d'en-tête, pas juste une question de style). Les chaînes MUI natives
+; (Suivant/Annuler, titres de page standard…) sont déjà traduites
 ; automatiquement par NSIS ; seules les chaînes que CE script écrit
-; lui-même ont besoin d'une traduction explicite via LangString.
+; lui-même ont besoin d'une traduction explicite via LangString ci-dessous.
 !insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "English"
 
@@ -87,26 +109,6 @@ LangString SEC_MAIN_NAME ${LANG_ENGLISH} "${APP_NAME}"
 
 LangString SEC_DESKTOP_NAME ${LANG_FRENCH}  "Raccourci sur le Bureau"
 LangString SEC_DESKTOP_NAME ${LANG_ENGLISH} "Desktop shortcut"
-
-; Doivent être définis après les LangString correspondantes ($(...) est résolu
-; à l'exécution, mais MUI_PAGE_WELCOME/MUI_PAGE_FINISH lisent ces !define au
-; moment de leur !insertmacro plus bas — l'ordre texte du script ne change
-; rien ici puisque la valeur reste la chaîne littérale "$(WELCOME_TITLE)".
-!define MUI_WELCOMEPAGE_TITLE   "$(WELCOME_TITLE)"
-!define MUI_WELCOMEPAGE_TEXT    "$(WELCOME_TEXT)"
-!define MUI_FINISHPAGE_RUN_TEXT "$(FINISH_RUN_TEXT)"
-
-; ── Pages installeur ──────────────────────────────────────────────────────────
-!insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_DIRECTORY
-!insertmacro MUI_PAGE_INSTFILES
-!insertmacro MUI_PAGE_FINISH
-
-; ── Pages désinstalleur ───────────────────────────────────────────────────────
-!insertmacro MUI_UNPAGE_WELCOME
-!insertmacro MUI_UNPAGE_CONFIRM
-!insertmacro MUI_UNPAGE_INSTFILES
-!insertmacro MUI_UNPAGE_FINISH
 
 ; Vérifie que l'application n'est pas en cours d'exécution avant d'installer
 ; ou de désinstaller (fichiers verrouillés sinon). Détection par titre de
