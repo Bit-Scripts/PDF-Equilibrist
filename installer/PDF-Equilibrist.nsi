@@ -1,4 +1,4 @@
-﻿; PDF-Equilibrist — Script NSIS (licence zlib, usage commercial libre)
+; PDF-Equilibrist — Script NSIS (licence zlib, usage commercial libre)
 ; =====================================================================
 ; Prérequis : NSIS 3.x
 ; Compiler :
@@ -11,22 +11,6 @@
 
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
-
-; Vérifie que l'application n'est pas en cours d'exécution avant d'installer
-; ou de désinstaller (fichiers verrouillés sinon). Détection par titre de
-; fenêtre (fiable : main_window.py fixe ce titre une fois pour toutes, il ne
-; change jamais même quand un document est ouvert). Pas de fermeture forcée
-; pour ne pas risquer de perdre un travail non sauvegardé.
-!macro CHECK_APP_RUNNING
-    check_app_running:
-        FindWindow $0 "" "PDF Equilibrist"
-        ${If} $0 <> 0
-            MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION \
-                "${APP_NAME} est en cours d'exécution.$\r$\n$\r$\nVeuillez fermer l'application avant de continuer." \
-                IDRETRY check_app_running
-            Abort
-        ${EndIf}
-!macroend
 
 ; ── Définitions ───────────────────────────────────────────────────────────────
 !define APP_NAME      "PDF-Equilibrist"
@@ -63,13 +47,54 @@ SetCompressor   lzma
 
 !define MUI_ABORTWARNING
 
-!define MUI_WELCOMEPAGE_TITLE "Bienvenue dans l'installation de ${APP_NAME}"
-!define MUI_WELCOMEPAGE_TEXT  "Cet assistant va installer ${APP_NAME} ${APP_VERSION} \
+!define MUI_FINISHPAGE_RUN      "$INSTDIR\${APP_EXE}"
+
+; ── Langues ───────────────────────────────────────────────────────────────────
+; Déclarées ici (après APP_NAME/APP_VERSION, avant toute référence $(...)) :
+; les constantes ${LANG_FRENCH}/${LANG_ENGLISH} utilisées par LangString
+; n'existent qu'une fois ces macros insérées, et LangString a lui-même besoin
+; de ${APP_NAME}/${APP_VERSION} déjà définis ci-dessus. Les chaînes MUI
+; natives (Suivant/Annuler, titres de page standard…) sont déjà traduites
+; automatiquement par NSIS ; seules les chaînes que CE script écrit
+; lui-même ont besoin d'une traduction explicite via LangString.
+!insertmacro MUI_LANGUAGE "French"
+!insertmacro MUI_LANGUAGE "English"
+
+LangString MSG_APP_RUNNING ${LANG_FRENCH}  "${APP_NAME} est en cours d'exécution.$\r$\n$\r$\nVeuillez fermer l'application avant de continuer."
+LangString MSG_APP_RUNNING ${LANG_ENGLISH} "${APP_NAME} is currently running.$\r$\n$\r$\nPlease close the application before continuing."
+
+LangString WELCOME_TITLE ${LANG_FRENCH}  "Bienvenue dans l'installation de ${APP_NAME}"
+LangString WELCOME_TITLE ${LANG_ENGLISH} "Welcome to the ${APP_NAME} Setup Wizard"
+
+LangString WELCOME_TEXT ${LANG_FRENCH} "Cet assistant va installer ${APP_NAME} ${APP_VERSION} \
 sur votre ordinateur.$\r$\n$\r$\nAucun droit administrateur requis — installation \
 personnelle dans votre profil utilisateur.$\r$\n$\r$\nCliquez sur Suivant pour continuer."
+LangString WELCOME_TEXT ${LANG_ENGLISH} "This wizard will install ${APP_NAME} ${APP_VERSION} \
+on your computer.$\r$\n$\r$\nNo administrator rights required — this installs \
+into your own user profile.$\r$\n$\r$\nClick Next to continue."
 
-!define MUI_FINISHPAGE_RUN      "$INSTDIR\${APP_EXE}"
-!define MUI_FINISHPAGE_RUN_TEXT "Lancer ${APP_NAME}"
+LangString FINISH_RUN_TEXT ${LANG_FRENCH}  "Lancer ${APP_NAME}"
+LangString FINISH_RUN_TEXT ${LANG_ENGLISH} "Launch ${APP_NAME}"
+
+LangString UNINSTALL_SHORTCUT ${LANG_FRENCH}  "Désinstaller ${APP_NAME}"
+LangString UNINSTALL_SHORTCUT ${LANG_ENGLISH} "Uninstall ${APP_NAME}"
+
+LangString APP_DESCRIPTION ${LANG_FRENCH}  "Éditeur PDF léger — modifier, convertir, protéger"
+LangString APP_DESCRIPTION ${LANG_ENGLISH} "Lightweight PDF editor — edit, convert, protect"
+
+LangString SEC_MAIN_NAME ${LANG_FRENCH}  "${APP_NAME}"
+LangString SEC_MAIN_NAME ${LANG_ENGLISH} "${APP_NAME}"
+
+LangString SEC_DESKTOP_NAME ${LANG_FRENCH}  "Raccourci sur le Bureau"
+LangString SEC_DESKTOP_NAME ${LANG_ENGLISH} "Desktop shortcut"
+
+; Doivent être définis après les LangString correspondantes ($(...) est résolu
+; à l'exécution, mais MUI_PAGE_WELCOME/MUI_PAGE_FINISH lisent ces !define au
+; moment de leur !insertmacro plus bas — l'ordre texte du script ne change
+; rien ici puisque la valeur reste la chaîne littérale "$(WELCOME_TITLE)".
+!define MUI_WELCOMEPAGE_TITLE   "$(WELCOME_TITLE)"
+!define MUI_WELCOMEPAGE_TEXT    "$(WELCOME_TEXT)"
+!define MUI_FINISHPAGE_RUN_TEXT "$(FINISH_RUN_TEXT)"
 
 ; ── Pages installeur ──────────────────────────────────────────────────────────
 !insertmacro MUI_PAGE_WELCOME
@@ -83,21 +108,41 @@ personnelle dans votre profil utilisateur.$\r$\n$\r$\nCliquez sur Suivant pour c
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
 
-; ── Langues ───────────────────────────────────────────────────────────────────
-!insertmacro MUI_LANGUAGE "French"
-!insertmacro MUI_LANGUAGE "English"
+; Vérifie que l'application n'est pas en cours d'exécution avant d'installer
+; ou de désinstaller (fichiers verrouillés sinon). Détection par titre de
+; fenêtre (fiable : main_window.py fixe ce titre une fois pour toutes, il ne
+; change jamais même quand un document est ouvert). Pas de fermeture forcée
+; pour ne pas risquer de perdre un travail non sauvegardé.
+!macro CHECK_APP_RUNNING
+    check_app_running:
+        FindWindow $0 "" "PDF Equilibrist"
+        ${If} $0 <> 0
+            MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION \
+                "$(MSG_APP_RUNNING)" \
+                IDRETRY check_app_running
+            Abort
+        ${EndIf}
+!macroend
 
 ; ── Fonctions d'initialisation ────────────────────────────────────────────────
+!insertmacro MUI_RESERVEFILE_LANGDLL
+
 Function .onInit
+    ; Sélecteur de langue FR/EN — sans cet appel, NSIS choisit silencieusement
+    ; la première langue déclarée (French) quelle que soit la langue système,
+    ; malgré les deux MUI_LANGUAGE déclarées plus haut. Présélectionne déjà
+    ; la langue de l'OS de l'utilisateur.
+    !insertmacro MUI_LANGDLL_DISPLAY
     !insertmacro CHECK_APP_RUNNING
 FunctionEnd
 
 Function un.onInit
+    !insertmacro MUI_LANGDLL_DISPLAY
     !insertmacro CHECK_APP_RUNNING
 FunctionEnd
 
 ; ── Section principale (obligatoire) ─────────────────────────────────────────
-Section "PDF-Equilibrist" SecMain
+Section "$(SEC_MAIN_NAME)" SecMain
     SectionIn RO
 
     SetOutPath "$INSTDIR"
@@ -110,7 +155,7 @@ Section "PDF-Equilibrist" SecMain
     CreateDirectory "$SMPROGRAMS\${APP_NAME}"
     CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" \
                    "$INSTDIR\${APP_EXE}" "" "$INSTDIR\${APP_EXE}"
-    CreateShortcut "$SMPROGRAMS\${APP_NAME}\Désinstaller ${APP_NAME}.lnk" \
+    CreateShortcut "$SMPROGRAMS\${APP_NAME}\$(UNINSTALL_SHORTCUT).lnk" \
                    "$INSTDIR\Uninstall.exe"
 
     ; ── Association .pdf ──────────────────────────────────────────────────────
@@ -137,7 +182,7 @@ Section "PDF-Equilibrist" SecMain
     WriteRegStr HKCU "Software\${APP_NAME}\Capabilities" \
                      "ApplicationName"        "PDF Equilibrist"
     WriteRegStr HKCU "Software\${APP_NAME}\Capabilities" \
-                     "ApplicationDescription" "Éditeur PDF léger — modifier, convertir, protéger"
+                     "ApplicationDescription" "$(APP_DESCRIPTION)"
     WriteRegStr HKCU "Software\${APP_NAME}\Capabilities\FileAssociations" \
                      ".pdf" "${PROG_ID}"
     WriteRegStr HKCU "Software\RegisteredApplications" \
@@ -170,7 +215,7 @@ Section "PDF-Equilibrist" SecMain
 SectionEnd
 
 ; ── Section optionnelle — raccourci Bureau ────────────────────────────────────
-Section /o "Raccourci sur le Bureau" SecDesktop
+Section /o "$(SEC_DESKTOP_NAME)" SecDesktop
     CreateShortcut "$DESKTOP\${APP_NAME}.lnk" \
                    "$INSTDIR\${APP_EXE}" "" "$INSTDIR\${APP_EXE}"
 SectionEnd
@@ -181,10 +226,11 @@ Section "Uninstall"
     ; Supprimer les fichiers installés
     RMDir /r "$INSTDIR"
 
-    ; Supprimer les raccourcis
-    Delete "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk"
-    Delete "$SMPROGRAMS\${APP_NAME}\Désinstaller ${APP_NAME}.lnk"
-    RMDir  "$SMPROGRAMS\${APP_NAME}"
+    ; Supprimer les raccourcis — dossier entier plutôt que fichiers nommés
+    ; individuellement : le nom du raccourci "Désinstaller"/"Uninstall" dépend
+    ; de la langue choisie, qui peut différer entre l'install et la désinstall
+    ; (le sélecteur de langue MUI_LANGDLL_DISPLAY est redemandé à chaque fois).
+    RMDir /r "$SMPROGRAMS\${APP_NAME}"
     Delete "$DESKTOP\${APP_NAME}.lnk"
 
     ; Supprimer les clés registre
