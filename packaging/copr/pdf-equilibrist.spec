@@ -1,5 +1,5 @@
 Name:           pdf-equilibrist
-Version:        0.1.17
+Version:        0.1.18
 Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
@@ -161,6 +161,14 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Fri Jul 31 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.18-1
+- Version-sync only, no content change for this package. Bumped because
+  0.1.16/0.1.17 never actually built on the PPA (Launchpad build farm
+  failure, unrelated to COPR/Fedora) and needed a fresh upstream version
+  to fix; keeping AUR/PPA/COPR on the same version avoids the in-app
+  update checker (GitHub-tag-only) telling users on any one channel a
+  version exists that their package manager can't actually offer them.
+
 * Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.17-1
 - New upstream release, Windows-only fix (NSIS installer banner/header
   image ordering bug) — no effect on this package. Bumped purely so the

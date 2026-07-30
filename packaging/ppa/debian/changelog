@@ -1,3 +1,37 @@
+pdf-equilibrist (0.1.18-2) resolute; urgency=high
+
+  * Fix build: 0.1.16 and 0.1.17 never actually built on Launchpad (source
+    was accepted and shown "Published", masking that every binary build
+    failed — "ERROR: Could not find a version that satisfies the
+    requirement cffi"). Root cause: the .orig.tar.gz was built by curling
+    the GitHub tag archive, which does not include packaging/ppa/vendor/
+    (gitignored, per packaging/ppa/README.md) — so the wheelhouse
+    --find-links dirs were empty on the build farm. Fix is procedural
+    only (build the orig tarball from a local `cp -r` of the checkout,
+    as documented, not from the GitHub archive); no source change needed.
+    Version bumped only so this correction is a fresh upstream version
+    Launchpad will accept (it locks the orig tarball checksum per version
+    once any revision is accepted, so 0.1.17 itself could not be reused).
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Fri, 31 Jul 2026 00:30:00 +0000
+
+pdf-equilibrist (0.1.18-1) noble; urgency=high
+
+  * Fix build: 0.1.16 and 0.1.17 never actually built on Launchpad (source
+    was accepted and shown "Published", masking that every binary build
+    failed — "ERROR: Could not find a version that satisfies the
+    requirement cffi"). Root cause: the .orig.tar.gz was built by curling
+    the GitHub tag archive, which does not include packaging/ppa/vendor/
+    (gitignored, per packaging/ppa/README.md) — so the wheelhouse
+    --find-links dirs were empty on the build farm. Fix is procedural
+    only (build the orig tarball from a local `cp -r` of the checkout,
+    as documented, not from the GitHub archive); no source change needed.
+    Version bumped only so this correction is a fresh upstream version
+    Launchpad will accept (it locks the orig tarball checksum per version
+    once any revision is accepted, so 0.1.17 itself could not be reused).
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Fri, 31 Jul 2026 00:30:00 +0000
+
 pdf-equilibrist (0.1.17-2) resolute; urgency=low
 
   * New upstream release, Windows-only fix (NSIS installer banner/header
