@@ -1,6 +1,6 @@
 Name:           pdf-equilibrist
-Version:        0.1.16
-Release:        2%{?dist}
+Version:        0.1.17
+Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
 # Le venv privé n'a ni sources C à débugger (pur Python + wheels manylinux
@@ -161,6 +161,13 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.17-1
+- New upstream release, Windows-only fix (NSIS installer banner/header
+  image ordering bug) — no effect on this package. Bumped purely so the
+  in-app update checker (which only compares against the latest GitHub
+  tag, not per-channel availability) doesn't tell COPR users a newer
+  version exists that dnf can't actually offer them.
+
 * Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.16-2
 - Add google-noto-color-emoji-fonts as a Requires. The ribbon uses color
   emoji as icons (🖨, 🖼, 🔒, 🌐…) — without a color emoji font, these

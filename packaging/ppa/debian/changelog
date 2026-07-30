@@ -1,3 +1,23 @@
+pdf-equilibrist (0.1.17-2) resolute; urgency=low
+
+  * New upstream release, Windows-only fix (NSIS installer banner/header
+    image ordering bug) — no effect on this package. Bumped purely so the
+    in-app update checker (which only compares against the latest GitHub
+    tag, not per-channel availability) doesn't tell PPA users a newer
+    version exists that apt can't actually offer them.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 30 Jul 2026 23:30:00 +0000
+
+pdf-equilibrist (0.1.17-1) noble; urgency=low
+
+  * New upstream release, Windows-only fix (NSIS installer banner/header
+    image ordering bug) — no effect on this package. Bumped purely so the
+    in-app update checker (which only compares against the latest GitHub
+    tag, not per-channel availability) doesn't tell PPA users a newer
+    version exists that apt can't actually offer them.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 30 Jul 2026 23:30:00 +0000
+
 pdf-equilibrist (0.1.16-2) resolute; urgency=medium
 
   * New upstream release: full English translation of the app UI (all
