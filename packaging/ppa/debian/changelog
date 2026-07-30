@@ -1,3 +1,25 @@
+pdf-equilibrist (0.1.14-6) resolute; urgency=high
+
+  * Security: strip pip from the shipped venv (CVE-2026-3219, CVE-2026-6357,
+    CVE-2026-8643, CVE-2025-8869, CVE-2026-1703). The app never invokes pip
+    at runtime — python3 -m venv bootstraps it via ensurepip from whatever
+    version is frozen in the build chroot's system Python, which was never
+    upgraded. Removed after the last pip install step in override_dh_auto_build
+    rather than chasing every future pip CVE with a version bump.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 30 Jul 2026 21:00:00 +0000
+
+pdf-equilibrist (0.1.14-5) noble; urgency=high
+
+  * Security: strip pip from the shipped venv (CVE-2026-3219, CVE-2026-6357,
+    CVE-2026-8643, CVE-2025-8869, CVE-2026-1703). The app never invokes pip
+    at runtime — python3 -m venv bootstraps it via ensurepip from whatever
+    version is frozen in the build chroot's system Python, which was never
+    upgraded. Removed after the last pip install step in override_dh_auto_build
+    rather than chasing every future pip CVE with a version bump.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 30 Jul 2026 21:00:00 +0000
+
 pdf-equilibrist (0.1.14-4) resolute; urgency=medium
 
   * Fix FAILEDTOBUILD on the previous resolute upload (-3): the

@@ -1,6 +1,6 @@
 Name:           pdf-equilibrist
 Version:        0.1.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
 # Le venv privé n'a ni sources C à débugger (pur Python + wheels manylinux
@@ -150,6 +150,14 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.14-2
+- Security: strip pip from the shipped venv (CVE-2026-3219, CVE-2026-6357,
+  CVE-2026-8643). The app never invokes pip at runtime — python3 -m venv
+  bootstraps it via ensurepip from whatever version is frozen in the
+  chroot's system Python, which was never upgraded. Removed after the
+  last pip install step in %build rather than chasing every future pip
+  CVE with a version bump.
+
 * Sun Jul 26 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.14-1
 - Fix CVE checker on frozen builds: the purelib-scoped dependency scan
   (added to avoid --system-site-packages noise on Linux venv packages,
