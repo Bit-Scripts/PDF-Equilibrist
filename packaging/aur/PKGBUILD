@@ -78,4 +78,12 @@ package() {
   # vide au lancement, cf. bug trouvé lors du premier test makepkg -si).
   mkdir -p "$pkgdir/usr/share/pdf-equilibrist"
   cp -r assets "$pkgdir/usr/share/pdf-equilibrist/assets"
+
+  # Même piège pour les traductions Qt (.qm) : resource_path() ne les trouve
+  # que sous $PREFIX/share/pdf-equilibrist/translations/ pour un paquet système
+  # — sans ça install_translator() ne trouve jamais le fichier et l'app reste
+  # toujours en français quelle que soit la langue choisie (trouvé lors du
+  # test AUR de la 0.1.15, i18n de l'app jamais testé sur un paquet système
+  # avant ce test).
+  cp -r translations "$pkgdir/usr/share/pdf-equilibrist/translations"
 }

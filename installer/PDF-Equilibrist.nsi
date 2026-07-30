@@ -1,4 +1,4 @@
-; PDF-Equilibrist — Script NSIS (licence zlib, usage commercial libre)
+﻿; PDF-Equilibrist — Script NSIS (licence zlib, usage commercial libre)
 ; =====================================================================
 ; Prérequis : NSIS 3.x
 ; Compiler :

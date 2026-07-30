@@ -1,18 +1,26 @@
-pdf-equilibrist (0.1.15-2) resolute; urgency=medium
+pdf-equilibrist (0.1.16-2) resolute; urgency=medium
 
   * New upstream release: full English translation of the app UI (all
     ribbon tabs, dialogs, menus, status bar), bilingual FR/EN NSIS
-    installer. No dependency changes — same wheelhouse as 0.1.14.
+    installer (Windows-only fix, no effect on this package — see 0.1.16-1).
+    Also fixes app translations (.qm) never being found on a system
+    package install: resource_path() only knew about assets/, not
+    translations/, so the app silently stayed French regardless of the
+    language picked. No dependency changes — same wheelhouse as 0.1.14.
 
- -- Paul Woisard <paulwoisard@gmail.com>  Thu, 30 Jul 2026 22:00:00 +0000
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 30 Jul 2026 23:00:00 +0000
 
-pdf-equilibrist (0.1.15-1) noble; urgency=medium
+pdf-equilibrist (0.1.16-1) noble; urgency=medium
 
   * New upstream release: full English translation of the app UI (all
-    ribbon tabs, dialogs, menus, status bar), bilingual FR/EN NSIS
-    installer. No dependency changes — same wheelhouse as 0.1.14.
+    ribbon tabs, dialogs, menus, status bar). Fixes app translations
+    (.qm) never being found on a system package install: resource_path()
+    only knew about assets/, not translations/, so the app silently
+    stayed French regardless of the language picked (found testing this
+    exact PPA/COPR/AUR install path). No dependency changes — same
+    wheelhouse as 0.1.14.
 
- -- Paul Woisard <paulwoisard@gmail.com>  Thu, 30 Jul 2026 22:00:00 +0000
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 30 Jul 2026 23:00:00 +0000
 
 pdf-equilibrist (0.1.14-6) resolute; urgency=high
 

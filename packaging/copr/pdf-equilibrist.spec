@@ -1,5 +1,5 @@
 Name:           pdf-equilibrist
-Version:        0.1.15
+Version:        0.1.16
 Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
@@ -138,6 +138,12 @@ install -Dm644 %{SOURCE3} %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/%{n
 # sur la PPA Ubuntu). Les assets doivent donc vivre dans le venv lui-même.
 install -d %{buildroot}%{_libdir}/%{name}/venv/share/%{name}
 cp -r assets %{buildroot}%{_libdir}/%{name}/venv/share/%{name}/assets
+# Même piège pour les traductions Qt (.qm) : resource_path() ne les trouve
+# que sous {sys.prefix}/share/pdf-equilibrist/translations/ — sans ça
+# install_translator() ne trouve jamais le .qm et l'app reste toujours en
+# français quelle que soit la langue choisie (trouvé lors du test AUR de
+# la 0.1.15, i18n de l'app jamais testé sur un paquet système avant ce test).
+cp -r translations %{buildroot}%{_libdir}/%{name}/venv/share/%{name}/translations
 
 desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 
@@ -150,10 +156,14 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
-* Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.15-1
+* Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.16-1
 - New upstream release: full English translation of the app UI (all
-  ribbon tabs, dialogs, menus, status bar), bilingual FR/EN NSIS
-  installer. No dependency changes — same wheelhouse as 0.1.14.
+  ribbon tabs, dialogs, menus, status bar). Fixes app translations (.qm)
+  never being found on a system package install: resource_path() only
+  knew about assets/, not translations/, so the app silently stayed
+  French regardless of the language picked (found testing this exact
+  PPA/COPR/AUR install path). No dependency changes — same wheelhouse
+  as 0.1.14.
 
 * Thu Jul 30 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.14-2
 - Security: strip pip from the shipped venv (CVE-2026-3219, CVE-2026-6357,

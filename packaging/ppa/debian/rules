@@ -102,6 +102,13 @@ override_dh_auto_install:
 	# paquet — sinon resource_path() ne les trouve jamais.
 	mkdir -p $(VENV)/share/pdf-equilibrist
 	cp -r assets $(VENV)/share/pdf-equilibrist/assets
+	# Même piège pour les traductions Qt (.qm) : resource_path() ne les
+	# trouve que sous {sys.prefix}/share/pdf-equilibrist/translations/ —
+	# sans ça install_translator() ne trouve jamais le .qm et l'app reste
+	# toujours en français quelle que soit la langue choisie (trouvé lors
+	# du test AUR de la 0.1.15, i18n de l'app jamais testé sur un paquet
+	# système avant ce test).
+	cp -r translations $(VENV)/share/pdf-equilibrist/translations
 
 override_dh_shlibdeps:
 	# Les .so embarqués (PyMuPDF, Pillow, lxml, opencv…) vivent dans le venv
