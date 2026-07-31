@@ -1,5 +1,5 @@
 Name:           pdf-equilibrist
-Version:        0.1.18
+Version:        0.1.19
 Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
@@ -161,6 +161,14 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Fri Jul 31 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.19-1
+- UI: the language switcher button in the title bar now shows the current
+  language (e.g. "🌐FR" / "🌐EN") instead of just a bare globe icon, and is
+  wider to fit it. Found via real user feedback on Reddit (r/degoogle): a
+  user installed the app and couldn't find any way to change the language
+  away from French, because the globe icon alone gave no indication it
+  was the language control.
+
 * Fri Jul 31 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.18-1
 - Version-sync only, no content change for this package. Bumped because
   0.1.16/0.1.17 never actually built on the PPA (Launchpad build farm

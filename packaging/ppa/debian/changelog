@@ -1,3 +1,25 @@
+pdf-equilibrist (0.1.19-1) noble; urgency=medium
+
+  * UI: the language switcher button in the title bar now shows the
+    current language (e.g. "🌐FR" / "🌐EN") instead of just a bare globe
+    icon, and is wider to fit it. Found via real user feedback on Reddit
+    (r/degoogle): a user installed the app and couldn't find any way to
+    change the language away from French, because the globe icon alone
+    gave no indication it was the language control.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Fri, 31 Jul 2026 02:00:00 +0000
+
+pdf-equilibrist (0.1.19-2) resolute; urgency=medium
+
+  * UI: the language switcher button in the title bar now shows the
+    current language (e.g. "🌐FR" / "🌐EN") instead of just a bare globe
+    icon, and is wider to fit it. Found via real user feedback on Reddit
+    (r/degoogle): a user installed the app and couldn't find any way to
+    change the language away from French, because the globe icon alone
+    gave no indication it was the language control.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Fri, 31 Jul 2026 02:00:00 +0000
+
 pdf-equilibrist (0.1.18-2) resolute; urgency=high
 
   * Fix build: 0.1.16 and 0.1.17 never actually built on Launchpad (source
