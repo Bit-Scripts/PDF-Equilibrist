@@ -207,8 +207,9 @@ class TitleBar(QWidget):
         layout.addStretch(1)
 
         # ── Bouton langue ─────────────────────────────────────────────────────
-        self._btn_lang = QPushButton("🌐")
-        self._btn_lang.setFixedSize(38, 30)
+        from pdf_equilibrist.i18n import current_lang as _cur_lang
+        self._btn_lang = QPushButton(f"🌐{_cur_lang().upper()}")
+        self._btn_lang.setFixedSize(52, 30)
         self._btn_lang.setStyleSheet(_CTRL_BASE)
         self._btn_lang.setToolTip(self.tr("Langue / Language"))
         self._btn_lang.clicked.connect(self._show_lang_menu)
