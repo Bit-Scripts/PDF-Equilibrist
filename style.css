@@ -72,23 +72,34 @@ img { max-width: 100%; display: block; }
 
 /* Sélecteur de langue */
 .lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   margin-left: 22px;
-  padding-left: 22px;
-  border-left: 1px solid var(--border);
+  padding: 3px 8px 3px 6px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
 }
+.lang-switch::before {
+  content: "🌐";
+  font-size: 0.9rem;
+  margin-right: 2px;
+}
 .lang-switch a {
   color: var(--text-dim);
-  padding: 2px 4px;
+  padding: 2px 5px;
+  border-radius: 999px;
 }
 .lang-switch a:hover { color: var(--accent); text-decoration: none; }
 .lang-switch a.lang-current {
-  color: var(--accent);
+  color: var(--bg-0);
+  background: var(--accent);
   pointer-events: none;
 }
-.lang-switch a + a::before { content: "·"; margin: 0 4px; color: var(--border); pointer-events: none; }
 
 /* Bandeau de suggestion de langue */
 .lang-banner {
