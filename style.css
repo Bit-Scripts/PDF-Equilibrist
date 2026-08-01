@@ -101,6 +101,19 @@ img { max-width: 100%; display: block; }
   pointer-events: none;
 }
 
+@media (max-width: 560px) {
+  .topnav {
+    flex-wrap: wrap;
+    padding: 14px 10px;
+  }
+  .topnav nav {
+    flex: 1 0 100%;
+    margin-top: 10px;
+    text-align: right;
+  }
+  .topnav nav a:first-child { margin-left: 0; }
+}
+
 /* Bandeau de suggestion de langue */
 .lang-banner {
   background: var(--bg-2);
