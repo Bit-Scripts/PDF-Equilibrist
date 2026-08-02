@@ -1,0 +1,117 @@
+name: Linux COPR Publish
+
+# Soumet automatiquement un build COPR pdf-equilibrist à chaque nouvelle
+# release, à la place de la construction manuelle du SRPM + upload web décrite
+# dans packaging/copr/README.md. Reproduit exactement les mêmes étapes que ce
+# README (rpmdev-setuptree, wheelhouse téléchargé hors-ligne, spec + assets
+# copiés depuis packaging/copr/, rpmbuild -bs) puis pousse le SRPM résultant
+# via `copr-cli build` — c'est ensuite COPR qui construit les RPMs réels sur
+# ses propres builders pour chaque chroot (fedora-43/44/rawhide).
+#
+# Prérequis (faits manuellement, voir mémoire projet) :
+#   - Secrets de dépôt COPR_LOGIN / COPR_USERNAME / COPR_TOKEN, copiés depuis
+#     ~/.config/copr (généré sur https://copr.fedorainfracloud.org/api/ après
+#     connexion FAS) — jamais commités, jamais affichés en clair dans les logs.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version à publier (ex. 0.1.19) — pour tester sans attendre un vrai tag'
+        required: false
+
+jobs:
+  publish:
+    name: Build SRPM and submit to COPR
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:44
+    steps:
+      # git n'est pas garanti présent sur l'image fedora minimale — même piège
+      # que sur archlinux:base-devel dans linux-aur-publish.yml : sans lui,
+      # actions/checkout retombe sur un téléchargement REST sans vrai .git.
+      - name: Install git (required before checkout)
+        run: dnf install -y git
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build tooling
+        run: |
+          dnf install -y rpmdevtools rpm-build python3-pip copr-cli
+
+      - name: Determine version from tag
+        id: version
+        env:
+          MANUAL_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          v="${MANUAL_VERSION:-${GITHUB_REF_NAME#v}}"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
+      # Force la cohérence avec le tag même si le .spec committé a pris du
+      # retard — auto-correctif plutôt que de dépendre d'un bump manuel parfait.
+      - name: Ensure spec Version matches the tag
+        run: |
+          sed -i "s/^Version:.*/Version:        ${{ steps.version.outputs.version }}/" \
+            packaging/copr/pdf-equilibrist.spec
+
+      - name: Set up rpmbuild tree
+        run: rpmdev-setuptree
+
+      # Mêmes 5 wheels vendorisées et mêmes versions figées que celles listées
+      # en Source10-14 du .spec (packaging/copr/README.md) — pip download hors
+      # réseau côté COPR n'est pas requis ici puisque cette étape tourne en CI,
+      # contrairement à la contrainte "aucun accès réseau" du build COPR lui-même.
+      - name: Download vendored wheels
+        run: |
+          pip download --no-deps --dest ~/rpmbuild/SOURCES \
+            pdf2docx==0.5.13 \
+            pdfplumber==0.11.10 \
+            python-pptx==1.0.2 \
+            python-docx==1.2.0 \
+            pypdfium2==5.12.1
+
+      - name: Copy packaging assets and spec
+        run: |
+          cp packaging/copr/pdf-equilibrist.sh \
+             packaging/copr/pdf-equilibrist.desktop \
+             packaging/copr/pdf-equilibrist-128.png \
+             packaging/copr/pdf-equilibrist-256.png \
+             ~/rpmbuild/SOURCES/
+          cp packaging/copr/pdf-equilibrist.spec ~/rpmbuild/SPECS/
+
+      # git archive plutôt qu'un curl vers l'archive GitHub du tag : le tag
+      # vient d'être poussé, rien ne garantit que l'archive GitHub soit déjà
+      # générée/propagée au moment où ce job tourne — le checkout local est
+      # déjà exactement au bon commit, pas besoin d'attendre GitHub.
+      - name: Build source tarball
+        run: |
+          v="${{ steps.version.outputs.version }}"
+          git archive --format=tar.gz \
+            --prefix="PDF-Equilibrist-${v}/" \
+            -o ~/rpmbuild/SOURCES/pdf-equilibrist-${v}.tar.gz \
+            HEAD
+
+      - name: Build SRPM
+        run: rpmbuild -bs ~/rpmbuild/SPECS/pdf-equilibrist.spec
+
+      # copr-cli lit ~/.config/copr — écrit ici plutôt que passé en argument
+      # pour ne jamais faire apparaître le token en clair dans les logs de commande.
+      - name: Configure copr-cli credentials
+        run: |
+          mkdir -p ~/.config
+          cat > ~/.config/copr <<EOF
+          [copr-cli]
+          login = ${{ secrets.COPR_LOGIN }}
+          username = ${{ secrets.COPR_USERNAME }}
+          token = ${{ secrets.COPR_TOKEN }}
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+          chmod 600 ~/.config/copr
+
+      - name: Submit build to COPR
+        run: |
+          srpm=$(find ~/rpmbuild/SRPMS -name '*.src.rpm')
+          copr-cli build paullux/PDF-Equilibrist "$srpm"
