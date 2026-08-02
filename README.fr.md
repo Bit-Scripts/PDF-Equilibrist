@@ -4,7 +4,7 @@
 
 [![Website](https://img.shields.io/badge/site-pdf--equilibrist.org-6BBF4E)](https://pdf-equilibrist.org)
 [![Release](https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
+[![Téléchargements Windows](https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=t%C3%A9l%C3%A9chargements%20Windows&cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
 [![AUR](https://img.shields.io/aur/version/pdf-equilibrist)](https://aur.archlinux.org/packages/pdf-equilibrist)
 [![PPA Ubuntu](https://img.shields.io/badge/PPA-ubuntu-orange)](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist)
 [![COPR Fedora](https://img.shields.io/badge/COPR-fedora-blue)](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
