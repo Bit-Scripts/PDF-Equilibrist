@@ -38,6 +38,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Nécessaire pour tout git ultérieur (ici `git archive`) dans ce
+      # conteneur : le checkout est fait par un utilisateur/UID différent de
+      # celui qui exécute les steps suivants, donc Git refuse par défaut
+      # d'opérer sur un dépôt qu'il ne se reconnaît pas comme propriétaire —
+      # même piège déjà rencontré dans linux-aur-publish.yml.
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Install build tooling
         run: |
           dnf install -y rpmdevtools rpm-build python3-pip copr-cli
