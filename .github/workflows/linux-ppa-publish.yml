@@ -49,7 +49,11 @@ jobs:
       - name: Install packaging tooling
         run: |
           sudo apt-get update
-          sudo apt-get install -y devscripts dpkg-dev gnupg dput lintian
+          # debhelper (la commande `dh`) est réellement invoquée par
+          # debian/rules même pour un build source-only (`dh clean` avant
+          # tout le reste) — -d plus bas ne dispense que de la vérification
+          # des Build-Depends, pas de la présence réelle des outils appelés.
+          sudo apt-get install -y devscripts dpkg-dev gnupg dput lintian debhelper
 
       # Python 3.12 réel pour le wheelhouse noble (pas de cross-download
       # nécessaire, contrairement à resolute où aucun interpréteur 3.14 réel
