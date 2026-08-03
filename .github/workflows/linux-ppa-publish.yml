@@ -1,0 +1,144 @@
+name: Linux PPA Publish
+
+# Publie automatiquement le paquet Ubuntu (noble + resolute) sur
+# ppa:paulwoisard/pdf-equilibrist à chaque nouvelle release, à la place du
+# cycle manuel debuild -S -sa + dput décrit dans packaging/ppa/README.md.
+# Reproduit exactement les leçons apprises manuellement ce soir :
+#   - l'orig.tar.gz est construit via `cp -r` du checkout (jamais via l'archive
+#     GitHub du tag) car packaging/ppa/vendor/ est gitignoré — c'est la cause
+#     racine du vrai échec de build qui a affecté 0.1.16/0.1.17.
+#   - l'orig.tar.gz doit être identique à l'octet près entre noble et resolute
+#     (contrainte Launchpad) : construit UNE SEULE FOIS puis ré-extrait pour
+#     chaque série, jamais retaré deux fois.
+#   - le haut de debian/changelog doit correspondre à la série en cours de
+#     build ; ce workflow retrouve la bonne entrée par son nom de série plutôt
+#     que de supposer un ordre fixe (l'ordre noble/resolute a déjà varié d'une
+#     release à l'autre).
+#
+# Prérequis (faits manuellement, voir mémoire projet) :
+#   - Secret de dépôt PPA_GPG_PRIVATE_KEY : clé GPG dédiée CI (RSA4096, sans
+#     passphrase — Launchpad ne supporte pas l'import de clés Ed25519/EdDSA),
+#     dont la clé publique est enregistrée sur le compte Launchpad en plus de
+#     la clé personnelle de l'auteur (launchpad.net/~/+editpgpkeys).
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version à publier (ex. 0.1.19) — pour tester sans attendre un vrai tag'
+        required: false
+
+jobs:
+  publish:
+    name: Build and upload PPA source packages (noble + resolute)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine version from tag
+        id: version
+        env:
+          MANUAL_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          v="${MANUAL_VERSION:-${GITHUB_REF_NAME#v}}"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
+      - name: Install packaging tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y devscripts dpkg-dev gnupg dput lintian
+
+      # Python 3.12 réel pour le wheelhouse noble (pas de cross-download
+      # nécessaire, contrairement à resolute où aucun interpréteur 3.14 réel
+      # n'est disponible sur ce runner).
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download noble wheelhouse (cp312, real interpreter)
+        run: |
+          mkdir -p packaging/ppa/vendor/wheelhouse
+          pip download --no-deps --dest packaging/ppa/vendor/wheelhouse \
+            cffi charset-normalizer cryptography et-xmlfile fire fonttools lxml \
+            numpy opencv-python-headless openpyxl pdf2docx pdfminer.six \
+            pdfplumber Pillow pycparser PyMuPDF pyparsing pypdfium2 \
+            python-docx python-pptx termcolor typing-extensions XlsxWriter
+
+      # Seuls les paquets réellement liés à l'ABI CPython (extensions
+      # compilées, pas de wheel abi3/py3-none-any) ont besoin d'une variante
+      # cp314 séparée — les 17 autres seront retrouvés dans le wheelhouse
+      # noble ci-dessus grâce au double --find-links de debian/rules.
+      - name: Download resolute-specific wheels (cp314, cross-download)
+        run: |
+          mkdir -p packaging/ppa/vendor/wheelhouse-resolute
+          pip download --no-deps --dest packaging/ppa/vendor/wheelhouse-resolute \
+            --python-version 3.14 --implementation cp --abi cp314 \
+            --platform manylinux_2_28_x86_64 --only-binary=:all: \
+            cffi charset-normalizer fonttools lxml numpy pillow
+
+      - name: Import CI signing key
+        env:
+          PPA_GPG_PRIVATE_KEY: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
+        run: |
+          echo "$PPA_GPG_PRIVATE_KEY" | gpg --batch --import
+          fpr=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/ {print $10; exit}')
+          echo "GPG_KEY_FPR=$fpr" >> "$GITHUB_ENV"
+
+      # Construit l'orig UNE SEULE FOIS à partir du checkout (pas de l'archive
+      # GitHub du tag, qui ne contient pas packaging/ppa/vendor/ gitignoré).
+      # Toutes les séries réutiliseront ce même fichier, jamais reconstruit.
+      - name: Build the shared orig tarball
+        run: |
+          v="${{ steps.version.outputs.version }}"
+          mkdir -p /tmp/ppa-build
+          cp -r "$GITHUB_WORKSPACE" "/tmp/ppa-build/pdf-equilibrist-${v}"
+          rm -rf "/tmp/ppa-build/pdf-equilibrist-${v}/.git"
+          tar czf "/tmp/ppa-build/pdf-equilibrist_${v}.orig.tar.gz" \
+            -C /tmp/ppa-build "pdf-equilibrist-${v}"
+
+      - name: Build and upload for each series
+        run: |
+          v="${{ steps.version.outputs.version }}"
+          for series in noble resolute; do
+            echo "::group::${series}"
+            workdir="/tmp/ppa-build/${series}"
+            rm -rf "$workdir"
+            mkdir -p "$workdir"
+            cp "/tmp/ppa-build/pdf-equilibrist_${v}.orig.tar.gz" "$workdir/"
+            tar xzf "$workdir/pdf-equilibrist_${v}.orig.tar.gz" -C "$workdir"
+            srcdir="$workdir/pdf-equilibrist-${v}"
+            rm -rf "$srcdir/debian"
+            cp -r "$GITHUB_WORKSPACE/packaging/ppa/debian" "$srcdir/debian"
+
+            # Isole l'entrée de changelog de CETTE série en tête, quel que
+            # soit son ordre initial dans le fichier (a déjà varié d'une
+            # release à l'autre : voir mémoire projet).
+            awk -v pat=") ${series};" '
+              index($0, pat) { found=1 }
+              found { print }
+            ' "$srcdir/debian/changelog" > "$srcdir/debian/changelog.trimmed"
+            mv "$srcdir/debian/changelog.trimmed" "$srcdir/debian/changelog"
+
+            top_version=$(head -1 "$srcdir/debian/changelog" | sed -E 's/^[^(]*\(([^)]+)\).*/\1/')
+            expected="${v}"
+            case "$top_version" in
+              "${expected}"-*) ;;
+              *)
+                echo "::error::debian/changelog top entry for ${series} is ${top_version}, expected ${expected}-* — bump the changelog before tagging."
+                exit 1
+                ;;
+            esac
+
+            (
+              cd "$srcdir"
+              debuild -S -sa -k"${GPG_KEY_FPR}"
+            )
+
+            changes=$(find "$workdir" -maxdepth 1 -name "*_source.changes")
+            dput ppa:paulwoisard/pdf-equilibrist "$changes"
+            echo "::endgroup::"
+          done
