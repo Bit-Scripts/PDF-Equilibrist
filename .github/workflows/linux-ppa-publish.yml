@@ -135,7 +135,12 @@ jobs:
 
             (
               cd "$srcdir"
-              debuild -S -sa -k"${GPG_KEY_FPR}"
+              # -d : ignore la vérification des Build-Depends de debian/control
+              # (debhelper-compat, python3-pyqt6...) — inutile ici, un build
+              # source-only ne compile rien localement, c'est le build farm
+              # Launchpad qui installera les vraies dépendances pour le build
+              # binaire réel.
+              debuild -S -sa -d -k"${GPG_KEY_FPR}"
             )
 
             changes=$(find "$workdir" -maxdepth 1 -name "*_source.changes")
