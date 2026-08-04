@@ -132,6 +132,30 @@ La documentation source se trouve dans le dossier `docs/`.
 
 ## FAQ
 
+**PDF‑Equilibrist envoie-t-il mes fichiers sur Internet ?**
+
+Non. Tous les traitements sont effectués localement sur votre machine. Aucun fichier ne quitte votre poste de travail.
+
+**PDF‑Equilibrist est-il gratuit ?**
+
+Oui, entièrement gratuit et open source, distribué sous licence GNU GPL v3.
+
+**PDF‑Equilibrist remplace-t-il Adobe Acrobat ?**
+
+Pour de nombreux usages courants — édition, annotation, conversion, protection — oui. Il ne nécessite ni abonnement ni compte.
+
+**Quels systèmes d'exploitation sont supportés ?**
+
+Windows (installeur .exe), Arch Linux (AUR), Ubuntu (PPA) et Fedora (COPR).
+
+**Faut-il des droits administrateur pour l'installer ?**
+
+Non. L'installeur Windows s'installe dans le profil utilisateur sans élévation UAC.
+
+**Le code source est-il auditable ?**
+
+Oui. Le code est publié sur [GitHub](https://github.com/Bit-Scripts/PDF-Equilibrist) et les dépendances sont analysées automatiquement contre les vulnérabilités connues.
+
 **PDF‑Equilibrist modifie-t-il mon fichier PDF d'origine ?**
 
 Vos fichiers restent intacts. PDF‑Equilibrist n'écrit jamais directement dans le PDF d'origine : toutes les modifications sont appliquées à une copie de travail en mémoire. Le fichier source n'est écrasé que si vous choisissez explicitement d'enregistrer par-dessus — sinon, exportez sous un nouveau nom et l'original reste inchangé.
