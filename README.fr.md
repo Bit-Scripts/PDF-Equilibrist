@@ -130,6 +130,12 @@ python src/pdf_equilibrist/main.py
 
 La documentation source se trouve dans le dossier `docs/`.
 
+## FAQ
+
+**PDF‑Equilibrist modifie-t-il mon fichier PDF d'origine ?**
+
+Vos fichiers restent intacts. PDF‑Equilibrist n'écrit jamais directement dans le PDF d'origine : toutes les modifications sont appliquées à une copie de travail en mémoire. Le fichier source n'est écrasé que si vous choisissez explicitement d'enregistrer par-dessus — sinon, exportez sous un nouveau nom et l'original reste inchangé.
+
 ## Licence
 
 Ce projet est distribué sous licence GNU GPL v3.0 (ou ultérieure). Voir [LICENSE.md](LICENSE.md).

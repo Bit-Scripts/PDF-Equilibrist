@@ -129,6 +129,12 @@ python src/pdf_equilibrist/main.py
 
 Source documentation lives in the `docs/` folder.
 
+## FAQ
+
+**Does PDF‑Equilibrist modify my original PDF file?**
+
+Non-destructive editing. PDF‑Equilibrist never writes to your original file — all edits happen on an in-memory working copy. Your source PDF stays untouched unless you explicitly choose to overwrite it; otherwise, export under a new name and the original is preserved.
+
 ## License
 
 This project is distributed under the GNU GPL v3.0 license (or later). See [LICENSE.md](LICENSE.md).
