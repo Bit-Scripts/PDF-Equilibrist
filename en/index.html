@@ -95,6 +95,11 @@
       "@type": "Question",
       "name": "Is the source code auditable?",
       "acceptedAnswer": { "@type": "Answer", "text": "Yes. The code is published on GitHub and dependencies are automatically checked against known vulnerabilities." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does PDF‑Equilibrist modify my original PDF file?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Non-destructive editing. PDF‑Equilibrist never writes to your original file — all edits happen on an in-memory working copy. Your source PDF stays untouched unless you explicitly choose to overwrite it; otherwise, export under a new name and the original is preserved." }
     }
   ]
 }
@@ -137,7 +142,7 @@
   <div class="badges">
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist"><img src="https://img.shields.io/badge/GitHub-source-181717?logo=github&logoColor=white" alt="GitHub"></a>
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"><img src="https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600" alt="Release"></a>
-    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=Windows%20downloads&cacheSeconds=3600" alt="Windows Downloads"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?cacheSeconds=3600" alt="Downloads"></a>
     <a href="https://aur.archlinux.org/packages/pdf-equilibrist"><img src="https://img.shields.io/aur/version/pdf-equilibrist" alt="AUR"></a>
     <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/PPA-ubuntu-orange" alt="PPA Ubuntu"></a>
     <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/COPR-fedora-blue" alt="COPR Fedora"></a>
@@ -306,6 +311,8 @@ sudo dnf install pdf-equilibrist</code></pre>
     <p>No. The Windows installer installs in the user profile without UAC elevation.</p>
     <h3>Is the source code auditable?</h3>
     <p>Yes. The code is published on <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a> and dependencies are automatically checked against known vulnerabilities.</p>
+    <h3>Does PDF‑Equilibrist modify my original PDF file?</h3>
+    <p>Non-destructive editing. PDF‑Equilibrist never writes to your original file — all edits happen on an in-memory working copy. Your source PDF stays untouched unless you explicitly choose to overwrite it; otherwise, export under a new name and the original is preserved.</p>
   </div>
 </section>
 

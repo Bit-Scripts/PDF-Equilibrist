@@ -94,6 +94,9 @@
   "faq.q6": "Is the source code auditable?",
   "faq.a6": "Yes. The code is published on <a href=\"https://github.com/Bit-Scripts/PDF-Equilibrist\">GitHub</a> and dependencies are automatically checked against known vulnerabilities.",
   "faq.a6.plain": "Yes. The code is published on GitHub and dependencies are automatically checked against known vulnerabilities.",
+  "faq.q7": "Does PDF‑Equilibrist modify my original PDF file?",
+  "faq.a7": "Non-destructive editing. PDF‑Equilibrist never writes to your original file — all edits happen on an in-memory working copy. Your source PDF stays untouched unless you explicitly choose to overwrite it; otherwise, export under a new name and the original is preserved.",
+  "faq.a7.plain": "Non-destructive editing. PDF‑Equilibrist never writes to your original file — all edits happen on an in-memory working copy. Your source PDF stays untouched unless you explicitly choose to overwrite it; otherwise, export under a new name and the original is preserved.",
 
   "footer.license": "GNU GPL v3.0 License (or later)",
   "footer.project": "A project by",

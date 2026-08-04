@@ -47,7 +47,7 @@
   "description": "Éditeur PDF open-source fonctionnant entièrement en local pour Windows et Linux.",
   "applicationCategory": "UtilityApplication",
   "operatingSystem": ["Windows", "Linux"],
-  "softwareVersion": "0.1.19",
+  "softwareVersion": "0.1.14",
   "screenshot": "https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png",
   "image": "https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png",
   "downloadUrl": "https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest",
@@ -95,6 +95,11 @@
       "@type": "Question",
       "name": "Le code source est-il auditable ?",
       "acceptedAnswer": { "@type": "Answer", "text": "Oui. Le code est publié sur GitHub et les dépendances sont analysées automatiquement contre les vulnérabilités connues." }
+    },
+    {
+      "@type": "Question",
+      "name": "PDF‑Equilibrist modifie-t-il mon fichier PDF d'origine ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Vos fichiers restent intacts. PDF‑Equilibrist n'écrit jamais directement dans le PDF d'origine : toutes les modifications sont appliquées à une copie de travail en mémoire. Le fichier source n'est écrasé que si vous choisissez explicitement d'enregistrer par-dessus — sinon, exportez sous un nouveau nom et l'original reste inchangé." }
     }
   ]
 }
@@ -137,7 +142,7 @@
   <div class="badges">
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist"><img src="https://img.shields.io/badge/GitHub-source-181717?logo=github&logoColor=white" alt="GitHub"></a>
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"><img src="https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600" alt="Release"></a>
-    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=t%C3%A9l%C3%A9chargements%20Windows&cacheSeconds=3600" alt="Téléchargements Windows"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?cacheSeconds=3600" alt="Downloads"></a>
     <a href="https://aur.archlinux.org/packages/pdf-equilibrist"><img src="https://img.shields.io/aur/version/pdf-equilibrist" alt="AUR"></a>
     <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/PPA-ubuntu-orange" alt="PPA Ubuntu"></a>
     <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/COPR-fedora-blue" alt="COPR Fedora"></a>
@@ -306,6 +311,8 @@ sudo dnf install pdf-equilibrist</code></pre>
     <p>Non. L'installeur Windows s'installe dans le profil utilisateur sans élévation UAC.</p>
     <h3>Le code source est-il auditable ?</h3>
     <p>Oui. Le code est publié sur <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a> et les dépendances sont analysées automatiquement contre les vulnérabilités connues.</p>
+    <h3>PDF‑Equilibrist modifie-t-il mon fichier PDF d'origine ?</h3>
+    <p>Vos fichiers restent intacts. PDF‑Equilibrist n'écrit jamais directement dans le PDF d'origine : toutes les modifications sont appliquées à une copie de travail en mémoire. Le fichier source n'est écrasé que si vous choisissez explicitement d'enregistrer par-dessus — sinon, exportez sous un nouveau nom et l'original reste inchangé.</p>
   </div>
 </section>
 
