@@ -1,3 +1,21 @@
+pdf-equilibrist (0.1.20-2) noble; urgency=medium
+
+  * Version-sync only, no content change for this package. 0.1.20-1 was
+    accepted for noble but the resolute upload hit a Launchpad-side FTP
+    error ("550 ... internal server error") on the .dsc — bumped so both
+    series retry as fresh uploads (0.1.20-1 noble is already Pending and
+    immutable on Launchpad's side).
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 17:26:31 +0000
+
+pdf-equilibrist (0.1.20-2) resolute; urgency=medium
+
+  * Version-sync only, no content change for this package. Retrying after
+    a Launchpad-side FTP error ("550 ... internal server error") on the
+    0.1.20-1 upload for this series.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 17:26:31 +0000
+
 pdf-equilibrist (0.1.20-1) noble; urgency=medium
 
   * UI: multi-selection support in the pages thumbnail panel (Ctrl/Shift-click)
