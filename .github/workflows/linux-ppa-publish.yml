@@ -143,8 +143,16 @@ jobs:
           mkdir -p /tmp/ppa-build
           cp -r "$GITHUB_WORKSPACE" "/tmp/ppa-build/pdf-equilibrist-${v}"
           rm -rf "/tmp/ppa-build/pdf-equilibrist-${v}/.git"
-          tar czf "/tmp/ppa-build/pdf-equilibrist_${v}.orig.tar.gz" \
-            -C /tmp/ppa-build "pdf-equilibrist-${v}"
+          # Reproductible octet pour octet entre deux runs : Launchpad exige un
+          # .orig.tar.gz identique pour toute révision d'une même version amont
+          # (le nom de fichier n'inclut pas le numéro de révision -N). `tar -z`
+          # / gzip embarquent par défaut un mtime dans leur en-tête qui varie à
+          # chaque run — d'où les rejets "already exists ... different contents"
+          # sur toute tentative après la première pour une version donnée. Tri
+          # des entrées + mtime fixe + gzip -n (pas de nom/date dans l'en-tête).
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+            -cf - -C /tmp/ppa-build "pdf-equilibrist-${v}" \
+            | gzip -n > "/tmp/ppa-build/pdf-equilibrist_${v}.orig.tar.gz"
 
       - name: Build and upload for each series
         run: |
