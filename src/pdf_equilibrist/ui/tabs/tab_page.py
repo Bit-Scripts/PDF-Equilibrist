@@ -29,7 +29,7 @@ différent des autres opérations qui modifient en place.
 from pathlib import Path
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QFileDialog
 from pdf_equilibrist.ui.widgets import RibbonButton, RibbonGroup
-from pdf_equilibrist.ui.dialogs import ask_page_index, show_info, show_error
+from pdf_equilibrist.ui.dialogs import ask_page_index, show_info, show_error, ensure_suffix
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations.pages import invert_pages, split_pdf, merge_pdfs, insert_page
 
@@ -99,6 +99,7 @@ class TabPage(QWidget):
         out, _ = QFileDialog.getSaveFileName(
             self, self.tr("PDF fusionné"), "", self.tr("PDF (*.pdf)"))
         if out:
+            out = ensure_suffix(out, ".pdf")
             try:
                 merged = merge_pdfs([Path(f) for f in files])
                 merged.save(out)

@@ -26,7 +26,7 @@ sur le disque, l'utilisateur doit utiliser "Enregistrer sous".
 from pathlib import Path
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QFileDialog
 from pdf_equilibrist.ui.widgets import RibbonButton, RibbonGroup
-from pdf_equilibrist.ui.dialogs import ask_encrypt_passwords, ask_password, show_info, show_error
+from pdf_equilibrist.ui.dialogs import ask_encrypt_passwords, ask_password, show_info, show_error, ensure_suffix
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations.protect import encrypt, decrypt
 
@@ -63,6 +63,7 @@ class TabProteger(QWidget):
             str(self.document.path.with_stem(self.document.path.stem + self.tr("_chiffré"))),
             self.tr("PDF (*.pdf)"))
         if path:
+            path = ensure_suffix(path, ".pdf")
             try:
                 encrypt(self.document.fitz_doc, Path(path), user_pw, owner_pw)
                 show_info(self, self.tr("Chiffrer"), self.tr("PDF chiffré :\n{0}").format(path))

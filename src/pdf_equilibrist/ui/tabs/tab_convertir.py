@@ -28,7 +28,7 @@ un ``QThread`` (``_Worker``) pour ne pas bloquer l'UI.
 from pathlib import Path
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QFileDialog
 from pdf_equilibrist.ui.widgets import RibbonButton, RibbonGroup
-from pdf_equilibrist.ui.dialogs import ask_image_format, show_info, show_error
+from pdf_equilibrist.ui.dialogs import ask_image_format, show_info, show_error, ensure_suffix
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations import convert
 from pdf_equilibrist.operations.convert import office_to_pdf, detect_office_engine
@@ -107,6 +107,7 @@ class TabConvertir(QWidget):
             self, self.tr("Vers Markdown"),
             str(self.document.path.with_suffix(".md")), self.tr("Markdown (*.md)"))
         if path:
+            path = ensure_suffix(path, ".md")
             try:
                 convert.to_markdown(self.document.fitz_doc, Path(path))
                 show_info(self, self.tr("Conversion"), self.tr("Markdown enregistré :\n{0}").format(path))
@@ -186,6 +187,7 @@ class TabConvertir(QWidget):
             str(self.document.path.with_stem(stem + "_OCR")), self.tr("PDF (*.pdf)"))
         if not path:
             return
+        path = ensure_suffix(path, ".pdf")
 
         def _convert(fitz_doc):
             try:
@@ -209,6 +211,7 @@ class TabConvertir(QWidget):
             self.tr("Markdown (*.md)"))
         if not path:
             return
+        path = ensure_suffix(path, ".md")
 
         def _convert(fitz_doc):
             try:
@@ -228,6 +231,7 @@ class TabConvertir(QWidget):
             str(self.document.path.with_suffix(".docx")), self.tr("Word (*.docx)"))
         if not path:
             return
+        path = ensure_suffix(path, ".docx")
 
         def _convert(fitz_doc):
             try:
@@ -246,6 +250,7 @@ class TabConvertir(QWidget):
             str(self.document.path.with_suffix(".xlsx")), self.tr("Excel (*.xlsx)"))
         if not path:
             return
+        path = ensure_suffix(path, ".xlsx")
 
         def _convert(fitz_doc):
             try:
@@ -263,6 +268,7 @@ class TabConvertir(QWidget):
             self, self.tr("Vers Word"),
             str(self.document.path.with_suffix(".docx")), self.tr("Word (*.docx)"))
         if path:
+            path = ensure_suffix(path, ".docx")
             try:
                 convert.to_word(self.document.fitz_doc, self.document.path, Path(path))
                 show_info(self, self.tr("Conversion"), self.tr("Word enregistré :\n{0}").format(path))
@@ -276,6 +282,7 @@ class TabConvertir(QWidget):
             self, self.tr("Vers Excel"),
             str(self.document.path.with_suffix(".xlsx")), self.tr("Excel (*.xlsx)"))
         if path:
+            path = ensure_suffix(path, ".xlsx")
             try:
                 convert.to_excel(self.document.fitz_doc, Path(path))
                 show_info(self, self.tr("Conversion"), self.tr("Excel enregistré :\n{0}").format(path))
@@ -289,6 +296,7 @@ class TabConvertir(QWidget):
             self, self.tr("Vers PowerPoint"),
             str(self.document.path.with_suffix(".pptx")), self.tr("PowerPoint (*.pptx)"))
         if path:
+            path = ensure_suffix(path, ".pptx")
             try:
                 convert.to_powerpoint(self.document.fitz_doc, Path(path))
                 show_info(self, self.tr("Conversion"), self.tr("PowerPoint enregistré :\n{0}").format(path))
@@ -361,6 +369,7 @@ class TabConvertir(QWidget):
         path, _ = QFileDialog.getSaveFileName(
             self, self.tr("Enregistrer le PDF"), "", self.tr("PDF (*.pdf)"))
         if path:
+            path = ensure_suffix(path, ".pdf")
             try:
                 convert.image_to_pdf([Path(f) for f in files], Path(path))
                 show_info(self, self.tr("Conversion"), self.tr("PDF créé :\n{0}").format(path))

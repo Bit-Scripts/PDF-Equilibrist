@@ -29,7 +29,7 @@ uniquement quand le mode édition est actif. ``_btn_edit`` change de style
 from pathlib import Path
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QFileDialog
 from pdf_equilibrist.ui.widgets import RibbonButton, RibbonGroup
-from pdf_equilibrist.ui.dialogs import ask_watermark_text, ask_text_input, show_info, show_error
+from pdf_equilibrist.ui.dialogs import ask_watermark_text, ask_text_input, show_info, show_error, ensure_suffix
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations.edit import (
     compress, add_watermark,
@@ -287,6 +287,7 @@ class TabModifier(QWidget):
             str(self.document.path.with_stem(self.document.path.stem + self.tr("_compressé"))),
             self.tr("PDF (*.pdf)"))
         if path:
+            path = ensure_suffix(path, ".pdf")
             try:
                 compress(self.document.fitz_doc, Path(path))
                 show_info(self, self.tr("Compresser"), self.tr("Enregistré :\n{0}").format(path))

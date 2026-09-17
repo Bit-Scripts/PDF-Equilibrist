@@ -21,6 +21,7 @@ Fonctions disponibles
 - ``ask_image_format``      : sélection du format image (combo png/jpg/bmp/tiff)
 - ``show_info``             : message d'information (non bloquant pour l'UX)
 - ``show_error``            : message d'erreur critique
+- ``ensure_suffix``         : force l'extension d'un chemin issu de getSaveFileName
 """
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtWidgets import (
@@ -159,3 +160,17 @@ def show_info(parent, title: str, message: str):
 
 def show_error(parent, title: str, message: str):
     QMessageBox.critical(parent, title, message)
+
+
+def ensure_suffix(path: str, suffix: str) -> str:
+    """
+    Garantit que ``path`` se termine par ``suffix`` (ex. ``.pdf``).
+
+    QFileDialog.getSaveFileName n'ajoute pas toujours l'extension du filtre
+    sélectionné selon la plateforme — le dialogue natif Windows le fait,
+    mais pas systématiquement sous Linux (confirmé sur Arch) si l'utilisateur
+    ne la tape pas lui-même.
+    """
+    if not path or path.lower().endswith(suffix.lower()):
+        return path
+    return path + suffix

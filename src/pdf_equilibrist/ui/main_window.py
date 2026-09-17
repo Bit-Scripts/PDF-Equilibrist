@@ -67,6 +67,7 @@ from pdf_equilibrist.ui.tabs.tab_page      import TabPage
 from pdf_equilibrist.ui.tabs.tab_proteger  import TabProteger
 from pdf_equilibrist.ui.viewer             import PdfViewer
 from pdf_equilibrist.ui.thumbnail_panel    import ThumbnailPanel
+from pdf_equilibrist.ui.dialogs            import ensure_suffix
 from pdf_equilibrist.core.document         import Document
 
 ACCENT       = "#6BBF4E"
@@ -707,7 +708,7 @@ class MainWindow(QWidget):
             self, self.tr("Enregistrer sous"),
             str(self._current_doc.path), self.tr("PDF (*.pdf)"))
         if path:
-            self._current_doc.save(path)
+            self._current_doc.save(ensure_suffix(path, ".pdf"))
 
     # ── Thumbnails ────────────────────────────────────────────────────────────
 

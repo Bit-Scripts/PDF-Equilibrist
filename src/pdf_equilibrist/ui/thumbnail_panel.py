@@ -54,7 +54,7 @@ from PyQt6.QtCore import (Qt, pyqtSignal, QSize, QPoint,
 import fitz
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations.pages import rotate_pages, extract_pages
-from pdf_equilibrist.ui.dialogs import show_info, show_error
+from pdf_equilibrist.ui.dialogs import show_info, show_error, ensure_suffix
 
 ACCENT    = "#6BBF4E"
 THUMB_H   = 160    # hauteur fixe de toutes les miniatures (px)
@@ -543,6 +543,7 @@ class ThumbnailPanel(QWidget):
             self, self.tr("Extraire les pages"), "", self.tr("PDF (*.pdf)"))
         if not out:
             return
+        out = ensure_suffix(out, ".pdf")
         try:
             new_doc = extract_pages(self.document.fitz_doc, rows)
             new_doc.save(out)
