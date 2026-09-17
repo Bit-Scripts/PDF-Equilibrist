@@ -146,6 +146,15 @@ jobs:
           mkdir -p /tmp/ppa-build
           cp -r "$GITHUB_WORKSPACE" "/tmp/ppa-build/pdf-equilibrist-${v}"
           rm -rf "/tmp/ppa-build/pdf-equilibrist-${v}/.git"
+          # packaging/ppa/debian/ n'est PAS de la source amont — c'est réinjecté
+          # séparément par série juste après (étape suivante). Le laisser dans
+          # l'orig cassait la reproductibilité d'une façon sournoise : chaque
+          # bump de debian/changelog (fait à CHAQUE révision, y compris entre
+          # deux tentatives de la même version) changeait le contenu de l'orig
+          # déjà verrouillé côté Launchpad, provoquant un rejet "already exists
+          # ... different contents" même sur une série déjà acceptée (noble,
+          # après l'ajout de l'entrée ~resolute1 au changelog pour 0.1.22).
+          rm -rf "/tmp/ppa-build/pdf-equilibrist-${v}/packaging/ppa/debian"
           # Reproductible octet pour octet entre deux runs : Launchpad exige un
           # .orig.tar.gz identique pour toute révision d'une même version amont
           # (le nom de fichier n'inclut pas le numéro de révision -N). `tar -z`
