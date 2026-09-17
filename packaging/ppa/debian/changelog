@@ -1,3 +1,37 @@
+pdf-equilibrist (0.1.20-1) noble; urgency=medium
+
+  * UI: multi-selection support in the pages thumbnail panel (Ctrl/Shift-click)
+    — reorder, rotate, duplicate, delete, extract or print several pages at
+    once from the right-click menu.
+  * Security fix: cryptography was vendored unpinned in the wheelhouse and had
+    picked up 49.0.0, vulnerable to CVE-2026-69247 (Bleichenbacher oracle on
+    PKCS#7 EnvelopedData decryption, GHSA-g6cj-pr64-35w5). Pinned to >=50.0.0.
+  * Fix: debian/rules only patched src/pdf_equilibrist/__init__.py's
+    __version__ with the changelog version, not pyproject.toml — so pip's
+    installed-package metadata (read by the in-app CVE checker via
+    importlib.metadata) kept reporting 0.1.0 even though the About dialog
+    (which reads __version__) showed the correct version. Both are now
+    patched, matching the AUR PKGBUILD and COPR spec.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 00:00:00 +0000
+
+pdf-equilibrist (0.1.20-1) resolute; urgency=medium
+
+  * UI: multi-selection support in the pages thumbnail panel (Ctrl/Shift-click)
+    — reorder, rotate, duplicate, delete, extract or print several pages at
+    once from the right-click menu.
+  * Security fix: cryptography was vendored unpinned in the wheelhouse and had
+    picked up 49.0.0, vulnerable to CVE-2026-69247 (Bleichenbacher oracle on
+    PKCS#7 EnvelopedData decryption, GHSA-g6cj-pr64-35w5). Pinned to >=50.0.0.
+  * Fix: debian/rules only patched src/pdf_equilibrist/__init__.py's
+    __version__ with the changelog version, not pyproject.toml — so pip's
+    installed-package metadata (read by the in-app CVE checker via
+    importlib.metadata) kept reporting 0.1.0 even though the About dialog
+    (which reads __version__) showed the correct version. Both are now
+    patched, matching the AUR PKGBUILD and COPR spec.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 00:00:00 +0000
+
 pdf-equilibrist (0.1.19-1) noble; urgency=medium
 
   * UI: the language switcher button in the title bar now shows the
