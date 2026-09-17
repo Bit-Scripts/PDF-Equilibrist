@@ -201,6 +201,13 @@ jobs:
             )
 
             changes=$(find "$workdir" -maxdepth 1 -name "*_source.changes")
-            timeout 120 dput pdf-equilibrist "$changes" < /dev/null
+            # 120s tuait le transfert en plein milieu du gros fichier
+            # (orig.tar.gz, potentiellement 100+ Mo avec les wheelhouses
+            # vendorisées) : le .dsc (petit) s'uploadait bien, exit 124
+            # (timeout) survenait toujours sur orig.tar.gz — le SFTP via
+            # paramiko est visiblement plus lent que le FTP legacy pour les
+            # gros transferts. 900s garde quand même un filet de sécurité
+            # contre un vrai blocage, sans tuer un transfert juste lent.
+            timeout 900 dput pdf-equilibrist "$changes" < /dev/null
             echo "::endgroup::"
           done
