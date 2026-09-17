@@ -66,8 +66,14 @@ jobs:
       - name: Download noble wheelhouse (cp312, real interpreter)
         run: |
           mkdir -p packaging/ppa/vendor/wheelhouse
+          # cryptography est épinglée à >=50.0.0 (contrairement aux autres
+          # paquets ci-dessous, laissés en "dernière version") : la 49.0.0
+          # est vulnérable à CVE-2026-69247 (GHSA-g6cj-pr64-35w5, oracle
+          # Bleichenbacher sur le déchiffrement PKCS#7 EnvelopedData, corrigé
+          # en 50.0.0) — trouvée par le vérificateur de CVE intégré à l'app
+          # sur un paquet Ubuntu déjà publié, faute de version plancher ici.
           pip download --no-deps --dest packaging/ppa/vendor/wheelhouse \
-            cffi charset-normalizer cryptography et-xmlfile fire fonttools lxml \
+            cffi charset-normalizer "cryptography>=50.0.0" et-xmlfile fire fonttools lxml \
             numpy opencv-python-headless openpyxl pdf2docx pdfminer.six \
             pdfplumber Pillow pycparser PyMuPDF pyparsing pypdfium2 \
             python-docx python-pptx termcolor typing-extensions XlsxWriter
