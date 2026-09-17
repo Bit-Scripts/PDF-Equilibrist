@@ -1,3 +1,27 @@
+pdf-equilibrist (0.1.22-1) noble; urgency=medium
+
+  * No application code change. Version bump only, to get a fresh
+    .orig.tar.gz filename: Launchpad had locked pdf-equilibrist_0.1.21
+    .orig.tar.gz to the bytes of the first (non-reproducible) build,
+    rejecting every retry with "already exists ... different contents".
+    This release also fixes the orig.tar.gz build itself to be byte
+    -reproducible across CI runs and switches the PPA upload from FTP to
+    SFTP.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 18:48:15 +0000
+
+pdf-equilibrist (0.1.22-1) resolute; urgency=medium
+
+  * No application code change. Version bump only, to get a fresh
+    .orig.tar.gz filename: Launchpad had locked pdf-equilibrist_0.1.21
+    .orig.tar.gz to the bytes of the first (non-reproducible) build,
+    rejecting every retry with "already exists ... different contents".
+    This release also fixes the orig.tar.gz build itself to be byte
+    -reproducible across CI runs and switches the PPA upload from FTP to
+    SFTP.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 18:48:15 +0000
+
 pdf-equilibrist (0.1.21-1) noble; urgency=medium
 
   * Fix: QFileDialog.getSaveFileName doesn't reliably append the selected
