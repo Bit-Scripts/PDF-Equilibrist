@@ -35,13 +35,22 @@ override_dh_auto_clean:
 # paquet système (--system-site-packages) plutôt que vendorisé : c'est ce que
 # fait déjà l'AUR (BaseApp) et ça évite d'embarquer Qt en double.
 override_dh_auto_build:
-	# Aligne __version__ sur le changelog debian — même logique que le sed du
-	# PKGBUILD AUR (prepare()) : sans ça, l'app se pense en v0.1.0 (valeur
-	# statique de src/pdf_equilibrist/__init__.py) et le vérificateur de MAJ
-	# affiche "nouvelle version disponible" pour la version qu'on vient
-	# d'installer soi-même.
+	# Aligne __version__ ET pyproject.toml sur le changelog debian — même
+	# logique que le double sed du PKGBUILD AUR (prepare()) et du .spec COPR
+	# (%prep) : sans le premier sed, l'app se pense en v0.1.0 (valeur statique
+	# de src/pdf_equilibrist/__init__.py) et le vérificateur de MAJ affiche
+	# "nouvelle version disponible" pour la version qu'on vient d'installer
+	# soi-même. Sans le second (pyproject.toml), pip génère les métadonnées
+	# du paquet installé (PKG-INFO) avec version=0.1.0 — invisible dans le
+	# dialogue "À propos" (qui lit __version__), mais visible via
+	# importlib.metadata.version("pdf-equilibrist"), utilisé par le
+	# vérificateur de CVE intégré : trouvé en confrontant les scans CVE de
+	# la même v0.1.19 sur Arch (correct, PKGBUILD patche déjà les deux
+	# fichiers) et sur Ubuntu/PPA (pdf-equilibrist affiché en 0.1.0).
 	sed -i "s/^__version__ = \".*\"/__version__ = \"$$(dpkg-parsechangelog -SVersion | cut -d- -f1)\"/" \
 		src/pdf_equilibrist/__init__.py
+	sed -i "s/^version = \".*\"$$/version = \"$$(dpkg-parsechangelog -SVersion | cut -d- -f1)\"/" \
+		pyproject.toml
 	python3 -m venv --system-site-packages $(CURDIR)/debian/venv-build
 	# --no-deps + liste explicite de TOUS les paquets du wheelhouse (pas
 	# seulement les paquets top-level) : avec --system-site-packages, pip
