@@ -1,3 +1,25 @@
+pdf-equilibrist (0.1.22-1~resolute1) resolute; urgency=medium
+
+  * No application code change. Adds a series-specific revision suffix
+    (~resolute1) for this series only — noble keeps plain 0.1.22-1
+    unchanged, already accepted and Pending on Launchpad.
+
+    Root cause found via Launchpad's own rejection email: debian.tar.xz's
+    filename only encodes <version>-<revision>, not the series, but its
+    *content* legitimately differs per series (the trimmed top changelog
+    entry names a different series each time). Using the identical
+    revision (-1) for both noble and resolute meant the second upload
+    always collided with the first under the same filename but different
+    bytes — the exact same class of error as the earlier orig.tar.gz
+    lock, just one file further down the upload. orig.tar.gz itself is
+    unaffected: its filename only encodes the upstream version (0.1.22,
+    no revision), and it's genuinely byte-identical between series since
+    the reproducible-tarball fix, so it doesn't need a per-series suffix.
+    This is the standard Debian/Ubuntu convention for publishing one
+    upstream version to multiple series in the same PPA.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 19:21:26 +0000
+
 pdf-equilibrist (0.1.22-1) noble; urgency=medium
 
   * No application code change. Version bump only, to get a fresh
