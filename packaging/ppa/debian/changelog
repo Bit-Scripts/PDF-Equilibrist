@@ -1,3 +1,29 @@
+pdf-equilibrist (0.1.23-1~noble1) noble; urgency=medium
+
+  * No application code change. Version bump to get a fresh .orig.tar.gz
+    filename after 0.1.22's got poisoned by a real build-script bug
+    (packaging/ppa/debian/ was leaking into the orig tarball, so every
+    changelog edit silently changed its bytes — fixed in this release).
+    Both series now use a per-series revision suffix (~noble1/~resolute1)
+    from the start, the standard Debian/Ubuntu convention for publishing
+    one upstream version to multiple series in the same PPA — avoids the
+    debian.tar.xz filename collision hit on 0.1.22 for good.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 19:40:31 +0000
+
+pdf-equilibrist (0.1.23-1~resolute1) resolute; urgency=medium
+
+  * No application code change. Version bump to get a fresh .orig.tar.gz
+    filename after 0.1.22's got poisoned by a real build-script bug
+    (packaging/ppa/debian/ was leaking into the orig tarball, so every
+    changelog edit silently changed its bytes — fixed in this release).
+    Both series now use a per-series revision suffix (~noble1/~resolute1)
+    from the start, the standard Debian/Ubuntu convention for publishing
+    one upstream version to multiple series in the same PPA — avoids the
+    debian.tar.xz filename collision hit on 0.1.22 for good.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 19:40:31 +0000
+
 pdf-equilibrist (0.1.22-1~resolute1) resolute; urgency=medium
 
   * No application code change. Adds a series-specific revision suffix
