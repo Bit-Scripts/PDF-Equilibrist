@@ -106,24 +106,27 @@ jobs:
       # passive_ftp). SFTP nécessite une authentification SSH réelle, donc
       # une clé dédiée CI (séparée de la clé GPG) dont la partie publique
       # doit être enregistrée sur launchpad.net/~paulwoisard/+editsshkeys.
+      # ssh-agent plutôt qu'un ~/.ssh/config avec IdentityFile : le premier
+      # essai a bloqué indéfiniment (job annulé manuellement après 15 min)
+      # sur l'étape d'upload — dput passe probablement par paramiko pour le
+      # SFTP, qui ne lit pas ~/.ssh/config (contrairement au client SSH
+      # natif) et a dû tenter d'autres méthodes d'auth par défaut en
+      # attendant une entrée interactive qui n'arrive jamais en CI.
+      # L'agent expose la clé via le protocole SSH agent standard, reconnu
+      # par toute implémentation SSH/SFTP, sans dépendre d'une convention
+      # de chemin de fichier.
       - name: Configure SFTP upload to Launchpad
         env:
           PPA_SSH_PRIVATE_KEY: ${{ secrets.PPA_SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "$PPA_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa_ppa
-          chmod 600 ~/.ssh/id_rsa_ppa
-
           ssh-keyscan -t rsa,ed25519 ppa.launchpad.net >> ~/.ssh/known_hosts 2>/dev/null
 
-          cat >> ~/.ssh/config <<'SSHCFG'
-          Host ppa.launchpad.net
-              User paulwoisard
-              IdentityFile ~/.ssh/id_rsa_ppa
-              IdentitiesOnly yes
-          SSHCFG
-          chmod 600 ~/.ssh/config
+          eval "$(ssh-agent -s)"
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
+          echo "$PPA_SSH_PRIVATE_KEY" | ssh-add -
 
           cat > ~/.dput.cf <<'DPUTCF'
           [pdf-equilibrist]
@@ -198,6 +201,6 @@ jobs:
             )
 
             changes=$(find "$workdir" -maxdepth 1 -name "*_source.changes")
-            dput pdf-equilibrist "$changes"
+            timeout 120 dput pdf-equilibrist "$changes" < /dev/null
             echo "::endgroup::"
           done
