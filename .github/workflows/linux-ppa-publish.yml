@@ -98,6 +98,42 @@ jobs:
           fpr=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/ {print $10; exit}')
           echo "GPG_KEY_FPR=$fpr" >> "$GITHUB_ENV"
 
+      # SFTP plutôt que FTP : le FTP legacy de Launchpad a échoué de façon
+      # répétée et identique sur resolute (jamais noble) avec "550 ...
+      # internal server error" sur .dsc, y compris avec une pause entre les
+      # deux séries — pas un souci de rythme, plus probablement le endpoint
+      # FTP lui-même (le message d'erreur pointait déjà vers le mode
+      # passive_ftp). SFTP nécessite une authentification SSH réelle, donc
+      # une clé dédiée CI (séparée de la clé GPG) dont la partie publique
+      # doit être enregistrée sur launchpad.net/~paulwoisard/+editsshkeys.
+      - name: Configure SFTP upload to Launchpad
+        env:
+          PPA_SSH_PRIVATE_KEY: ${{ secrets.PPA_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$PPA_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa_ppa
+          chmod 600 ~/.ssh/id_rsa_ppa
+
+          ssh-keyscan -t rsa,ed25519 ppa.launchpad.net >> ~/.ssh/known_hosts 2>/dev/null
+
+          cat >> ~/.ssh/config <<'SSHCFG'
+          Host ppa.launchpad.net
+              User paulwoisard
+              IdentityFile ~/.ssh/id_rsa_ppa
+              IdentitiesOnly yes
+          SSHCFG
+          chmod 600 ~/.ssh/config
+
+          cat > ~/.dput.cf <<'DPUTCF'
+          [pdf-equilibrist]
+          fqdn = ppa.launchpad.net
+          method = sftp
+          incoming = ~paulwoisard/ubuntu/pdf-equilibrist/
+          login = paulwoisard
+          allow_unsigned_uploads = 0
+          DPUTCF
+
       # Construit l'orig UNE SEULE FOIS à partir du checkout (pas de l'archive
       # GitHub du tag, qui ne contient pas packaging/ppa/vendor/ gitignoré).
       # Toutes les séries réutiliseront ce même fichier, jamais reconstruit.
@@ -113,20 +149,8 @@ jobs:
       - name: Build and upload for each series
         run: |
           v="${{ steps.version.outputs.version }}"
-          first=1
           for series in noble resolute; do
             echo "::group::${series}"
-            # Launchpad a rejeté resolute avec "550 ... internal server error"
-            # sur .dsc à trois reprises (0.1.20-1, 0.1.20-2, 0.1.21-1), à chaque
-            # fois dans les ~10s suivant l'upload réussi de noble — jamais noble
-            # lui-même. Pause avant tout upload qui suit un autre, pour laisser
-            # Launchpad respirer entre deux uploads rapprochés depuis la même
-            # clé GPG plutôt que de retaper la même version en boucle.
-            if [ "$first" = "0" ]; then
-              echo "Pause de 30s avant l'upload de ${series} (voir commentaire ci-dessus)."
-              sleep 30
-            fi
-            first=0
             workdir="/tmp/ppa-build/${series}"
             rm -rf "$workdir"
             mkdir -p "$workdir"
@@ -166,6 +190,6 @@ jobs:
             )
 
             changes=$(find "$workdir" -maxdepth 1 -name "*_source.changes")
-            dput ppa:paulwoisard/pdf-equilibrist "$changes"
+            dput pdf-equilibrist "$changes"
             echo "::endgroup::"
           done
