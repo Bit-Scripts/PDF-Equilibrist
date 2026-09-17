@@ -113,8 +113,20 @@ jobs:
       - name: Build and upload for each series
         run: |
           v="${{ steps.version.outputs.version }}"
+          first=1
           for series in noble resolute; do
             echo "::group::${series}"
+            # Launchpad a rejeté resolute avec "550 ... internal server error"
+            # sur .dsc à trois reprises (0.1.20-1, 0.1.20-2, 0.1.21-1), à chaque
+            # fois dans les ~10s suivant l'upload réussi de noble — jamais noble
+            # lui-même. Pause avant tout upload qui suit un autre, pour laisser
+            # Launchpad respirer entre deux uploads rapprochés depuis la même
+            # clé GPG plutôt que de retaper la même version en boucle.
+            if [ "$first" = "0" ]; then
+              echo "Pause de 30s avant l'upload de ${series} (voir commentaire ci-dessus)."
+              sleep 30
+            fi
+            first=0
             workdir="/tmp/ppa-build/${series}"
             rm -rf "$workdir"
             mkdir -p "$workdir"
