@@ -1,3 +1,25 @@
+pdf-equilibrist (0.1.21-1) noble; urgency=medium
+
+  * Fix: QFileDialog.getSaveFileName doesn't reliably append the selected
+    filter's extension on Linux the way the native Windows dialog does —
+    confirmed on Arch, saved files with no extension when the user didn't
+    type it. Affected every Save dialog in the app (export, OCR, compress,
+    encrypt, merge, extract — 14 call sites), not just page extraction.
+    Now enforced via a shared ensure_suffix() helper.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 17:36:16 +0000
+
+pdf-equilibrist (0.1.21-1) resolute; urgency=medium
+
+  * Fix: QFileDialog.getSaveFileName doesn't reliably append the selected
+    filter's extension on Linux the way the native Windows dialog does —
+    confirmed on Arch, saved files with no extension when the user didn't
+    type it. Affected every Save dialog in the app (export, OCR, compress,
+    encrypt, merge, extract — 14 call sites), not just page extraction.
+    Now enforced via a shared ensure_suffix() helper.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Thu, 17 Sep 2026 17:36:16 +0000
+
 pdf-equilibrist (0.1.20-2) noble; urgency=medium
 
   * Version-sync only, no content change for this package. 0.1.20-1 was
