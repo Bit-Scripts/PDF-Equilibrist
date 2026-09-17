@@ -44,7 +44,10 @@ Surlignage, barré, soulignement, zones de texte.
 ![Annotation](assets/images/feature-annoter.png)
 
 ### Pages
-Insertion, division, fusion, inversion.
+Insertion, division, fusion, inversion, extraction. Sélection multiple des
+pages dans le panneau de miniatures (Ctrl/Shift-clic) pour réorganiser,
+pivoter, dupliquer, supprimer, extraire ou imprimer plusieurs pages à la
+fois depuis le menu clic droit.
 
 ![Pages](assets/images/feature-page.png)
 

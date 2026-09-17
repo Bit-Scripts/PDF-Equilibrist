@@ -369,6 +369,21 @@ def _parse_page_range(text: str, n: int) -> list[int]:
     return result or list(range(n))
 
 
+def _format_page_ranges(indices: list[int]) -> str:
+    """Compacte une liste d'indices 0-based en plage lisible 1-based (« 2-4, 7 »)."""
+    nums = sorted(set(i + 1 for i in indices))
+    parts: list[str] = []
+    start = prev = nums[0]
+    for n in nums[1:]:
+        if n == prev + 1:
+            prev = n
+            continue
+        parts.append(str(start) if start == prev else f"{start}-{prev}")
+        start = prev = n
+    parts.append(str(start) if start == prev else f"{start}-{prev}")
+    return ", ".join(parts)
+
+
 def _draw_fit(painter: QPainter, pixmap: QPixmap, target: QRect):
     scaled = pixmap.scaled(
         target.width(), target.height(),
@@ -384,7 +399,8 @@ def _draw_fit(painter: QPainter, pixmap: QPixmap, target: QRect):
 
 class PrintDialog(QDialog):
 
-    def __init__(self, document: Document, parent=None):
+    def __init__(self, document: Document, parent=None,
+                 initial_pages: list[int] | None = None):
         super().__init__(parent)
         self._doc      = document
         self._fitz_doc = document.fitz_doc
@@ -417,6 +433,12 @@ class PrintDialog(QDialog):
 
         # Peupler les formats de la première imprimante
         self._populate_paper_sizes()
+
+        # Plage de pages pré-sélectionnée (ex. depuis le menu clic droit des miniatures)
+        if initial_pages:
+            self._cb_pages.setCurrentIndex(1)
+            self._edit_range.setText(_format_page_ranges(initial_pages))
+
         self._refresh_preview()
 
     # ── Options ───────────────────────────────────────────────────────────────
@@ -729,10 +751,11 @@ class PrintDialog(QDialog):
 
 # ── Point d'entrée ────────────────────────────────────────────────────────────
 
-def print_document(document: Document, parent=None) -> bool:
+def print_document(document: Document, parent=None,
+                    initial_pages: list[int] | None = None) -> bool:
     if not document.is_open:
         return False
-    PrintDialog(document, parent).exec()
+    PrintDialog(document, parent, initial_pages=initial_pages).exec()
     # Restaurer le focus sur la fenêtre principale — sinon Windows peut laisser
     # le focus dans le vide après fermeture d'un dialogue modal Qt + Win32 mixte.
     if parent is not None:

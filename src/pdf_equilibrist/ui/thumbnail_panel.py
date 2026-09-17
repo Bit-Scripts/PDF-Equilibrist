@@ -45,7 +45,7 @@ prend la largeur de la page la plus large + padding.
 from __future__ import annotations
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QListWidget, QListWidgetItem,
-    QLabel, QAbstractItemView, QMenu,
+    QLabel, QAbstractItemView, QMenu, QFileDialog,
 )
 from PyQt6.QtGui import (QIcon, QPixmap, QImage, QAction,
                           QPainter, QPen, QColor, QDrag)
@@ -53,6 +53,8 @@ from PyQt6.QtCore import (Qt, pyqtSignal, QSize, QPoint,
                            QMimeData, QEvent)
 import fitz
 from pdf_equilibrist.core.document import Document
+from pdf_equilibrist.operations.pages import rotate_pages, extract_pages
+from pdf_equilibrist.ui.dialogs import show_info, show_error
 
 ACCENT    = "#6BBF4E"
 THUMB_H   = 160    # hauteur fixe de toutes les miniatures (px)
@@ -164,7 +166,9 @@ class ThumbnailPanel(QWidget):
         self._list.setViewMode(QListWidget.ViewMode.IconMode)
         self._list.setIconSize(QSize(THUMB_W, 155))
         self._list.setGridSize(QSize(THUMB_W + 4, 178))
-        self._list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        # ExtendedSelection : Ctrl+clic ajoute/retire une page, Shift+clic
+        # sélectionne une plage, comportement standard Qt/desktop.
+        self._list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self._list.setResizeMode(QListWidget.ResizeMode.Adjust)
         self._list.setSpacing(4)
         self._list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -367,7 +371,6 @@ class ThumbnailPanel(QWidget):
         try:
             src = fitz.open(path)
         except Exception as e:
-            from pdf_equilibrist.ui.dialogs import show_error
             show_error(self, self.tr("Insertion PDF"), self.tr("Impossible d'ouvrir :\n{0}").format(e))
             return
         doc      = self.document.fitz_doc
@@ -381,12 +384,33 @@ class ThumbnailPanel(QWidget):
 
     # ── clic droit ───────────────────────────────────────────────────────────
 
+    def _selected_rows(self) -> list[int]:
+        return sorted({idx.row() for idx in self._list.selectedIndexes()})
+
+    def _select_rows(self, rows: list[int]):
+        self._list.clearSelection()
+        for r in rows:
+            item = self._list.item(r)
+            if item:
+                item.setSelected(True)
+        if rows:
+            self._list.setCurrentItem(self._list.item(rows[0]))
+
     def _on_right_click(self, pos: QPoint):
         item = self._list.itemAt(pos)
         if not item:
             return
-        row = self._list.row(item)
-        n   = self._list.count()
+        # Clic droit sur une page hors sélection → ne concerne que cette page
+        # (comportement standard) ; clic droit sur la sélection courante → la
+        # préserve intégralement pour que le menu agisse sur tout le groupe.
+        if not item.isSelected():
+            self._list.clearSelection()
+            item.setSelected(True)
+            self._list.setCurrentItem(item)
+
+        rows = self._selected_rows()
+        n    = self._list.count()
+        many = len(rows) > 1
 
         menu = QMenu(self)
         menu.setStyleSheet(f"""
@@ -396,72 +420,138 @@ class ThumbnailPanel(QWidget):
             QMenu::separator {{ height:1px; background:#3A3A3A; margin:3px 0; }}
         """)
 
-        up = QAction(self.tr("↑  Monter  ({0}/{1} → {2}/{3})").format(row+1, n, row, n), self)
-        up.setEnabled(row > 0)
-        up.triggered.connect(lambda _=False, r=row: self._move_page(r, r - 1))
+        row = rows[0]
+        if many:
+            up_label = self.tr("↑  Monter la sélection ({0} pages)").format(len(rows))
+            dn_label = self.tr("↓  Descendre la sélection ({0} pages)").format(len(rows))
+        else:
+            up_label = self.tr("↑  Monter  ({0}/{1} → {2}/{3})").format(row+1, n, row, n)
+            dn_label = self.tr("↓  Descendre  ({0}/{1} → {2}/{3})").format(row+1, n, row+2, n)
+
+        up = QAction(up_label, self)
+        up.setEnabled(rows[0] > 0)
+        up.triggered.connect(lambda _=False, r=rows: self._move_selection(r, -1))
         menu.addAction(up)
 
-        dn = QAction(self.tr("↓  Descendre  ({0}/{1} → {2}/{3})").format(row+1, n, row+2, n), self)
-        dn.setEnabled(row < n - 1)
-        dn.triggered.connect(lambda _=False, r=row: self._move_page(r, r + 1))
+        dn = QAction(dn_label, self)
+        dn.setEnabled(rows[-1] < n - 1)
+        dn.triggered.connect(lambda _=False, r=rows: self._move_selection(r, 1))
         menu.addAction(dn)
 
         menu.addSeparator()
 
-        cw = QAction(self.tr("↻  Rotation horaire"), self)
-        cw.triggered.connect(lambda _=False, r=row: self._rotate(r, 90))
+        rot_suffix = self.tr(" ({0} pages)").format(len(rows)) if many else ""
+        cw = QAction(self.tr("↻  Rotation horaire") + rot_suffix, self)
+        cw.triggered.connect(lambda _=False, r=rows: self._rotate(r, 90))
         menu.addAction(cw)
 
-        ccw = QAction(self.tr("↺  Rotation antihoraire"), self)
-        ccw.triggered.connect(lambda _=False, r=row: self._rotate(r, -90))
+        ccw = QAction(self.tr("↺  Rotation antihoraire") + rot_suffix, self)
+        ccw.triggered.connect(lambda _=False, r=rows: self._rotate(r, -90))
         menu.addAction(ccw)
 
         menu.addSeparator()
 
-        dup = QAction(self.tr("⧉  Dupliquer la page {0}").format(row+1), self)
-        dup.triggered.connect(lambda _=False, r=row: self._duplicate(r))
+        if many:
+            dup_label = self.tr("⧉  Dupliquer la sélection ({0} pages)").format(len(rows))
+            ext_label = self.tr("⇥  Extraire la sélection ({0} pages)…").format(len(rows))
+        else:
+            dup_label = self.tr("⧉  Dupliquer la page {0}").format(row+1)
+            ext_label = self.tr("⇥  Extraire la page {0}…").format(row+1)
+
+        dup = QAction(dup_label, self)
+        dup.triggered.connect(lambda _=False, r=rows: self._duplicate(r))
         menu.addAction(dup)
 
-        dl = QAction(self.tr("🗑  Supprimer la page {0}").format(row+1), self)
-        dl.triggered.connect(lambda _=False, r=row: self._delete(r))
+        ext = QAction(ext_label, self)
+        ext.triggered.connect(lambda _=False, r=rows: self._extract(r))
+        menu.addAction(ext)
+
+        menu.addSeparator()
+
+        dl_label = (self.tr("🗑  Supprimer la sélection ({0} pages)").format(len(rows))
+                    if many else self.tr("🗑  Supprimer la page {0}").format(row+1))
+        dl = QAction(dl_label, self)
+        dl.setEnabled(len(rows) < n)
+        dl.triggered.connect(lambda _=False, r=rows: self._delete(r))
         menu.addAction(dl)
+
+        menu.addSeparator()
+
+        pr_label = (self.tr("🖶  Imprimer la sélection ({0} pages)…").format(len(rows))
+                    if many else self.tr("🖶  Imprimer la page {0}…").format(row+1))
+        pr = QAction(pr_label, self)
+        pr.triggered.connect(lambda _=False, r=rows: self._print_selection(r))
+        menu.addAction(pr)
 
         menu.exec(self._list.viewport().mapToGlobal(pos))
 
-    def _move_page(self, src: int, dst: int):
+    # ── actions clic droit (opèrent sur une liste de pages, 1 ou plus) ────────
+
+    def _move_selection(self, rows: list[int], delta: int):
+        """Décale tout le groupe sélectionné d'une position (haut/bas)."""
         doc = self.document.fitz_doc
         n   = len(doc)
-        if not (0 <= dst < n):
+        rows = sorted(rows)
+        if delta < 0 and rows[0] <= 0:
             return
-        to = dst if dst < src else (dst + 1 if dst + 1 < n else -1)
-        doc.move_page(src, to)
+        if delta > 0 and rows[-1] >= n - 1:
+            return
+        self.document.checkpoint()
+        # Ordre de traitement : ascendant pour monter, descendant pour descendre —
+        # garantit que chaque page sélectionnée échange bien sa place avec la
+        # page non sélectionnée qui la précède/suit, même en sélection discontinue.
+        order = rows if delta < 0 else reversed(rows)
+        for r in order:
+            dst = r + delta
+            to  = dst if dst < r else (dst + 1 if dst + 1 < n else -1)
+            doc.move_page(r, to)
         self.document.changed.emit()
-        self._list.setCurrentRow(dst)
+        self._select_rows([r + delta for r in rows])
 
-    def _rotate(self, row: int, angle: int):
+    def _rotate(self, rows: list[int], angle: int):
+        self.document.checkpoint()
+        rotate_pages(self.document.fitz_doc, angle, rows)
+        self.document.changed.emit()
+        self._select_rows(rows)
+
+    def _duplicate(self, rows: list[int]):
         doc = self.document.fitz_doc
+        rows = sorted(rows)
+        self.document.checkpoint()
         tmp = fitz.open()
-        tmp.insert_pdf(doc, from_page=row, to_page=row)
-        tmp[0].set_rotation((tmp[0].rotation + angle) % 360)
-        doc.delete_page(row)
-        doc.insert_pdf(tmp, start_at=row)
+        for i in rows:
+            tmp.insert_pdf(doc, from_page=i, to_page=i)
+        at = rows[-1] + 1
+        doc.insert_pdf(tmp, start_at=at if at < len(doc) else -1)
         tmp.close()
         self.document.changed.emit()
-        self._list.setCurrentRow(row)
+        self._select_rows(list(range(at, at + len(rows))))
 
-    def _duplicate(self, row: int):
+    def _delete(self, rows: list[int]):
         doc = self.document.fitz_doc
-        tmp = fitz.open()
-        tmp.insert_pdf(doc, from_page=row, to_page=row)
-        at  = row + 1 if row + 1 < len(doc) else -1
-        doc.insert_pdf(tmp, start_at=at if at != -1 else len(doc))
-        tmp.close()
+        if len(rows) >= len(doc):
+            show_error(self, self.tr("Supprimer"),
+                       self.tr("Impossible de supprimer toutes les pages."))
+            return
+        self.document.checkpoint()
+        for i in sorted(rows, reverse=True):
+            doc.delete_page(i)
         self.document.changed.emit()
 
-    def _delete(self, row: int):
-        if len(self.document.fitz_doc) <= 1:
-            from pdf_equilibrist.ui.dialogs import show_error
-            show_error(self, self.tr("Supprimer"), self.tr("Impossible de supprimer la seule page."))
+    def _extract(self, rows: list[int]):
+        out, _ = QFileDialog.getSaveFileName(
+            self, self.tr("Extraire les pages"), "", self.tr("PDF (*.pdf)"))
+        if not out:
             return
-        self.document.fitz_doc.delete_page(row)
-        self.document.changed.emit()
+        try:
+            new_doc = extract_pages(self.document.fitz_doc, rows)
+            new_doc.save(out)
+            new_doc.close()
+            show_info(self, self.tr("Extraire"),
+                      self.tr("{0} page(s) extraite(s) dans :\n{1}").format(len(rows), out))
+        except Exception as e:
+            show_error(self, self.tr("Erreur"), str(e))
+
+    def _print_selection(self, rows: list[int]):
+        from pdf_equilibrist.ui.print_dialog import print_document
+        print_document(self.document, self, initial_pages=rows)

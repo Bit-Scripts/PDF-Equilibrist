@@ -43,7 +43,9 @@ Highlight, strikethrough, underline, text boxes.
 ![Annotate](assets/images/feature-annoter.png)
 
 ### Pages
-Insert, split, merge, reverse.
+Insert, split, merge, reverse, extract. Multi-select pages in the thumbnail
+panel (Ctrl/Shift-click) to reorder, rotate, duplicate, delete, extract or
+print several pages at once from the right-click menu.
 
 ![Pages](assets/images/feature-page.png)
 

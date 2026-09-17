@@ -103,6 +103,31 @@ def split_pdf(doc: fitz.Document, output_dir: Path) -> list[Path]:
     return paths
 
 
+def extract_pages(doc: fitz.Document, page_indices: list[int]) -> fitz.Document:
+    """
+    Extrait un sous-ensemble de pages dans un **nouveau** document en mémoire.
+
+    Le document source n'est pas modifié. Les pages sont copiées dans l'ordre
+    croissant de leur index d'origine, quel que soit l'ordre de ``page_indices``.
+
+    Parameters
+    ----------
+    doc : fitz.Document
+        Document source (non modifié).
+    page_indices : list[int]
+        Indices 0-based des pages à extraire.
+
+    Returns
+    -------
+    fitz.Document
+        Nouveau document ne contenant que les pages demandées, non sauvegardé.
+    """
+    result = fitz.open()
+    for i in sorted(set(page_indices)):
+        result.insert_pdf(doc, from_page=i, to_page=i)
+    return result
+
+
 def merge_pdfs(paths: list[Path]) -> fitz.Document:
     """
     Fusionne plusieurs fichiers PDF en un seul document en mémoire.

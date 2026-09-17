@@ -9,6 +9,7 @@ from pdf_equilibrist.operations.pages import (
     insert_page,
     crop_page,
     set_page_size,
+    extract_pages,
 )
 
 
@@ -85,4 +86,22 @@ def test_set_page_size():
     set_page_size(doc, 0, 595, 842)
     assert doc[0].mediabox.width == 595
     assert doc[0].mediabox.height == 842
+    doc.close()
+
+
+def test_extract_pages():
+    doc = _create_sample_doc()
+    result = extract_pages(doc, [2, 0])
+    assert result.page_count == 2
+    assert "Page 1" in result[0].get_text()
+    assert "Page 3" in result[1].get_text()
+    doc.close()
+    result.close()
+
+
+def test_extract_pages_does_not_modify_source():
+    doc = _create_sample_doc()
+    result = extract_pages(doc, [1])
+    assert doc.page_count == 3
+    result.close()
     doc.close()
