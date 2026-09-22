@@ -1,0 +1,49 @@
+name: Update download stats
+
+# Les compteurs affichés sur le site (section #diffusion et badges) viennent de
+# `stats.json` sur gh-pages, régénéré ici par build_stats.py (lui aussi sur
+# gh-pages). Le site n'a pas besoin d'être reconstruit : seul ce fichier change.
+#
+# Ce workflow doit vivre sur la branche par défaut (main) : GitHub n'exécute les
+# déclencheurs `schedule` / `workflow_dispatch` que depuis celle-ci.
+
+on:
+  schedule:
+    - cron: "17 4 * * 1" # tous les lundis, 04h17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stats
+  cancel-in-progress: false
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Relever les compteurs
+        env:
+          # Évite le plafond de 60 requêtes/heure par IP de l'API GitHub anonyme.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python build_stats.py
+
+      - name: Commiter si les chiffres ont changé
+        run: |
+          if git diff --quiet -- stats.json; then
+            echo "stats.json inchangé"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: met à jour les compteurs de diffusion" -- stats.json
+          git push origin gh-pages

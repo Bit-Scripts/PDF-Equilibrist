@@ -4,10 +4,13 @@
 
 [![Website](https://img.shields.io/badge/site-pdf--equilibrist.org-6BBF4E)](https://pdf-equilibrist.org)
 [![Release](https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest)
-[![Téléchargements Windows](https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=t%C3%A9l%C3%A9chargements%20Windows&cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
 [![AUR](https://img.shields.io/aur/version/pdf-equilibrist)](https://aur.archlinux.org/packages/pdf-equilibrist)
-[![PPA Ubuntu](https://img.shields.io/badge/PPA-ubuntu-orange)](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist)
-[![COPR Fedora](https://img.shields.io/badge/COPR-fedora-blue)](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
+
+[![Téléchargements (total)](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.total&label=t%C3%A9l%C3%A9chargements%20(total)&color=6BBF4E&cacheSeconds=3600)](https://pdf-equilibrist.org/#diffusion)
+[![Téléchargements Windows](https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=t%C3%A9l%C3%A9chargements%20Windows&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
+[![Téléchargements Ubuntu](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.launchpad.total&label=t%C3%A9l%C3%A9chargements%20Ubuntu&logo=ubuntu&logoColor=white&color=E95420&cacheSeconds=3600)](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist)
+[![Téléchargements Fedora](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.copr.total&label=t%C3%A9l%C3%A9chargements%20Fedora&logo=fedora&logoColor=white&color=51A2DA&cacheSeconds=3600)](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
+[![Téléchargements Arch : non mesuré](https://img.shields.io/badge/t%C3%A9l%C3%A9chargements%20Arch-non%20mesur%C3%A9-lightgrey?logo=archlinux&logoColor=white "L'AUR ne publie aucun compteur de téléchargements")](https://pdf-equilibrist.org/#diffusion-arch)
 
 [![CI](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg)](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE.md)
