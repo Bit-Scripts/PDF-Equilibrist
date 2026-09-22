@@ -377,3 +377,16 @@ footer {
 }
 /* Cible des badges (#diffusion, #diffusion-arch) : ne pas finir sous la barre fixe */
 #diffusion, #diffusion-arch { scroll-margin-top: 90px; }
+
+/* Paragraphe « Connexions réseau » de la section #securite */
+.privacy-note {
+  margin: 22px 0 0;
+  padding: 14px 16px;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-1);
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.privacy-note strong { color: var(--text); }
+.privacy-note code { font-size: 0.88em; }

@@ -70,6 +70,7 @@
   "security.li1": "<strong>Analyse SAST du code source</strong> via <a href=\"https://bandit.readthedocs.io/\">Bandit</a>.",
   "security.li2": "<strong>Vérification des dépendances</strong> contre les vulnérabilités connues via l'API <a href=\"https://osv.dev/\">OSV</a>.",
   "security.li3": "L'outil d'audit est intégré à l'application, accessible en un clic.",
+  "security.network": "<strong>Connexions réseau.</strong> Vos documents ne quittent jamais votre ordinateur. L'application ne peut contacter que deux services, et l'indique à l'écran chaque fois qu'elle le fait : <code>api.github.com</code>, pour savoir si une nouvelle version existe (au démarrage sous Windows, désactivable), et <code>api.osv.dev</code>, quand vous lancez la vérification CVE (noms et versions des bibliothèques uniquement). Comme toute requête Internet, elles exposent votre adresse IP au service contacté. Le menu <em>Aide › Connexions Internet</em> permet de toutes les bloquer. <a href=\"https://github.com/Bit-Scripts/PDF-Equilibrist/blob/main/PRIVACY.md#politique-de-confidentialité\">Politique de confidentialité</a>",
 
   "install.title": "Installation",
   "install.windows.lead": "📦 Pour installer la version exécutable Windows (.exe) sans installer Python, téléchargez le dernier installeur dans les <a href=\"https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest\">Releases</a>.",
