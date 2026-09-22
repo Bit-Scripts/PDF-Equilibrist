@@ -344,3 +344,36 @@ footer {
   .docs-sidebar { border-right: none; border-bottom: 1px solid var(--border); }
   .docs-content { padding: 28px 20px; }
 }
+
+/* Compteurs de diffusion (section #diffusion, remplie depuis stats.json) */
+.stats-list {
+  list-style: none;
+  margin: 18px 0 10px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+.stats-list li {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.stats-list strong {
+  display: block;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.stats-list span {
+  color: var(--text-dim);
+  font-size: 0.92rem;
+}
+.stats-note {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin: 0 0 6px;
+}
+/* Cible des badges (#diffusion, #diffusion-arch) : ne pas finir sous la barre fixe */
+#diffusion, #diffusion-arch { scroll-margin-top: 90px; }

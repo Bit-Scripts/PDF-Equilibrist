@@ -1,0 +1,35 @@
+{
+  "generated": "2026-09-22",
+  "total": 355,
+  "channels": {
+    "github": {
+      "total": 222,
+      "releases": 23,
+      "latest": "v0.1.23",
+      "latest_date": "2026-09-17"
+    },
+    "launchpad": {
+      "total": 73,
+      "by_series": {
+        "resolute": 33,
+        "noble": 40
+      }
+    },
+    "copr": {
+      "total": 60,
+      "by_release": {
+        "Fedora 43": 15,
+        "Fedora 44": 29,
+        "Fedora 45": 4,
+        "Fedora rawhide": 12
+      }
+    },
+    "aur": {
+      "version": "0.1.23-1",
+      "votes": 0,
+      "popularity": 0,
+      "first_submitted": "2026-07-25",
+      "last_modified": "2026-09-17"
+    }
+  }
+}

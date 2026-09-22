@@ -131,5 +131,27 @@
   "docs.file3.title": "3. Contributing",
   "docs.file4.title": "4. Opérations",
   "docs.file5.title": "5. Build",
-  "docs.file6.title": "6. Sécurité"
+  "docs.file6.title": "6. Sécurité",
+
+  "badge.dl.total": "t%C3%A9l%C3%A9chargements%20(total)",
+  "badge.dl.total.alt": "Téléchargements (total)",
+  "badge.dl.windows": "t%C3%A9l%C3%A9chargements%20Windows",
+  "badge.dl.windows.alt": "Téléchargements Windows",
+  "badge.dl.ubuntu": "t%C3%A9l%C3%A9chargements%20Ubuntu",
+  "badge.dl.ubuntu.alt": "Téléchargements Ubuntu",
+  "badge.dl.fedora": "t%C3%A9l%C3%A9chargements%20Fedora",
+  "badge.dl.fedora.alt": "Téléchargements Fedora",
+  "badge.dl.arch": "t%C3%A9l%C3%A9chargements%20Arch",
+  "badge.dl.arch.msg": "non%20mesur%C3%A9",
+  "badge.dl.arch.alt": "Téléchargements Arch : non mesuré",
+  "badge.dl.arch.title": "L'AUR ne publie aucun compteur de téléchargements",
+
+  "stats.title": "Diffusion",
+  "stats.lead": "Chiffres relevés automatiquement chaque semaine sur les dépôts officiels.",
+  "stats.total": "téléchargements, tous canaux confondus",
+  "stats.github": "depuis les versions GitHub (installeur Windows)",
+  "stats.launchpad": "depuis le PPA Ubuntu (Noble et Resolute)",
+  "stats.copr": "activations du dépôt Fedora (COPR)",
+  "stats.arch": "Arch Linux (AUR) n'a pas de compteur : l'AUR ne diffuse qu'une recette de construction, le paquet est compilé sur la machine de l'utilisateur depuis l'archive des sources GitHub, que GitHub ne comptabilise pas.",
+  "stats.updated": "Relevé du"
 }

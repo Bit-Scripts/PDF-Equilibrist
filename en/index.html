@@ -47,7 +47,7 @@
   "description": "Open-source PDF editor running entirely locally for Windows and Linux.",
   "applicationCategory": "UtilityApplication",
   "operatingSystem": ["Windows", "Linux"],
-  "softwareVersion": "0.1.14",
+  "softwareVersion": "0.1.23",
   "screenshot": "https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png",
   "image": "https://pdf-equilibrist.org/assets/images/PDF-Equilibrist.png",
   "downloadUrl": "https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest",
@@ -142,10 +142,17 @@
   <div class="badges">
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist"><img src="https://img.shields.io/badge/GitHub-source-181717?logo=github&logoColor=white" alt="GitHub"></a>
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"><img src="https://img.shields.io/github/v/release/Bit-Scripts/PDF-Equilibrist?cacheSeconds=3600" alt="Release"></a>
-    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?cacheSeconds=3600" alt="Downloads"></a>
     <a href="https://aur.archlinux.org/packages/pdf-equilibrist"><img src="https://img.shields.io/aur/version/pdf-equilibrist" alt="AUR"></a>
-    <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/PPA-ubuntu-orange" alt="PPA Ubuntu"></a>
-    <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/COPR-fedora-blue" alt="COPR Fedora"></a>
+  </div>
+  <!-- Compteurs : Windows vient directement de l'API GitHub, les autres de
+       stats.json (relevé hebdomadaire). L'AUR n'expose aucun compteur : le
+       badge Arch renvoie vers l'explication dans la section #diffusion. -->
+  <div class="badges">
+    <a href="#diffusion"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.total&label=total%20downloads&color=6BBF4E&cacheSeconds=3600" alt="Total downloads"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=Windows%20downloads&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600" alt="Windows downloads"></a>
+    <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.launchpad.total&label=Ubuntu%20downloads&logo=ubuntu&logoColor=white&color=E95420&cacheSeconds=3600" alt="Ubuntu downloads"></a>
+    <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.copr.total&label=Fedora%20downloads&logo=fedora&logoColor=white&color=51A2DA&cacheSeconds=3600" alt="Fedora downloads"></a>
+    <a href="#diffusion-arch" title="The AUR does not publish any download counter"><img src="https://img.shields.io/badge/Arch%20downloads-not%20tracked-lightgrey?logo=archlinux&logoColor=white" alt="Arch downloads: not tracked"></a>
   </div>
   <div class="badges">
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml"><img src="https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -296,6 +303,21 @@ sudo dnf install pdf-equilibrist</code></pre>
   </div>
 </section>
 
+<section id="diffusion" hidden>
+  <div class="container">
+    <h2>Reach</h2>
+    <p class="lead">Figures collected automatically every week from the official repositories.</p>
+    <ul class="stats-list">
+      <li><strong data-stat="total">&mdash;</strong><span>downloads, all channels combined</span></li>
+      <li><strong data-stat="github">&mdash;</strong><span>from GitHub releases (Windows installer)</span></li>
+      <li><strong data-stat="launchpad">&mdash;</strong><span>from the Ubuntu PPA (Noble and Resolute)</span></li>
+      <li><strong data-stat="copr">&mdash;</strong><span>Fedora repository enablements (COPR)</span></li>
+    </ul>
+    <p class="stats-note" id="diffusion-arch">Arch Linux (AUR) has no counter: the AUR only distributes a build recipe, and the package is compiled on the user's machine from the GitHub source archive, which GitHub does not count.</p>
+    <p class="stats-note">As of <time data-stat-date></time></p>
+  </div>
+</section>
+
 <section id="faq">
   <div class="container">
     <h2>Frequently Asked Questions</h2>
@@ -387,6 +409,48 @@ sudo dnf install pdf-equilibrist</code></pre>
         try { localStorage.setItem('langBannerDismissed', '1'); } catch (e) {}
       });
     } catch (e) { /* localStorage indisponible (mode privé strict) : pas de bandeau, pas grave */ }
+  })();
+
+  // Compteurs de diffusion. `stats.json` est régénéré chaque semaine par
+  // .github/workflows/stats.yml (branche main) : la page n'est pas reconstruite
+  // pour autant, elle lit le fichier au chargement. Tant qu'il n'a pas répondu,
+  // la section reste masquée (attribut `hidden`) — pas de bloc vide hors ligne.
+  (async () => {
+    const section = document.getElementById('diffusion');
+    if (!section) return;
+    try {
+      const res = await fetch('/stats.json', { cache: 'no-cache' });
+      if (!res.ok) return;
+      const stats = await res.json();
+      const lang = document.documentElement.lang || 'fr';
+      const nf = new Intl.NumberFormat(lang);
+
+      for (const el of section.querySelectorAll('[data-stat]')) {
+        const key = el.dataset.stat;
+        const value = key === 'total' ? stats.total : stats.channels?.[key]?.total;
+        if (typeof value === 'number') el.textContent = nf.format(value);
+      }
+
+      const when = section.querySelector('[data-stat-date]');
+      if (when && stats.generated) {
+        when.dateTime = stats.generated;
+        // `generated` est une date UTC sans heure : l'afficher en UTC évite
+        // d'annoncer la veille aux visiteurs situés à l'ouest de Greenwich.
+        when.textContent = new Date(stats.generated).toLocaleDateString(lang, {
+          year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
+        });
+      }
+      section.hidden = false;
+
+      // Arrivée par un lien #diffusion / #diffusion-arch (badges, README) : le
+      // navigateur n'a pas pu défiler vers une section encore masquée.
+      const target = location.hash && section.querySelector(location.hash);
+      if (location.hash === '#diffusion' || target) {
+        (target || section).scrollIntoView();
+      }
+    } catch {
+      /* pas de chiffres, pas de section : la page reste valide */
+    }
   })();
 </script>
 

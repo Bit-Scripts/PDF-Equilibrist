@@ -131,5 +131,27 @@
   "docs.file3.title": "3. Contributing",
   "docs.file4.title": "4. Operations",
   "docs.file5.title": "5. Build",
-  "docs.file6.title": "6. Security"
+  "docs.file6.title": "6. Security",
+
+  "badge.dl.total": "total%20downloads",
+  "badge.dl.total.alt": "Total downloads",
+  "badge.dl.windows": "Windows%20downloads",
+  "badge.dl.windows.alt": "Windows downloads",
+  "badge.dl.ubuntu": "Ubuntu%20downloads",
+  "badge.dl.ubuntu.alt": "Ubuntu downloads",
+  "badge.dl.fedora": "Fedora%20downloads",
+  "badge.dl.fedora.alt": "Fedora downloads",
+  "badge.dl.arch": "Arch%20downloads",
+  "badge.dl.arch.msg": "not%20tracked",
+  "badge.dl.arch.alt": "Arch downloads: not tracked",
+  "badge.dl.arch.title": "The AUR does not publish any download counter",
+
+  "stats.title": "Reach",
+  "stats.lead": "Figures collected automatically every week from the official repositories.",
+  "stats.total": "downloads, all channels combined",
+  "stats.github": "from GitHub releases (Windows installer)",
+  "stats.launchpad": "from the Ubuntu PPA (Noble and Resolute)",
+  "stats.copr": "Fedora repository enablements (COPR)",
+  "stats.arch": "Arch Linux (AUR) has no counter: the AUR only distributes a build recipe, and the package is compiled on the user's machine from the GitHub source archive, which GitHub does not count.",
+  "stats.updated": "As of"
 }
