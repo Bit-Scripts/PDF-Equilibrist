@@ -1,3 +1,39 @@
+pdf-equilibrist (0.1.24-1~noble1) noble; urgency=medium
+
+  * New upstream release: user control over every network connection.
+    - Every outbound request (api.github.com, api.osv.dev) now goes through
+      a single gate: Help > Internet connections > Block all Internet
+      connections stops them before they are sent.
+    - The startup update check is now off by default on Linux: updates are
+      the package manager's job. It can be re-enabled in the same menu, and
+      the manual check stays available in the Help menu.
+    - Every connection is announced on screen, naming the service contacted.
+    - Web links inside a PDF now ask for confirmation, showing the full URL.
+    - CVE check: when offline, packages that could not be checked are no
+      longer reported as having no known vulnerability.
+    - English translation: new strings, plus 14 thumbnail-panel strings that
+      had never been translated.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Tue, 22 Sep 2026 20:40:40 +0000
+
+pdf-equilibrist (0.1.24-1~resolute1) resolute; urgency=medium
+
+  * New upstream release: user control over every network connection.
+    - Every outbound request (api.github.com, api.osv.dev) now goes through
+      a single gate: Help > Internet connections > Block all Internet
+      connections stops them before they are sent.
+    - The startup update check is now off by default on Linux: updates are
+      the package manager's job. It can be re-enabled in the same menu, and
+      the manual check stays available in the Help menu.
+    - Every connection is announced on screen, naming the service contacted.
+    - Web links inside a PDF now ask for confirmation, showing the full URL.
+    - CVE check: when offline, packages that could not be checked are no
+      longer reported as having no known vulnerability.
+    - English translation: new strings, plus 14 thumbnail-panel strings that
+      had never been translated.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Tue, 22 Sep 2026 20:40:40 +0000
+
 pdf-equilibrist (0.1.23-1~noble1) noble; urgency=medium
 
   * No application code change. Version bump to get a fresh .orig.tar.gz

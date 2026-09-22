@@ -161,6 +161,15 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Tue Sep 22 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.24-1
+- New upstream release: user control over every network connection. Every
+  outbound request (api.github.com, api.osv.dev) now goes through a single
+  gate; Help > Internet connections > Block all Internet connections stops
+  them before they are sent. The startup update check is off by default on
+  Linux (updates are dnf's job) and every connection is announced on screen.
+  Web links inside a PDF now ask for confirmation. CVE check no longer
+  reports unchecked packages as clean when offline.
+
 * Fri Jul 31 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.19-1
 - UI: the language switcher button in the title bar now shows the current
   language (e.g. "🌐FR" / "🌐EN") instead of just a bare globe icon, and is
