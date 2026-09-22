@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import QThread, pyqtSignal
 
-from pdf_equilibrist import cve_checker
+from pdf_equilibrist import cve_checker, network
 
 
 class _ScanThread(QThread):
@@ -25,11 +25,16 @@ class _ScanThread(QThread):
 
     def run(self):
         try:
-            pkgs = self.packages or cve_checker.get_installed_packages()
-            total = len(pkgs)
-            self.progress.emit(0, total)
-            packages = cve_checker.scan_dependencies(pkgs)
-            self.progress.emit(total, total)
+            if network.is_blocked():
+                # Connexions bloquées : pas de requête à OSV.dev, mais l'analyse
+                # bandit du code, entièrement locale, reste utile.
+                packages = None
+            else:
+                pkgs = self.packages or cve_checker.get_installed_packages()
+                total = len(pkgs)
+                self.progress.emit(0, total)
+                packages = cve_checker.scan_dependencies(pkgs)
+                self.progress.emit(total, total)
             code_scan = cve_checker.scan_source_code()
             self.finished_ok.emit({"packages": packages, "code_scan": code_scan})
         except Exception as exc:
@@ -50,6 +55,12 @@ class CVEDialog(QDialog):
         self._progress = QProgressBar()
         self._progress.setRange(0, 0)
         layout.addWidget(self._progress)
+
+        # Dire où l'on se connecte et ce qui part (voir network.py).
+        self._net_notice = QLabel()
+        self._net_notice.setWordWrap(True)
+        self._net_notice.setStyleSheet("color: #888888; font-size: 11px;")
+        layout.addWidget(self._net_notice)
 
         self._output = QPlainTextEdit()
         self._output.setReadOnly(True)
@@ -140,6 +151,12 @@ class CVEDialog(QDialog):
     def _on_result(self, results: dict):
         packages = results["packages"]
         code_scan = results["code_scan"]
+        if packages is None:
+            self._progress.setRange(0, 1)
+            self._progress.setValue(1)
+            self._lbl.setText(self.tr("Vérification CVE en ligne ignorée : connexions Internet bloquées"))
+            self._output.setPlainText(self._render_code_scan(code_scan))
+            return
         total = len(packages)
         vuln_count = sum(1 for r in packages if r["vulnerabilities"])
         code_issue_count = len(code_scan["issues"]) if code_scan["available"] else 0
@@ -170,6 +187,14 @@ class CVEDialog(QDialog):
 
     def _start_scan(self):
         self._lbl.setText(self.tr("Analyse des paquets installés et du code source…"))
+        if network.is_blocked():
+            self._net_notice.setText(self.tr(
+                "Connexions Internet bloquées : aucune requête envoyée à api.osv.dev "
+                "(menu Aide › Connexions Internet). Seule l'analyse locale du code est faite."))
+        else:
+            self._net_notice.setText(self.tr(
+                "Connexion à api.osv.dev (OSV) : seuls les noms et versions des "
+                "bibliothèques utilisées par l'application sont envoyés."))
         self._output.clear()
         self._progress.setRange(0, 0)
         self._thread = _ScanThread(self._packages)

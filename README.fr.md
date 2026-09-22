@@ -16,7 +16,7 @@
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE.md)
 [![Bandit](https://img.shields.io/badge/Bandit-Passed-brightgreen.svg)](.)
 [![Dependencies](https://img.shields.io/badge/Dependencies-Clean-brightgreen.svg)](.)
-[![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen.svg)](.)
+[![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen.svg)](PRIVACY.md)
 
 **🇬🇧 [Read this in English](README.md)**
 
@@ -68,6 +68,13 @@ Chiffrement et déchiffrement AES-256.
 
 Contrairement aux outils PDF en ligne qui envoient vos fichiers sur des serveurs tiers,
 PDF-Equilibrist exécute tous ses traitements à 100 % en local.
+
+Vos documents ne quittent jamais votre ordinateur. L'application ne peut contacter que deux
+services, et l'indique à l'écran chaque fois qu'elle le fait : `api.github.com` pour savoir
+si une nouvelle version existe (au démarrage sous Windows, désactivable) et `api.osv.dev`
+quand vous lancez la vérification CVE (noms et versions des bibliothèques uniquement).
+*Aide › Connexions Internet › Bloquer toutes les connexions Internet* arrête chaque requête
+avant son envoi. Détails dans [PRIVACY.md](PRIVACY.md#politique-de-confidentialité).
 
 L'application embarque aussi son propre outil d'audit de sécurité, accessible en un clic
 depuis l'interface :

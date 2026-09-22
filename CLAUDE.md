@@ -32,6 +32,10 @@ src/pdf_equilibrist/
 ├── main.py                  # point d'entrée — splash PyQt6 + chargement progressif
 ├── app.py                   # configure QApplication, stylesheet globale, crée MainWindow
 ├── utils.py                 # resource_path() — résolution chemins dev / PyInstaller
+├── network.py               # urlopen() : SEUL point de sortie réseau (api.github.com,
+│                            #   api.osv.dev) — NetworkBlockedError si l'utilisateur bloque
+├── settings.py              # QSettings réseau : blocage total, vérif. MAJ au démarrage
+│                            #   (défaut : Windows seulement) — menu Aide › Connexions Internet
 │
 ├── core/
 │   └── document.py          # Document(QObject) — détient le fitz.Document ouvert,

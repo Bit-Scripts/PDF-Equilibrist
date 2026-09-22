@@ -9,6 +9,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, Qt
 from PyQt6.QtGui import QPixmap
 
 from pdf_equilibrist import __version__
+from pdf_equilibrist import network
 from pdf_equilibrist import update as updater
 
 _GREEN  = "#6BBF4E"
@@ -108,6 +109,14 @@ class UpdateDialog(QDialog):
         self._progress.setRange(0, 0)
         layout.addWidget(self._progress)
 
+        # Dire où l'on se connecte, et ce qui part : rien d'autre qu'une requête.
+        self._net_notice = QLabel(self.tr(
+            "Connexion à api.github.com (GitHub) pour la version et les "
+            "statistiques. Aucun document ni aucune donnée personnelle n'est envoyé."))
+        self._net_notice.setWordWrap(True)
+        self._net_notice.setStyleSheet(f"color: {_GRAY}; font-size: 11px;")
+        layout.addWidget(self._net_notice)
+
         # ── Statistiques de téléchargement ────────────────────────────────────
         layout.addWidget(_sep())
 
@@ -168,6 +177,17 @@ class UpdateDialog(QDialog):
         self._btn_download.clicked.connect(self._download_and_run)
 
         self._release = None
+
+        if network.is_blocked():
+            # Réglage de l'utilisateur : ni requête, ni fenêtre qui attend.
+            self._progress.setRange(0, 1)
+            self._lbl.setText(self.tr("Version installée : v{0}").format(__version__))
+            self._net_notice.setText(self.tr(
+                "Connexions Internet bloquées : aucune requête envoyée "
+                "(menu Aide › Connexions Internet)."))
+            self._lbl_current.setText("—")
+            self._lbl_total.setText("—")
+            return
 
         self._thread = _CheckThread(repo=self._repo)
         self._thread.finished_ok.connect(self._on_result)

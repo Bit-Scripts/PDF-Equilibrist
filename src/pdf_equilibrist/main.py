@@ -49,6 +49,11 @@ def main():
     from pdf_equilibrist.i18n import install_translator
     install_translator(app)
 
+    # Blocage des connexions (menu Aide › Connexions Internet) appliqué avant
+    # toute requête possible — voir network.py.
+    from pdf_equilibrist.settings import apply_network_policy
+    apply_network_policy()
+
     from pdf_equilibrist.ui.splash_screen import SplashScreen
     splash = SplashScreen()
     splash.show()

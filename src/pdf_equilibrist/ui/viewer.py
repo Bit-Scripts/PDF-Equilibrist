@@ -207,8 +207,11 @@ class _PageLabel(QLabel):
         kind = link.get("kind")
 
         if kind == fitz.LINK_URI:
-            # Lien web → navigateur par défaut
-            webbrowser.open(link.get("uri", ""))
+            # Lien web → navigateur par défaut, après confirmation : un lien
+            # peut servir à pister l'ouverture du document (URL unique).
+            uri = link.get("uri", "")
+            if uri:
+                self._confirm_and_open_uri(uri)
 
         elif kind == fitz.LINK_GOTOR:
             # Lien vers un autre PDF — résoudre le chemin relatif
@@ -258,6 +261,28 @@ class _PageLabel(QLabel):
         )
         if reply == QMessageBox.StandardButton.Yes:
             self._open_with_system(path)
+
+    def _confirm_and_open_uri(self, uri: str):
+        """
+        Demande confirmation avant d'ouvrir un lien web du PDF dans le
+        navigateur, en montrant l'adresse réelle (le texte du lien peut
+        en afficher une autre). PDF-Equilibrist ne se connecte pas lui-même :
+        c'est le navigateur qui chargera la page.
+        """
+        from PyQt6.QtWidgets import QMessageBox
+        reply = QMessageBox.question(
+            self,
+            self.tr("Ouverture d'un lien Internet"),
+            self.tr(
+                "Ce document PDF contient un lien vers :\n\n"
+                "{0}\n\n"
+                "L'ouvrir dans votre navigateur ?"
+            ).format(uri),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            webbrowser.open(uri)
 
     @staticmethod
     def _open_with_system(path: str):

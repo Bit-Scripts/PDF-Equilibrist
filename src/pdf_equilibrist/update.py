@@ -9,6 +9,8 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+from pdf_equilibrist import network
+
 DEFAULT_GITHUB_REPO = os.getenv(
     "PDF_EQUILIBRIST_UPDATE_REPO",
     "Bit-Scripts/PDF-Equilibrist",
@@ -85,7 +87,7 @@ def _fetch_json(url: str, timeout: int = 10):
             "Accept": "application/vnd.github+json",
         },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
+    with network.urlopen(request, timeout=timeout) as response:
         text = response.read().decode("utf-8")
     return json.loads(text)
 
@@ -154,7 +156,7 @@ def download_release_asset(asset: dict, target_path: Path, timeout: int = 120) -
         },
     )
     target_path.parent.mkdir(parents=True, exist_ok=True)
-    with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
+    with network.urlopen(request, timeout=timeout) as response:
         data = response.read()
     target_path.write_bytes(data)
     return target_path

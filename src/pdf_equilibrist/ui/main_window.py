@@ -236,10 +236,16 @@ class MainWindow(QWidget):
             "background: #141414; border-top: 1px solid #2A2A2A;")
         sl = QHBoxLayout(status)
         sl.setContentsMargins(8, 0, 8, 0)
+        # Signale toute connexion en cours (vérification de version au
+        # démarrage) : l'application ne contacte jamais Internet en silence.
+        self._status_net = QLabel("")
         sl.addWidget(self._status_file)
         sl.addStretch()
+        sl.addWidget(self._status_net)
+        sl.addSpacing(12)
         sl.addWidget(self._status_page)
         self._status_file.setStyleSheet("color: #666666; font-size: 11px;")
+        self._status_net.setStyleSheet("color: #6BBF4E; font-size: 11px;")
         self._status_page.setStyleSheet("color: #666666; font-size: 11px;")
 
         # ── Barre de recherche (cachée par défaut) ────────────────────────────
@@ -407,6 +413,23 @@ class MainWindow(QWidget):
         act_cve.triggered.connect(self._check_for_cves)
         aide.addAction(act_cve)
 
+        # ── Connexions Internet (voir settings.py / network.py) ──────────────
+        from pdf_equilibrist import settings
+        net_menu = aide.addMenu(self.tr("Connexions Internet"))
+        self._act_block_net = QAction(self.tr("Bloquer toutes les connexions Internet"), self)
+        self._act_block_net.setCheckable(True)
+        self._act_block_net.setChecked(settings.network_blocked())
+        self._act_block_net.toggled.connect(self._on_block_network_toggled)
+        net_menu.addAction(self._act_block_net)
+
+        self._act_startup_check = QAction(
+            self.tr("Vérifier les mises à jour au démarrage (api.github.com)"), self)
+        self._act_startup_check.setCheckable(True)
+        self._act_startup_check.setChecked(settings.startup_update_check())
+        self._act_startup_check.setEnabled(not settings.network_blocked())
+        self._act_startup_check.toggled.connect(settings.set_startup_update_check)
+        net_menu.addAction(self._act_startup_check)
+
         aide.addSeparator()
 
         # Même fenêtre que "Vérifier les mises à jour" : elle affiche déjà le
@@ -419,26 +442,41 @@ class MainWindow(QWidget):
 
     def check_updates_on_startup(self):
         """
-        Vérifie silencieusement les mises à jour au démarrage.
+        Vérifie les mises à jour au démarrage, en arrière-plan.
 
         Contrairement à ``_check_for_updates()``, n'ouvre le dialogue que
-        si une version plus récente est réellement disponible — sinon
-        aucune fenêtre n'apparaît (vérification en arrière-plan uniquement).
+        si une version plus récente est réellement disponible. La requête
+        est signalée dans la barre d'état le temps qu'elle dure.
 
         Désactivé sous Flatpak : Flathub gère ses propres mises à jour
         (``flatpak update``), et les assets de release sont des ``.exe``
         Windows sans équivalent Linux à proposer au téléchargement.
+
+        Respecte aussi les réglages du menu Aide › Connexions Internet :
+        rien n'est envoyé si la vérification au démarrage est décochée (par
+        défaut hors Windows) ou si toutes les connexions sont bloquées.
         """
+        from pdf_equilibrist import settings
         from pdf_equilibrist import update as updater
         if updater.is_flatpak():
             return
+        if settings.network_blocked() or not settings.startup_update_check():
+            return
+        self._status_net.setText(
+            self.tr("Recherche de mise à jour (api.github.com)…"))
         self._startup_update_thread = _StartupUpdateCheckThread(self)
         self._startup_update_thread.found.connect(self._on_startup_update_found)
         self._startup_update_thread.start()
 
     def _on_startup_update_found(self, release: object | None):
+        self._status_net.setText("")
         if release:
             self._check_for_updates()
+
+    def _on_block_network_toggled(self, blocked: bool):
+        from pdf_equilibrist import settings
+        settings.set_network_blocked(blocked)
+        self._act_startup_check.setEnabled(not blocked)
 
     def _check_for_updates(self):
         """Ouvre le dialogue de vérification des mises à jour (non bloquant)."""

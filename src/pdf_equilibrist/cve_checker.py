@@ -10,6 +10,8 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
+from pdf_equilibrist import network
+
 OSV_API_URL = "https://api.osv.dev/v1/query"
 PACKAGE_ECOSYSTEM = "PyPI"
 _MAX_WORKERS = 8
@@ -80,7 +82,7 @@ def _fetch_json(url: str, data: bytes, timeout: int = 15) -> dict:
             "Content-Type": "application/json",
         },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
+    with network.urlopen(request, timeout=timeout) as response:
         return json.load(response)
 
 
@@ -96,8 +98,9 @@ def query_package_vulnerabilities(package_name: str, version: str) -> list[dict]
         if exc.code == 404:
             return []
         raise
-    except urllib.error.URLError:
-        return []
+    # Hors ligne (URLError) ou connexions bloquées (NetworkBlockedError) : on
+    # laisse remonter. Renvoyer [] ferait afficher « aucune vulnérabilité »
+    # pour un paquet qui n'a en réalité pas été vérifié.
 
     vulnerabilities = []
     for item in response.get("vulns", []) or []:

@@ -90,38 +90,38 @@
 </context><context>
     <name>CVEDialog</name>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="42" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="47" />
         <source>Vérifier les vulnérabilités CVE</source>
         <translation>Check CVE vulnerabilities</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="172" />
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="47" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="189" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="52" />
         <source>Analyse des paquets installés et du code source…</source>
         <translation>Scanning installed packages and source code…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="56" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="67" />
         <source>Les résultats s'afficheront ici une fois l'analyse terminée.</source>
         <translation>Results will appear here once the scan is finished.</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="60" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="71" />
         <source>Relancer</source>
         <translation>Rescan</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="62" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="73" />
         <source>Fermer</source>
         <translation>Close</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="74" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="85" />
         <source>Aucun paquet installé détecté.</source>
         <translation>No installed packages detected.</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="81" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="92" />
         <source>Aucune vulnérabilité CVE détectée ({0} paquets analysés).
 
 </source>
@@ -130,438 +130,473 @@
 </translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="86" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="97" />
         <source>{0} paquet(s) vulnérable(s) sur {1} analysés :</source>
         <translation>{0} vulnerable package(s) out of {1} scanned:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="95" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="106" />
         <source>    Gravité : {0}</source>
         <translation>    Severity: {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="97" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="108" />
         <source>    Résumé : {0}</source>
         <translation>    Summary: {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="105" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="116" />
         <source>Paquets sans vulnérabilité connue :</source>
         <translation>Packages with no known vulnerability:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="112" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="123" />
         <source>Analyse statique du code source (bandit)</source>
         <translation>Static source code analysis (bandit)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="120" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="131" />
         <source>Aucun problème détecté dans le code source du projet.</source>
         <translation>No issues detected in the project's source code.</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="123" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="134" />
         <source>{0} problème(s) détecté(s) dans le code source :</source>
         <translation>{0} issue(s) detected in the source code:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="127" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="138" />
         <source>[{0}/confiance {1}] {2}:{3} — {4} ({5})</source>
         <translation>[{0}/confidence {1}] {2}:{3} — {4} ({5})</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="138" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="149" />
         <source>Analyse en cours… {0}/{1} paquets</source>
         <translation>Scanning… {0}/{1} packages</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="152" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="157" />
+        <source>Vérification CVE en ligne ignorée : connexions Internet bloquées</source>
+        <translation>Online CVE check skipped: Internet connections are blocked</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="169" />
         <source>⚠ {0} paquet(s) vulnérable(s)/{1}</source>
         <translation>⚠ {0} vulnerable package(s)/{1}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="154" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="171" />
         <source>✓ {0} paquets OK</source>
         <translation>✓ {0} packages OK</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="157" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="174" />
         <source>⚠ {0} problème(s) dans le code</source>
         <translation>⚠ {0} issue(s) in the code</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="159" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="176" />
         <source>✓ code source OK</source>
         <translation>✓ source code OK</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="168" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="185" />
         <source>Échec de l'analyse</source>
         <translation>Scan failed</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="169" />
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="186" />
         <source>Erreur : {0}</source>
         <translation>Error: {0}</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="191" />
+        <source>Connexions Internet bloquées : aucune requête envoyée à api.osv.dev (menu Aide › Connexions Internet). Seule l'analyse locale du code est faite.</source>
+        <translation>Internet connections are blocked: no request sent to api.osv.dev (Help › Internet connections menu). Only the local code analysis is run.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\cve_dialog.py" line="195" />
+        <source>Connexion à api.osv.dev (OSV) : seuls les noms et versions des bibliothèques utilisées par l'application sont envoyés.</source>
+        <translation>Connecting to api.osv.dev (OSV): only the names and versions of the libraries used by the application are sent.</translation>
     </message>
 </context><context>
     <name>MainWindow</name>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="196" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="200" />
         <source>Afficher</source>
         <translation>Display</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="197" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="201" />
         <source>Modifier</source>
         <translation>Edit</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="198" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="202" />
         <source>Convertir</source>
         <translation>Convert</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="199" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="203" />
         <source>Annoter</source>
         <translation>Annotate</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="200" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="204" />
         <source>Page</source>
         <translation>Page</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="201" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="205" />
         <source>Protéger</source>
         <translation>Protect</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="687" />
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="227" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="729" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="231" />
         <source>Aucun document ouvert</source>
         <translation>No document open</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="343" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="353" />
         <source>Fichier</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="345" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="355" />
         <source>Ouvrir…</source>
         <translation>Open…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="351" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="361" />
         <source>Ouvrir récemment</source>
         <translation>Open Recent</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="355" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="365" />
         <source>Imprimer…</source>
         <translation>Print…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="361" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="371" />
         <source>Enregistrer</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="366" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="376" />
         <source>Enregistrer sous…</source>
         <translation>Save As…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="372" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="382" />
         <source>Fermer l'onglet</source>
         <translation>Close Tab</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="379" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="389" />
         <source>Quitter</source>
         <translation>Quit</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="384" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="394" />
         <source>Édition</source>
         <translation>Edit</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="385" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="395" />
         <source>Annuler</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="391" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="401" />
         <source>Rechercher…</source>
         <translation>Find…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="397" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="407" />
         <source>Aide</source>
         <translation>Help</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="398" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="408" />
         <source>Vérifier les mises à jour…</source>
         <translation>Check for Updates…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="402" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="412" />
         <source>Vérifier les vulnérabilités CVE…</source>
         <translation>Check CVE Vulnerabilities…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="410" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="418" />
+        <source>Connexions Internet</source>
+        <translation>Internet connections</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="419" />
+        <source>Bloquer toutes les connexions Internet</source>
+        <translation>Block all Internet connections</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="426" />
+        <source>Vérifier les mises à jour au démarrage (api.github.com)</source>
+        <translation>Check for updates at startup (api.github.com)</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="437" />
         <source>À propos de PDF-Equilibrist…</source>
         <translation>About PDF-Equilibrist…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="449" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="466" />
+        <source>Recherche de mise à jour (api.github.com)…</source>
+        <translation>Checking for updates (api.github.com)…</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="491" />
         <source>Vérification des mises à jour</source>
         <translation>Checking for updates</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="450" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="492" />
         <source>Impossible d'ouvrir le dialogue de mise à jour :
 {0}</source>
         <translation>Could not open the update dialog:
 {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="460" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="502" />
         <source>Vérification CVE</source>
         <translation>CVE check</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="461" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="503" />
         <source>Impossible d'ouvrir le dialogue CVE :
 {0}</source>
         <translation>Could not open the CVE dialog:
 {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="486" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="528" />
         <source>(vide)</source>
         <translation>(empty)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="499" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="541" />
         <source>Effacer l'historique</source>
         <translation>Clear History</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="527" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="569" />
         <source>Ouvrir un PDF</source>
         <translation>Open a PDF</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="527" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="569" />
         <source>Fichiers PDF (*.pdf)</source>
         <translation>PDF files (*.pdf)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="685" />
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="672" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="727" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="714" />
         <source>{0} page</source>
         <translation>{0} page</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="685" />
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="672" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="727" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="714" />
         <source>{0} pages</source>
         <translation>{0} pages</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="697" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="739" />
         <source>Enregistré : {0}</source>
         <translation>Saved: {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="704" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="746" />
         <source>Enregistrer sous</source>
         <translation>Save As</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="705" />
+        <location filename="..\src\pdf_equilibrist\ui\main_window.py" line="747" />
         <source>PDF (*.pdf)</source>
         <translation>PDF (*.pdf)</translation>
     </message>
 </context><context>
     <name>PrintDialog</name>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="399" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="415" />
         <source>Imprimer — {0}</source>
         <translation>Print — {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="432" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="454" />
         <source>Imprimante</source>
         <translation>Printer</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="442" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="464" />
         <source>Nom :</source>
         <translation>Name:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="604" />
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="444" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="626" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="466" />
         <source>Propriétés avancées…</source>
         <translation>Advanced properties…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="606" />
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="446" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="628" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="468" />
         <source>Ouvre les propriétés natives de l'imprimante
 (agrafe, perforation, format rouleau, découpe, …)</source>
         <translation>Opens the printer's native properties
 (staple, punch, roll size, cut, …)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="456" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="478" />
         <source>Copies</source>
         <translation>Copies</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="461" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="483" />
         <source>Nombre :</source>
         <translation>Number:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="465" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="487" />
         <source>Pages à imprimer</source>
         <translation>Pages to print</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="469" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="491" />
         <source>Tout</source>
         <translation>All</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="469" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="491" />
         <source>Pages personnalisées</source>
         <translation>Custom pages</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="470" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="492" />
         <source>Plage :</source>
         <translation>Range:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="472" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="494" />
         <source>ex: 1-3, 5, 8-10</source>
         <translation>e.g. 1-3, 5, 8-10</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="474" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="496" />
         <source>Numéros :</source>
         <translation>Numbers:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="480" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="502" />
         <source>Format papier</source>
         <translation>Paper size</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="484" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="506" />
         <source>Format :</source>
         <translation>Size:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="489" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="511" />
         <source>Orientation</source>
         <translation>Orientation</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="493" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="515" />
         <source>Auto (par page)</source>
         <translation>Auto (per page)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="493" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="515" />
         <source>Portrait</source>
         <translation>Portrait</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="493" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="515" />
         <source>Paysage</source>
         <translation>Landscape</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="499" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="521" />
         <source>Échelle / Dimensionnement</source>
         <translation>Scale / Sizing</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="504" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="526" />
         <source>Ajuster (remplir le papier)</source>
         <translation>Fit (fill the paper)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="505" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="527" />
         <source>Réduire uniquement</source>
         <translation>Shrink only</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="506" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="528" />
         <source>100 % (rogner si déborde)</source>
         <translation>100% (crop if oversized)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="514" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="536" />
         <source>Recto / Verso</source>
         <translation>Duplex</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="519" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="541" />
         <source>Désactivé</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="520" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="542" />
         <source>Retourner sur le bord long</source>
         <translation>Flip on long edge</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="521" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="543" />
         <source>Retourner sur le bord court</source>
         <translation>Flip on short edge</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="532" />
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="528" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="554" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="550" />
         <source>Couleur</source>
         <translation>Color</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="532" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="554" />
         <source>Nuances de gris</source>
         <translation>Grayscale</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="540" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="562" />
         <source>Impression en cours…</source>
         <translation>Printing…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="551" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="573" />
         <source>Annuler</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="552" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="574" />
         <source>Imprimer</source>
         <translation>Print</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="585" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="607" />
         <source>Propriétés avancées ✓</source>
         <translation>Advanced properties ✓</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="587" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="609" />
         <source>Réglages driver configurés (agrafe, finition…)
 Ces réglages seront transmis directement au driver à l'impression.
 Cliquer pour modifier.</source>
@@ -570,17 +605,17 @@ These settings will be sent directly to the driver when printing.
 Click to change.</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="718" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="740" />
         <source>Impression en cours… page {0}/{1}</source>
         <translation>Printing… page {0}/{1}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="724" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="746" />
         <source>Erreur d'impression</source>
         <translation>Printing error</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="725" />
+        <location filename="..\src\pdf_equilibrist\ui\print_dialog.py" line="747" />
         <source>Impossible de démarrer le travail d'impression.
 Vérifiez que l'imprimante est disponible.</source>
         <translation>Could not start the print job.
@@ -913,229 +948,229 @@ processing</translation>
         <translation>To Markdown</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="209" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="211" />
         <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="108" />
         <source>Markdown (*.md)</source>
         <translation>Markdown (*.md)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="366" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="309" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="294" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="281" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="268" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="112" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="375" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="317" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="302" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="288" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="274" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="113" />
         <source>Conversion</source>
         <translation>Conversion</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="217" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="112" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="220" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="113" />
         <source>Markdown enregistré :
 {0}</source>
         <translation>Markdown saved:
 {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="114" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="115" />
         <source>Conversion impossible</source>
         <translation>Conversion not possible</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="368" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="312" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="296" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="283" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="270" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="255" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="237" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="219" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="201" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="116" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="377" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="320" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="304" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="290" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="276" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="260" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="241" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="222" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="203" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="117" />
         <source>Erreur</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="153" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="154" />
         <source>Initialisation OCR…</source>
         <translation>Initializing OCR…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="153" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="154" />
         <source>Annuler</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="172" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="173" />
         <source>OCR — Erreur</source>
         <translation>OCR — Error</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="185" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="186" />
         <source>OCR → PDF cherchable</source>
         <translation>OCR → Searchable PDF</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="362" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="186" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="370" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="187" />
         <source>PDF (*.pdf)</source>
         <translation>PDF (*.pdf)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="203" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="199" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="205" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="201" />
         <source>OCR → PDF</source>
         <translation>OCR → PDF</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="199" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="201" />
         <source>PDF cherchable enregistré :
 {0}</source>
         <translation>Searchable PDF saved:
 {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="221" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="217" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="207" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="224" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="220" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="209" />
         <source>OCR → Markdown</source>
         <translation>OCR → Markdown</translation>
     </message>
     <message>
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="243" />
         <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="239" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="235" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="227" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="230" />
         <source>OCR → Word</source>
         <translation>OCR → Word</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="264" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="228" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="269" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="231" />
         <source>Word (*.docx)</source>
         <translation>Word (*.docx)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="268" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="235" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="274" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="239" />
         <source>Word enregistré :
 {0}</source>
         <translation>Word file saved:
 {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="257" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="253" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="245" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="262" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="258" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="249" />
         <source>OCR → Excel</source>
         <translation>OCR → Excel</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="277" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="246" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="283" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="250" />
         <source>Excel (*.xlsx)</source>
         <translation>Excel (*.xlsx)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="281" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="253" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="288" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="258" />
         <source>Excel enregistré :
 {0}</source>
         <translation>Excel file saved:
 {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="263" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="268" />
         <source>Vers Word</source>
         <translation>To Word</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="276" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="282" />
         <source>Vers Excel</source>
         <translation>To Excel</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="289" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="296" />
         <source>Vers PowerPoint</source>
         <translation>To PowerPoint</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="290" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="297" />
         <source>PowerPoint (*.pptx)</source>
         <translation>PowerPoint (*.pptx)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="294" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="302" />
         <source>PowerPoint enregistré :
 {0}</source>
         <translation>PowerPoint file saved:
 {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="334" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="304" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="342" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="312" />
         <source>Dossier de sortie</source>
         <translation>Output folder</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="310" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="318" />
         <source>{0} image(s) dans :
 {1}</source>
         <translation>{0} image(s) in:
 {1}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="353" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="351" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="322" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="361" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="359" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="330" />
         <source>Office en PDF</source>
         <translation>Office to PDF</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="323" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="331" />
         <source>Aucun moteur trouvé.
 Installez Microsoft Office ou LibreOffice.</source>
         <translation>No engine found.
 Install Microsoft Office or LibreOffice.</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="329" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="337" />
         <source>Fichiers Office à convertir</source>
         <translation>Office files to convert</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="330" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="338" />
         <source>Office (*.docx *.xlsx *.pptx *.doc *.xls *.ppt *.odt *.ods *.odp)</source>
         <translation>Office (*.docx *.xlsx *.pptx *.doc *.xls *.ppt *.odt *.ods *.odp)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="348" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="356" />
         <source>Moteur : {0}
 {1} fichier(s) converti(s).</source>
         <translation>Engine: {0}
 {1} file(s) converted.</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="350" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="358" />
         <source>Erreurs :</source>
         <translation>Errors:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="357" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="365" />
         <source>Choisir des images</source>
         <translation>Choose images</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="358" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="366" />
         <source>Images (*.png *.jpg *.jpeg *.bmp *.tiff)</source>
         <translation>Images (*.png *.jpg *.jpeg *.bmp *.tiff)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="362" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="370" />
         <source>Enregistrer le PDF</source>
         <translation>Save the PDF</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="366" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="375" />
         <source>PDF créé :
 {0}</source>
         <translation>PDF created:
@@ -1332,19 +1367,19 @@ Remember to save the document.</translation>
         <translation>PDF (*.pdf)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_modifier.py" line="292" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_modifier.py" line="293" />
         <source>Compresser</source>
         <translation>Compress</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_modifier.py" line="292" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_modifier.py" line="293" />
         <source>Enregistré :
 {0}</source>
         <translation>Saved:
 {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_modifier.py" line="294" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_modifier.py" line="295" />
         <source>Erreur</source>
         <translation>Error</translation>
     </message>
@@ -1423,7 +1458,7 @@ ge</translation>
 {1}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_page.py" line="108" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_page.py" line="109" />
         <location filename="..\src\pdf_equilibrist\ui\tabs\tab_page.py" line="92" />
         <source>Erreur</source>
         <translation>Error</translation>
@@ -1439,12 +1474,12 @@ ge</translation>
         <translation>Merged PDF</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_page.py" line="106" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_page.py" line="107" />
         <source>Fusionner</source>
         <translation>Merge</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_page.py" line="106" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_page.py" line="107" />
         <source>PDF fusionné :
 {0}</source>
         <translation>Merged PDF:
@@ -1453,7 +1488,7 @@ ge</translation>
 </context><context>
     <name>TabProteger</name>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="68" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="69" />
         <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="43" />
         <source>Chiffrer</source>
         <translation>Encrypt</translation>
@@ -1486,98 +1521,170 @@ rypt</translation>
         <translation>PDF (*.pdf)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="68" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="69" />
         <source>PDF chiffré :
 {0}</source>
         <translation>Encrypted PDF:
 {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="70" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="71" />
         <source>Erreur</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="86" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="84" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="78" />
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="76" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="87" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="85" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="79" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="77" />
         <source>Déchiffrer</source>
         <translation>Decrypt</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="76" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="77" />
         <source>Ce document n'est pas chiffré.</source>
         <translation>This document is not encrypted.</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="84" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="85" />
         <source>Document déchiffré.</source>
         <translation>Document decrypted.</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="86" />
+        <location filename="..\src\pdf_equilibrist\ui\tabs\tab_proteger.py" line="87" />
         <source>Mot de passe incorrect.</source>
         <translation>Incorrect password.</translation>
     </message>
 </context><context>
     <name>ThumbnailPanel</name>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="152" />
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="159" />
         <source>Pages</source>
         <translation>Pages</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="365" />
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="374" />
         <source>Insertion PDF</source>
         <translation>PDF insertion</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="365" />
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="374" />
         <source>Impossible d'ouvrir :
 {0}</source>
         <translation>Could not open:
 {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="393" />
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="425" />
+        <source>↑  Monter la sélection ({0} pages)</source>
+        <translation>↑  Move selection up ({0} pages)</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="426" />
+        <source>↓  Descendre la sélection ({0} pages)</source>
+        <translation>↓  Move selection down ({0} pages)</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="428" />
         <source>↑  Monter  ({0}/{1} → {2}/{3})</source>
         <translation>↑  Move up  ({0}/{1} → {2}/{3})</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="398" />
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="429" />
         <source>↓  Descendre  ({0}/{1} → {2}/{3})</source>
         <translation>↓  Move down  ({0}/{1} → {2}/{3})</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="405" />
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="443" />
+        <source> ({0} pages)</source>
+        <translation> ({0} pages)</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="444" />
         <source>↻  Rotation horaire</source>
         <translation>↻  Rotate clockwise</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="409" />
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="448" />
         <source>↺  Rotation antihoraire</source>
         <translation>↺  Rotate counter-clockwise</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="415" />
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="455" />
+        <source>⧉  Dupliquer la sélection ({0} pages)</source>
+        <translation>⧉  Duplicate selection ({0} pages)</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="456" />
+        <source>⇥  Extraire la sélection ({0} pages)…</source>
+        <translation>⇥  Extract selection ({0} pages)…</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="458" />
         <source>⧉  Dupliquer la page {0}</source>
         <translation>⧉  Duplicate page {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="419" />
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="459" />
+        <source>⇥  Extraire la page {0}…</source>
+        <translation>⇥  Extract page {0}…</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="471" />
+        <source>🗑  Supprimer la sélection ({0} pages)</source>
+        <translation>🗑  Delete selection ({0} pages)</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="472" />
         <source>🗑  Supprimer la page {0}</source>
         <translation>🗑  Delete page {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="458" />
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="480" />
+        <source>🖶  Imprimer la sélection ({0} pages)…</source>
+        <translation>🖶  Print selection ({0} pages)…</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="481" />
+        <source>🖶  Imprimer la page {0}…</source>
+        <translation>🖶  Print page {0}…</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="533" />
         <source>Supprimer</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="458" />
-        <source>Impossible de supprimer la seule page.</source>
-        <translation>Cannot delete the only page.</translation>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="534" />
+        <source>Impossible de supprimer toutes les pages.</source>
+        <translation>Cannot delete all pages.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="543" />
+        <source>Extraire les pages</source>
+        <translation>Extract pages</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="543" />
+        <source>PDF (*.pdf)</source>
+        <translation>PDF (*.pdf)</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="551" />
+        <source>Extraire</source>
+        <translation>Extract</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="552" />
+        <source>{0} page(s) extraite(s) dans :
+{1}</source>
+        <translation>{0} page(s) extracted to:
+{1}</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\thumbnail_panel.py" line="554" />
+        <source>Erreur</source>
+        <translation>Error</translation>
     </message>
 </context><context>
     <name>TitleBar</name>
@@ -1587,146 +1694,161 @@ rypt</translation>
         <translation>Open a PDF (Ctrl+O)</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="213" />
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="214" />
         <source>Langue / Language</source>
         <translation>Language</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="237" />
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="238" />
         <source>Réduire</source>
         <translation>Minimize</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="238" />
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="239" />
         <source>Agrandir / Restaurer</source>
         <translation>Maximize / Restore</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="239" />
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="240" />
         <source>Fermer</source>
         <translation>Close</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="396" />
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="397" />
         <source>Langue modifiée</source>
         <translation>Language changed</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="397" />
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="398" />
         <source>Le changement de langue sera appliqué au prochain démarrage.</source>
         <translation>The language change will be applied after restart.</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="402" />
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="403" />
         <source>Redémarrer maintenant</source>
         <translation>Restart now</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="405" />
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="406" />
         <source>Plus tard</source>
         <translation>Later</translation>
     </message>
 </context><context>
     <name>UpdateDialog</name>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="63" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="64" />
         <source>À propos de PDF-Equilibrist</source>
         <translation>About PDF-Equilibrist</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="90" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="91" />
         <source>Éditeur PDF de bureau — © 2026 PDF Equilibrist — Licence GPLv3</source>
         <translation>Desktop PDF editor — © 2026 PDF Equilibrist — GPLv3 License</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="96" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="97" />
         <source>Dépôt GitHub</source>
         <translation>GitHub Repository</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="104" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="105" />
         <source>Vérification des nouvelles versions…</source>
         <translation>Checking for new versions…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="114" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="113" />
+        <source>Connexion à api.github.com (GitHub) pour la version et les statistiques. Aucun document ni aucune donnée personnelle n'est envoyé.</source>
+        <translation>Connecting to api.github.com (GitHub) for the version and statistics. No document and no personal data is sent.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="123" />
         <source>Téléchargements</source>
         <translation>Downloads</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="119" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="128" />
         <source>Cette version (v{0}) :</source>
         <translation>This version (v{0}):</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="127" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="136" />
         <source>Total toutes versions :</source>
         <translation>Total across all versions:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="143" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="152" />
         <source>Copier</source>
         <translation>Copy</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="144" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="153" />
         <source>Mise à jour :</source>
         <translation>Update:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="156" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="165" />
         <source>Ouvrir la page de la release</source>
         <translation>Open release page</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="158" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="167" />
         <source>Télécharger et installer</source>
         <translation>Download and install</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="160" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="169" />
         <source>Fermer</source>
         <translation>Close</translation>
     </message>
     <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="184" />
+        <source>Version installée : v{0}</source>
+        <translation>Installed version: v{0}</translation>
+    </message>
+    <message>
         <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="185" />
+        <source>Connexions Internet bloquées : aucune requête envoyée (menu Aide › Connexions Internet).</source>
+        <translation>Internet connections are blocked: no request sent (Help › Internet connections menu).</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="205" />
         <source>v{0} — version la plus récente.</source>
         <translation>v{0} — latest version.</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="189" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="209" />
         <source>Nouvelle version disponible : {0}</source>
         <translation>New version available: {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="216" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="236" />
         <source>Erreur lors de la vérification : {0}</source>
         <translation>Error while checking: {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="246" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="266" />
         <source>Téléchargement en cours…</source>
         <translation>Downloading…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="249" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="269" />
         <source>Téléchargé : {0}</source>
         <translation>Downloaded: {0}</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="266" />
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="286" />
         <source>Échec du téléchargement : {0}</source>
         <translation>Download failed: {0}</translation>
     </message>
 </context><context>
     <name>_PageLabel</name>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\viewer.py" line="250" />
+        <location filename="..\src\pdf_equilibrist\ui\viewer.py" line="253" />
         <source>Ouverture d'un fichier externe</source>
         <translation>Opening an external file</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\viewer.py" line="251" />
+        <location filename="..\src\pdf_equilibrist\ui\viewer.py" line="254" />
         <source>Ce document PDF demande à ouvrir :
 
 {0}
@@ -1738,10 +1860,28 @@ N'acceptez que si vous faites confiance à ce document.</source>
 
 Only accept if you trust this document.</translation>
     </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\viewer.py" line="275" />
+        <source>Ouverture d'un lien Internet</source>
+        <translation>Opening an Internet link</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\viewer.py" line="276" />
+        <source>Ce document PDF contient un lien vers :
+
+{0}
+
+L'ouvrir dans votre navigateur ?</source>
+        <translation>This PDF document contains a link to:
+
+{0}
+
+Open it in your browser?</translation>
+    </message>
 </context><context>
     <name>_WelcomePage</name>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\viewer.py" line="321" />
+        <location filename="..\src\pdf_equilibrist\ui\viewer.py" line="346" />
         <source>Glissez un PDF ici ou utilisez  Fichier › Ouvrir</source>
         <translation>Drag a PDF here or use  File › Open</translation>
     </message>
@@ -1775,109 +1915,109 @@ Only accept if you trust this document.</translation>
 </context><context>
     <name>dialogs</name>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="54" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="55" />
         <source>Annuler</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="55" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="56" />
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="66" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="67" />
         <source>Mot de passe :</source>
         <translation>Password:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="82" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="83" />
         <source>Chiffrer le PDF</source>
         <translation>Encrypt the PDF</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="86" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="87" />
         <source>Mot de passe utilisateur :</source>
         <translation>User password:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="90" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="91" />
         <source>Mot de passe propriétaire (optionnel) :</source>
         <translation>Owner password (optional):</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="102" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="103" />
         <source>Après la page n° :</source>
         <translation>After page no.:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="104" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="105" />
         <source>Numéro de page</source>
         <translation>Page number</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="118" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="119" />
         <source>Filigrane</source>
         <translation>Watermark</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="122" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="123" />
         <source>Texte du filigrane :</source>
         <translation>Watermark text:</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="124" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="125" />
         <source>ex: CONFIDENTIEL</source>
         <translation>e.g. CONFIDENTIAL</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="145" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="146" />
         <source>Format d'image</source>
         <translation>Image format</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="148" />
+        <location filename="..\src\pdf_equilibrist\ui\dialogs.py" line="149" />
         <source>Format :</source>
         <translation>Format:</translation>
     </message>
 </context><context>
     <name>main</name>
     <message>
-        <location filename="..\src\pdf_equilibrist\main.py" line="60" />
+        <location filename="..\src\pdf_equilibrist\main.py" line="65" />
         <source>Chargement de PyMuPDF…</source>
         <translation>Loading PyMuPDF…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\main.py" line="63" />
+        <location filename="..\src\pdf_equilibrist\main.py" line="68" />
         <source>Chargement de PyQt6…</source>
         <translation>Loading PyQt6…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\main.py" line="67" />
+        <location filename="..\src\pdf_equilibrist\main.py" line="72" />
         <source>Chargement des convertisseurs…</source>
         <translation>Loading converters…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\main.py" line="74" />
+        <location filename="..\src\pdf_equilibrist\main.py" line="79" />
         <source>Chargement de l'interface…</source>
         <translation>Loading interface…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\main.py" line="78" />
+        <location filename="..\src\pdf_equilibrist\main.py" line="83" />
         <source>Initialisation de la fenêtre…</source>
         <translation>Initializing window…</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\main.py" line="81" />
+        <location filename="..\src\pdf_equilibrist\main.py" line="86" />
         <source>Prêt !</source>
         <translation>Ready!</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\main.py" line="90" />
+        <location filename="..\src\pdf_equilibrist\main.py" line="95" />
         <source>Erreur au démarrage</source>
         <translation>Startup error</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\main.py" line="91" />
+        <location filename="..\src\pdf_equilibrist\main.py" line="96" />
         <source>PDF Equilibrist n'a pas pu démarrer.</source>
         <translation>PDF Equilibrist could not start.</translation>
     </message>
