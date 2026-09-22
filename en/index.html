@@ -146,12 +146,14 @@
   </div>
   <!-- Compteurs : Windows vient directement de l'API GitHub, les autres de
        stats.json (relevé hebdomadaire). L'AUR n'expose aucun compteur : le
-       badge Arch renvoie vers l'explication dans la section #diffusion. -->
+       badge Arch renvoie vers l'explication dans la section #diffusion.
+       `v=2` n'est lu que par le cache de shields.io : changer sa valeur force
+       un nouveau relevé si une erreur y est restée en cache. -->
   <div class="badges">
-    <a href="#diffusion"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.total&label=total%20downloads&color=6BBF4E&cacheSeconds=3600" alt="Total downloads"></a>
+    <a href="#diffusion"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.total&label=total%20downloads&color=6BBF4E&cacheSeconds=3600&v=2" alt="Total downloads"></a>
     <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=Windows%20downloads&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600" alt="Windows downloads"></a>
-    <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.launchpad.total&label=Ubuntu%20downloads&logo=ubuntu&logoColor=white&color=E95420&cacheSeconds=3600" alt="Ubuntu downloads"></a>
-    <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.copr.total&label=Fedora%20downloads&logo=fedora&logoColor=white&color=51A2DA&cacheSeconds=3600" alt="Fedora downloads"></a>
+    <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.launchpad.total&label=Ubuntu%20downloads&logo=ubuntu&logoColor=white&color=E95420&cacheSeconds=3600&v=2" alt="Ubuntu downloads"></a>
+    <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.copr.total&label=Fedora%20downloads&logo=fedora&logoColor=white&color=51A2DA&cacheSeconds=3600&v=2" alt="Fedora downloads"></a>
     <a href="#diffusion-arch" title="The AUR does not publish any download counter"><img src="https://img.shields.io/badge/Arch%20downloads-not%20tracked-lightgrey?logo=archlinux&logoColor=white" alt="Arch downloads: not tracked"></a>
   </div>
   <div class="badges">
