@@ -9,13 +9,15 @@ Sources, toutes publiques et en lecture seule :
 
     GitHub      API releases, somme des `download_count` des assets
     Launchpad   API du PPA : getPublishedBinaries puis getDownloadCount
-    COPR        page HTML — pas d'API pour ce compteur
+    COPR        page HTML — pas d'API pour ces compteurs
     AUR         RPC v5 : ni téléchargements ni installations, mais votes
                 et popularité
 
-Le compteur COPR est celui du fichier `.repo` : c'est le nombre de fois où le
-dépôt a été *activé*, pas le nombre d'installations. Le libellé de la page le
-dit, et il ne faut pas le présenter autrement.
+COPR affiche deux compteurs par version de Fedora, tirés des journaux de ses
+serveurs. `total` est celui des paquets RPM téléchargés (« x86_64 (N)* ») :
+comme pour Launchpad et GitHub, chaque installation *et chaque mise à jour*
+compte, ce n'est pas un nombre d'utilisateurs. `enablements` est celui du
+fichier `.repo`, c'est-à-dire des `dnf copr enable` ; il est conservé à part.
 
 Usage :
     python build_stats.py
@@ -94,15 +96,36 @@ def launchpad() -> dict:
 
 
 def copr() -> dict:
-    """La page COPR liste « <Release> … (N downloads) » — seul point scrapé."""
-    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", get(COPR_PAGE)))
-    rows = {
-        release.strip(): int(count)
-        for release, count in re.findall(r"(Fedora [\w.]+).{0,120}?\((\d+) downloads?\)", text)
-    }
-    if not rows:
+    """Une ligne du tableau « Active Releases » de la page COPR par version :
+
+        Fedora 44 | x86_64 (123)* | [Fedora 44] (29 downloads)
+
+    `(N)*` : paquets RPM téléchargés, par architecture ; `(N downloads)` :
+    téléchargements du fichier `.repo`, soit les activations du dépôt.
+    """
+    downloads: dict[str, int] = {}
+    enablements: dict[str, int] = {}
+    for row in re.findall(r"<tr\b.*?</tr>", get(COPR_PAGE), re.S):
+        text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", row))
+        release = re.search(r"Fedora [\w.]+", text)
+        repo = re.search(r"\((\d+) downloads?\)", text)
+        if not (release and repo):
+            continue
+        rpms = re.findall(r"\((\d+)\)\s*\*", text)
+        if not rpms:
+            # Mieux vaut un échec (et le chiffre d'hier, marqué `stale`)
+            # qu'un zéro silencieux si COPR change sa mise en page.
+            raise ValueError(f"compteur de paquets absent pour {release.group()}")
+        downloads[release.group()] = sum(map(int, rpms))
+        enablements[release.group()] = int(repo.group(1))
+    if not downloads:
         raise ValueError("aucun compteur trouvé (mise en page COPR changée ?)")
-    return {"total": sum(rows.values()), "by_release": rows}
+    return {
+        "total": sum(downloads.values()),
+        "by_release": downloads,
+        "enablements": sum(enablements.values()),
+        "enablements_by_release": enablements,
+    }
 
 
 def aur() -> dict:

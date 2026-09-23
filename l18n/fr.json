@@ -152,7 +152,7 @@
   "stats.total": "téléchargements, tous canaux confondus",
   "stats.github": "depuis les versions GitHub (installeur Windows)",
   "stats.launchpad": "depuis le PPA Ubuntu (Noble et Resolute)",
-  "stats.copr": "activations du dépôt Fedora (COPR)",
+  "stats.copr": "depuis le dépôt Fedora (COPR)",
   "stats.arch": "Arch Linux (AUR) n'a pas de compteur : l'AUR ne diffuse qu'une recette de construction, le paquet est compilé sur la machine de l'utilisateur depuis l'archive des sources GitHub, que GitHub ne comptabilise pas.",
   "stats.updated": "Relevé du"
 }
