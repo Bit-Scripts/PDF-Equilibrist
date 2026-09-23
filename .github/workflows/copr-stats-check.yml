@@ -1,0 +1,15 @@
+name: COPR stats check (temporaire)
+on:
+  push:
+    branches: [claude/eloquent-fermi-mrb6m4]
+    paths: [".github/copr-check/**", ".github/workflows/copr-stats-check.yml"]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python check.py
+        working-directory: .github/copr-check
