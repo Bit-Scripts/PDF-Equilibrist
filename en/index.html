@@ -315,6 +315,7 @@ sudo dnf install pdf-equilibrist</code></pre>
       <li><strong data-stat="github">&mdash;</strong><span>from GitHub releases (Windows installer)</span></li>
       <li><strong data-stat="launchpad">&mdash;</strong><span>from the Ubuntu PPA (Noble and Resolute)</span></li>
       <li><strong data-stat="copr">&mdash;</strong><span>from the Fedora repository (COPR)</span></li>
+      <li><strong data-stat="copr.enablements">&mdash;</strong><span>Fedora repository enablements (dnf copr enable)</span></li>
     </ul>
     <p class="stats-note" id="diffusion-arch">Arch Linux (AUR) has no counter: the AUR only distributes a build recipe, and the package is compiled on the user's machine from the GitHub source archive, which GitHub does not count.</p>
     <p class="stats-note">As of <time data-stat-date></time></p>
@@ -429,8 +430,9 @@ sudo dnf install pdf-equilibrist</code></pre>
       const nf = new Intl.NumberFormat(lang);
 
       for (const el of section.querySelectorAll('[data-stat]')) {
-        const key = el.dataset.stat;
-        const value = key === 'total' ? stats.total : stats.channels?.[key]?.total;
+        // `canal` lit channels.canal.total, `canal.champ` un autre champ du canal.
+        const [key, field = 'total'] = el.dataset.stat.split('.');
+        const value = key === 'total' ? stats.total : stats.channels?.[key]?.[field];
         if (typeof value === 'number') el.textContent = nf.format(value);
       }
 

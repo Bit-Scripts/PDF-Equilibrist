@@ -315,6 +315,7 @@ sudo dnf install pdf-equilibrist</code></pre>
       <li><strong data-stat="github">&mdash;</strong><span>{{stats.github}}</span></li>
       <li><strong data-stat="launchpad">&mdash;</strong><span>{{stats.launchpad}}</span></li>
       <li><strong data-stat="copr">&mdash;</strong><span>{{stats.copr}}</span></li>
+      <li><strong data-stat="copr.enablements">&mdash;</strong><span>{{stats.copr.enablements}}</span></li>
     </ul>
     <p class="stats-note" id="diffusion-arch">{{stats.arch}}</p>
     <p class="stats-note">{{stats.updated}} <time data-stat-date></time></p>
@@ -429,8 +430,9 @@ sudo dnf install pdf-equilibrist</code></pre>
       const nf = new Intl.NumberFormat(lang);
 
       for (const el of section.querySelectorAll('[data-stat]')) {
-        const key = el.dataset.stat;
-        const value = key === 'total' ? stats.total : stats.channels?.[key]?.total;
+        // `canal` lit channels.canal.total, `canal.champ` un autre champ du canal.
+        const [key, field = 'total'] = el.dataset.stat.split('.');
+        const value = key === 'total' ? stats.total : stats.channels?.[key]?.[field];
         if (typeof value === 'number') el.textContent = nf.format(value);
       }
 
