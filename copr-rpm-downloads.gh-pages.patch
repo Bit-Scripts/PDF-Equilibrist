@@ -1,0 +1,149 @@
+From e28e75bd52674072a0a483c094897d663884cda7 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 23 Sep 2026 08:45:31 +0000
+Subject: [PATCH] =?UTF-8?q?stats:=20compte=20les=20paquets=20RPM=20t=C3=A9?=
+ =?UTF-8?q?l=C3=A9charg=C3=A9s=20sur=20COPR,=20plus=20les=20activations?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Le badge « Fedora downloads » (site et README) lisait channels.copr.total,
+qui était le compteur du fichier .repo, donc les activations du dépôt.
+COPR publie aussi, par version de Fedora, le nombre de paquets RPM
+téléchargés : c'est désormais lui qui fait « total », comme pour
+Launchpad et GitHub. Les activations restent à part (enablements).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013w9SXkxezqpxmv1GuBowAH
+---
+ build_stats.py | 47 +++++++++++++++++++++++++++++++++++------------
+ en/index.html  |  2 +-
+ index.html     |  2 +-
+ l18n/en.json   |  2 +-
+ l18n/fr.json   |  2 +-
+ 5 files changed, 39 insertions(+), 16 deletions(-)
+
+diff --git a/build_stats.py b/build_stats.py
+index c782fc8..76e7020 100644
+--- a/build_stats.py
++++ b/build_stats.py
+@@ -9,13 +9,15 @@ Sources, toutes publiques et en lecture seule :
+ 
+     GitHub      API releases, somme des `download_count` des assets
+     Launchpad   API du PPA : getPublishedBinaries puis getDownloadCount
+-    COPR        page HTML — pas d'API pour ce compteur
++    COPR        page HTML — pas d'API pour ces compteurs
+     AUR         RPC v5 : ni téléchargements ni installations, mais votes
+                 et popularité
+ 
+-Le compteur COPR est celui du fichier `.repo` : c'est le nombre de fois où le
+-dépôt a été *activé*, pas le nombre d'installations. Le libellé de la page le
+-dit, et il ne faut pas le présenter autrement.
++COPR affiche deux compteurs par version de Fedora, tirés des journaux de ses
++serveurs. `total` est celui des paquets RPM téléchargés (« x86_64 (N)* ») :
++comme pour Launchpad et GitHub, chaque installation *et chaque mise à jour*
++compte, ce n'est pas un nombre d'utilisateurs. `enablements` est celui du
++fichier `.repo`, c'est-à-dire des `dnf copr enable` ; il est conservé à part.
+ 
+ Usage :
+     python build_stats.py
+@@ -94,15 +96,36 @@ def launchpad() -> dict:
+ 
+ 
+ def copr() -> dict:
+-    """La page COPR liste « <Release> … (N downloads) » — seul point scrapé."""
+-    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", get(COPR_PAGE)))
+-    rows = {
+-        release.strip(): int(count)
+-        for release, count in re.findall(r"(Fedora [\w.]+).{0,120}?\((\d+) downloads?\)", text)
+-    }
+-    if not rows:
++    """Une ligne du tableau « Active Releases » de la page COPR par version :
++
++        Fedora 44 | x86_64 (123)* | [Fedora 44] (29 downloads)
++
++    `(N)*` : paquets RPM téléchargés, par architecture ; `(N downloads)` :
++    téléchargements du fichier `.repo`, soit les activations du dépôt.
++    """
++    downloads: dict[str, int] = {}
++    enablements: dict[str, int] = {}
++    for row in re.findall(r"<tr\b.*?</tr>", get(COPR_PAGE), re.S):
++        text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", row))
++        release = re.search(r"Fedora [\w.]+", text)
++        repo = re.search(r"\((\d+) downloads?\)", text)
++        if not (release and repo):
++            continue
++        rpms = re.findall(r"\((\d+)\)\s*\*", text)
++        if not rpms:
++            # Mieux vaut un échec (et le chiffre d'hier, marqué `stale`)
++            # qu'un zéro silencieux si COPR change sa mise en page.
++            raise ValueError(f"compteur de paquets absent pour {release.group()}")
++        downloads[release.group()] = sum(map(int, rpms))
++        enablements[release.group()] = int(repo.group(1))
++    if not downloads:
+         raise ValueError("aucun compteur trouvé (mise en page COPR changée ?)")
+-    return {"total": sum(rows.values()), "by_release": rows}
++    return {
++        "total": sum(downloads.values()),
++        "by_release": downloads,
++        "enablements": sum(enablements.values()),
++        "enablements_by_release": enablements,
++    }
+ 
+ 
+ def aur() -> dict:
+diff --git a/en/index.html b/en/index.html
+index 8971182..3877f84 100644
+--- a/en/index.html
++++ b/en/index.html
+@@ -314,7 +314,7 @@ sudo dnf install pdf-equilibrist</code></pre>
+       <li><strong data-stat="total">&mdash;</strong><span>downloads, all channels combined</span></li>
+       <li><strong data-stat="github">&mdash;</strong><span>from GitHub releases (Windows installer)</span></li>
+       <li><strong data-stat="launchpad">&mdash;</strong><span>from the Ubuntu PPA (Noble and Resolute)</span></li>
+-      <li><strong data-stat="copr">&mdash;</strong><span>Fedora repository enablements (COPR)</span></li>
++      <li><strong data-stat="copr">&mdash;</strong><span>from the Fedora repository (COPR)</span></li>
+     </ul>
+     <p class="stats-note" id="diffusion-arch">Arch Linux (AUR) has no counter: the AUR only distributes a build recipe, and the package is compiled on the user's machine from the GitHub source archive, which GitHub does not count.</p>
+     <p class="stats-note">As of <time data-stat-date></time></p>
+diff --git a/index.html b/index.html
+index 62840a3..af6db20 100644
+--- a/index.html
++++ b/index.html
+@@ -314,7 +314,7 @@ sudo dnf install pdf-equilibrist</code></pre>
+       <li><strong data-stat="total">&mdash;</strong><span>téléchargements, tous canaux confondus</span></li>
+       <li><strong data-stat="github">&mdash;</strong><span>depuis les versions GitHub (installeur Windows)</span></li>
+       <li><strong data-stat="launchpad">&mdash;</strong><span>depuis le PPA Ubuntu (Noble et Resolute)</span></li>
+-      <li><strong data-stat="copr">&mdash;</strong><span>activations du dépôt Fedora (COPR)</span></li>
++      <li><strong data-stat="copr">&mdash;</strong><span>depuis le dépôt Fedora (COPR)</span></li>
+     </ul>
+     <p class="stats-note" id="diffusion-arch">Arch Linux (AUR) n'a pas de compteur : l'AUR ne diffuse qu'une recette de construction, le paquet est compilé sur la machine de l'utilisateur depuis l'archive des sources GitHub, que GitHub ne comptabilise pas.</p>
+     <p class="stats-note">Relevé du <time data-stat-date></time></p>
+diff --git a/l18n/en.json b/l18n/en.json
+index 9dd8031..f3636b1 100644
+--- a/l18n/en.json
++++ b/l18n/en.json
+@@ -152,7 +152,7 @@
+   "stats.total": "downloads, all channels combined",
+   "stats.github": "from GitHub releases (Windows installer)",
+   "stats.launchpad": "from the Ubuntu PPA (Noble and Resolute)",
+-  "stats.copr": "Fedora repository enablements (COPR)",
++  "stats.copr": "from the Fedora repository (COPR)",
+   "stats.arch": "Arch Linux (AUR) has no counter: the AUR only distributes a build recipe, and the package is compiled on the user's machine from the GitHub source archive, which GitHub does not count.",
+   "stats.updated": "As of"
+ }
+diff --git a/l18n/fr.json b/l18n/fr.json
+index 23f9691..72dbd23 100644
+--- a/l18n/fr.json
++++ b/l18n/fr.json
+@@ -152,7 +152,7 @@
+   "stats.total": "téléchargements, tous canaux confondus",
+   "stats.github": "depuis les versions GitHub (installeur Windows)",
+   "stats.launchpad": "depuis le PPA Ubuntu (Noble et Resolute)",
+-  "stats.copr": "activations du dépôt Fedora (COPR)",
++  "stats.copr": "depuis le dépôt Fedora (COPR)",
+   "stats.arch": "Arch Linux (AUR) n'a pas de compteur : l'AUR ne diffuse qu'une recette de construction, le paquet est compilé sur la machine de l'utilisateur depuis l'archive des sources GitHub, que GitHub ne comptabilise pas.",
+   "stats.updated": "Relevé du"
+ }
+-- 
+2.43.0
+
