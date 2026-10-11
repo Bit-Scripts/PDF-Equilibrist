@@ -165,3 +165,44 @@ def test_excel_export_rebuilds_a_scanned_table_from_ocr_positions(tmp_path):
     convert.to_excel(doc, out)
     rows = [[c.value for c in r] for r in openpyxl.load_workbook(out).active.iter_rows()]
     assert rows == words, rows
+
+
+def _two_scanned_pages() -> fitz.Document:
+    doc = _scanned_doc()
+    doc.insert_pdf(_scanned_doc())
+    return doc
+
+
+def test_cancel_leaves_the_document_strictly_untouched():
+    """Annulation coopérative atomique : même si la 1re page est déjà reconnue, rien n'est inséré."""
+    doc = _two_scanned_pages()
+    calls = {"n": 0}
+
+    def cancel_after_first_page():
+        calls["n"] += 1
+        return calls["n"] > 2          # 1er contrôle : page 1 ; 2e : page 2 ; 3e : annule
+
+    with pytest.raises(ocr.OcrCancelled):
+        ocr.apply_ocr_to_pdf(doc, cancel_cb=cancel_after_first_page)
+    assert doc[0].get_text().strip() == "" and doc[1].get_text().strip() == ""
+    assert not doc[0].get_texttrace() and not doc[1].get_texttrace()   # aucune couche OCR insérée
+
+
+def test_cancel_before_start_does_nothing():
+    doc = _scanned_doc()
+    with pytest.raises(ocr.OcrCancelled):
+        ocr.apply_ocr_to_pdf(doc, cancel_cb=lambda: True)
+    assert doc[0].get_text().strip() == ""
+
+
+def test_cancel_markdown_export_writes_no_file(tmp_path):
+    out = tmp_path / "x.md"
+    with pytest.raises(ocr.OcrCancelled):
+        ocr.ocr_to_markdown(_scanned_doc(), out, cancel_cb=lambda: True)
+    assert not out.exists()
+
+
+def test_not_cancelled_ocr_still_processes_every_page():
+    doc = _two_scanned_pages()
+    assert ocr.apply_ocr_to_pdf(doc, cancel_cb=lambda: False) == 2
+    assert "Société" in doc[0].get_text() and "Société" in doc[1].get_text()

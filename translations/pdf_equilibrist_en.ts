@@ -996,6 +996,14 @@ processing</translation>
         <translation>Initializing OCR…</translation>
     </message>
     <message>
+        <source>Annulation en cours…</source>
+        <translation>Cancelling…</translation>
+    </message>
+    <message>
+        <source>Un OCR est déjà en cours (ou en cours d'annulation).</source>
+        <translation>An OCR is already running (or being cancelled).</translation>
+    </message>
+    <message>
         <location filename="..\src\pdf_equilibrist\ui\tabs\tab_convertir.py" line="154" />
         <source>Annuler</source>
         <translation>Cancel</translation>
@@ -1326,6 +1334,14 @@ text</translation>
         <location filename="..\src\pdf_equilibrist\ui\tabs\tab_modifier.py" line="252" />
         <source>Initialisation OCR…</source>
         <translation>Initializing OCR…</translation>
+    </message>
+    <message>
+        <source>Annulation en cours…</source>
+        <translation>Cancelling…</translation>
+    </message>
+    <message>
+        <source>Un OCR est déjà en cours (ou en cours d'annulation).</source>
+        <translation>An OCR is already running (or being cancelled).</translation>
     </message>
     <message>
         <location filename="..\src\pdf_equilibrist\ui\tabs\tab_modifier.py" line="253" />

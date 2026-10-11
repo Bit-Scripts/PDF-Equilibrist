@@ -121,62 +121,35 @@ class TabConvertir(QWidget):
     def _run_ocr_then(self, title: str, on_done_cb):
         """
         Lance l'OCR sur le document courant dans un QThread avec barre de progression,
-        puis appelle ``on_done_cb()`` si l'OCR réussit.
+        puis appelle ``on_done_cb(fitz_doc)`` si l'OCR réussit.
 
         ``on_done_cb`` reçoit le fitz_doc (maintenant enrichi de texte) et peut
         lancer n'importe quelle conversion dessus.
+
+        « Annuler » est coopératif (voir ``ui/ocr_job.py``) : le document reste inchangé et
+        ``on_done_cb`` n'est pas appelé.
         """
         if not self.document.is_open:
             return
+        from pdf_equilibrist.ui.ocr_job import is_running, start_ocr_job
+        if is_running(getattr(self, "_ocr_worker_ref", None)):
+            show_info(self, title, self.tr("Un OCR est déjà en cours (ou en cours d'annulation)."))
+            return
 
-        from PyQt6.QtWidgets import QProgressDialog
-        from PyQt6.QtCore import Qt, QThread
-        from PyQt6.QtCore import pyqtSignal as Signal
+        fitz_doc = self.document.fitz_doc
 
-        class _OcrWorker(QThread):
-            progress = Signal(int, int, str)
-            finished = Signal()
-            error    = Signal(str)
+        def _work(progress_cb, cancel_cb):
+            from pdf_equilibrist.operations.ocr import apply_ocr_to_pdf
+            return apply_ocr_to_pdf(fitz_doc, progress_cb, cancel_cb)
 
-            def __init__(self, fitz_doc):
-                super().__init__()
-                self._doc = fitz_doc
-
-            def run(self):
-                try:
-                    from pdf_equilibrist.operations.ocr import apply_ocr_to_pdf
-                    apply_ocr_to_pdf(self._doc, self.progress.emit)
-                    self.finished.emit()
-                except Exception as e:
-                    self.error.emit(str(e))
-
-        n = len(self.document.fitz_doc)
-        dlg = QProgressDialog(self.tr("Initialisation OCR…"), self.tr("Annuler"), 0, n, self)
-        dlg.setWindowTitle(title)
-        dlg.setWindowModality(Qt.WindowModality.WindowModal)
-        dlg.setMinimumWidth(380)
-        dlg.show()
-
-        worker = _OcrWorker(self.document.fitz_doc)
-        self._ocr_worker_ref = worker   # éviter le GC
-
-        def _on_progress(cur, total, msg):
-            dlg.setLabelText(msg)
-            dlg.setValue(cur)
-
-        def _on_done():
-            dlg.close()
-            on_done_cb(self.document.fitz_doc)
-
-        def _on_error(msg):
-            dlg.close()
-            show_error(self, self.tr("OCR — Erreur"), msg)
-
-        worker.progress.connect(_on_progress)
-        worker.finished.connect(_on_done)
-        worker.error.connect(_on_error)
-        dlg.canceled.connect(worker.terminate)
-        worker.start()
+        self._ocr_worker_ref = start_ocr_job(
+            self, title, len(fitz_doc), _work,
+            lambda _n: on_done_cb(self.document.fitz_doc),
+            lambda msg: show_error(self, self.tr("OCR — Erreur"), msg),
+            init_text=self.tr("Initialisation OCR…"),
+            cancel_text=self.tr("Annuler"),
+            cancelling_text=self.tr("Annulation en cours…"),
+        )
 
     def _ocr_to_pdf(self):
         if not self.document.is_open:

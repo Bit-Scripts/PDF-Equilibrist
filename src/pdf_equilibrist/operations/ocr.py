@@ -62,6 +62,15 @@ class OcrModelsMissingError(RuntimeError):
     """Modèles OCR embarqués introuvables (installation incomplète)."""
 
 
+class OcrCancelled(Exception):
+    """OCR interrompu à la demande de l'utilisateur (annulation coopérative)."""
+
+
+def _check_cancel(cancel_cb: Callable[[], bool] | None) -> None:
+    if cancel_cb is not None and cancel_cb():
+        raise OcrCancelled()
+
+
 # Modèles livrés dans la wheel rapidocr (dossier ``rapidocr/models``)
 _MODEL_FILES = (
     "PP-OCRv6_det_small.onnx",
@@ -136,6 +145,7 @@ def _bbox_to_pdf_rect(bbox_pts: list, zoom: float) -> fitz.Rect:
 def apply_ocr_to_pdf(
     doc: fitz.Document,
     progress_cb: Callable[[int, int, str], None] | None = None,
+    cancel_cb: Callable[[], bool] | None = None,
 ) -> int:
     """
     Rend le PDF « searchable » en réinjectant le texte OCR sur les pages image.
@@ -144,12 +154,19 @@ def apply_ocr_to_pdf(
     rien ne change, mais le texte devient cherchable, copiable, et extractible
     par PyMuPDF pour l'édition ultérieure.
 
+    Annulation coopérative et **atomique** : l'OCR de toutes les pages se fait d'abord, sans
+    toucher au document ; ``cancel_cb`` est interrogée avant chaque page. Si elle renvoie True,
+    ``OcrCancelled`` est levée et le document est resté strictement inchangé. Le texte n'est
+    inséré (étape rapide) qu'une fois toutes les pages reconnues.
+
     Parameters
     ----------
     doc : fitz.Document
-        Document PyMuPDF ouvert, modifié en place.
+        Document PyMuPDF ouvert, modifié en place (seulement en cas de succès).
     progress_cb : callable | None
         Fonction ``(page_actuelle, total_pages, message)`` pour la progression.
+    cancel_cb : callable | None
+        Fonction sans argument, True quand l'utilisateur a demandé l'annulation.
 
     Returns
     -------
@@ -158,9 +175,11 @@ def apply_ocr_to_pdf(
     """
     ocr_engine = None
     n_pages    = len(doc)
-    n_ocr      = 0
+    results: list[tuple[int, list[dict]]] = []
 
+    # ── Phase 1 : reconnaissance (document intact, annulable) ────────────────
     for i, page in enumerate(doc):
+        _check_cancel(cancel_cb)
         if progress_cb:
             progress_cb(i, n_pages, f"Page {i + 1}/{n_pages}…")
 
@@ -172,10 +191,15 @@ def apply_ocr_to_pdf(
             if progress_cb:
                 progress_cb(i, n_pages, "Chargement du moteur OCR…")
             ocr_engine = _get_ocr_engine()
+            _check_cancel(cancel_cb)
 
-        pil_img = _page_to_pil(page)
-        items   = _ocr_image(ocr_engine, pil_img)
+        results.append((i, _ocr_image(ocr_engine, _page_to_pil(page))))
 
+    _check_cancel(cancel_cb)
+
+    # ── Phase 2 : insertion (rapide, non annulable : jamais d'état à moitié appliqué) ──
+    for i, items in results:
+        page = doc[i]
         for item in items:
             rect      = _bbox_to_pdf_rect(item["bbox"], _OCR_ZOOM)
             text      = item["text"]
@@ -193,18 +217,17 @@ def apply_ocr_to_pdf(
             except Exception:  # nosec B110
                 pass   # certains glyphes non supportés → on ignore
 
-        n_ocr += 1
-
     if progress_cb:
-        progress_cb(n_pages, n_pages, f"OCR terminé — {n_ocr} page(s) traitée(s).")
+        progress_cb(n_pages, n_pages, f"OCR terminé — {len(results)} page(s) traitée(s).")
 
-    return n_ocr
+    return len(results)
 
 
 def ocr_to_markdown(
     doc: fitz.Document,
     output_path: Path,
     progress_cb: Callable[[int, int, str], None] | None = None,
+    cancel_cb: Callable[[], bool] | None = None,
 ) -> Path:
     """
     Exporte le contenu texte d'un PDF (y compris pages scannées) en Markdown.
@@ -220,6 +243,9 @@ def ocr_to_markdown(
         Chemin du fichier .md de sortie.
     progress_cb : callable | None
         Fonction ``(page_actuelle, total_pages, message)`` pour la progression.
+    cancel_cb : callable | None
+        True quand l'utilisateur a demandé l'annulation : ``OcrCancelled`` est levée et
+        **aucun fichier n'est écrit** (le .md n'est créé qu'à la toute fin).
 
     Returns
     -------
@@ -231,6 +257,7 @@ def ocr_to_markdown(
     md_lines: list[str] = []
 
     for i, page in enumerate(doc):
+        _check_cancel(cancel_cb)
         if progress_cb:
             progress_cb(i, n_pages, f"Page {i + 1}/{n_pages}…")
 
@@ -269,6 +296,7 @@ def ocr_to_markdown(
             md_lines.append("---")
             md_lines.append("")
 
+    _check_cancel(cancel_cb)
     if progress_cb:
         progress_cb(n_pages, n_pages, "Export Markdown terminé.")
 
