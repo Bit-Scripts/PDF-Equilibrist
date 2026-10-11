@@ -1,2 +1,0 @@
-[console_scripts]
-pdf-equilibrist = pdf_equilibrist.main:main

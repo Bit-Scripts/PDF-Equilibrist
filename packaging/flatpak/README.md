@@ -1,5 +1,12 @@
 # Packaging Flatpak — PDF-Equilibrist
 
+> **⏸ Distribution Flatpak temporairement suspendue** (décision d'octobre 2026) : aucun développement,
+> packaging ni test Flatpak n'est prévu pour l'instant — l'effort porte sur les canaux actifs (Windows,
+> PPA, COPR, AUR). Les fichiers de ce dossier sont **conservés tels quels pour une reprise ultérieure**.
+> **L'OCR n'est pas inclus** dans ce manifeste. Pour le lever plus tard : ajouter `rapidocr` et
+> `onnxruntime` (+ leurs dépendances : voir `packaging/ppa/fetch_wheelhouse.sh`) aux sources générées
+> par `flatpak-pip-generator`, puis valider avec `PDF-Equilibrist --ocr-selftest`.
+
 Ce dossier contient les fichiers nécessaires à la publication de PDF-Equilibrist
 sur Flathub (App ID : `io.github.BitScripts.PDFEquilibrist`).
 
@@ -26,7 +33,7 @@ Ne pas inclure `PyQt6` (flatpak-pip-generator le refuse explicitement — le mes
 `Please use the baseapp https://github.com/flathub/com.riverbankcomputing.PyQt.BaseApp`
 s'affiche et rien n'est généré ; PyQt6 est fourni par le `base:
 com.riverbankcomputing.PyQt.BaseApp` déjà déclaré dans le manifest), ni `bandit`
-(dev/scan uniquement), ni `paddleocr`/`paddlepaddle` (OCR exclu de la v1 — voir la
+(dev/scan uniquement), ni `rapidocr`/`onnxruntime` (OCR exclu tant que le Flatpak est suspendu — voir la
 mémoire projet sur le portage Flathub).
 
 ## Build local de test

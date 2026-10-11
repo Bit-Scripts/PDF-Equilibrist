@@ -12,7 +12,12 @@ on:
         default: '0.1.0'
 
 jobs:
+  checks:
+    name: Contrôles (lint, Bandit, tests)
+    uses: ./.github/workflows/checks.yml
+
   build_and_release:
+    needs: checks
     name: Build installer and create release
     runs-on: windows-latest
     env:
@@ -93,6 +98,15 @@ jobs:
       - name: Build PyInstaller bundle
         run: |
           pyinstaller PDF-Equilibrist.spec
+
+      - name: Vérifier l'OCR de l'exécutable figé (modèles embarqués, réseau interdit)
+        shell: pwsh
+        run: |
+          $report = Join-Path $env:RUNNER_TEMP 'ocr-selftest.txt'
+          $p = Start-Process -FilePath 'dist\PDF-Equilibrist\PDF-Equilibrist.exe' `
+                 -ArgumentList '--ocr-selftest', $report -Wait -PassThru
+          if (Test-Path $report) { Get-Content $report }
+          if ($p.ExitCode -ne 0) { throw "OCR embarqué KO dans l'exécutable (code $($p.ExitCode))" }
 
       - name: Install NSIS (Chocolatey)
         run: |

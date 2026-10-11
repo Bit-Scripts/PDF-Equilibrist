@@ -20,8 +20,11 @@ Like any Internet request, these connections expose your IP address to the
 service contacted. Whenever the application connects, it says so on screen and
 names the service.
 
-On Linux (AUR, PPA, COPR, Flatpak), the startup check is disabled by default:
-updates are handled by your package manager. On Flatpak it is never run.
+**OCR makes no connection.** The text-recognition models (RapidOCR, ONNX format) are shipped inside the application: nothing is downloaded at first use, the feature works offline, and your scanned pages never leave your computer.
+
+On Linux (AUR, PPA, COPR), the startup check is disabled by default:
+updates are handled by your package manager. (A Flatpak package is temporarily
+suspended; where it exists, the check is never run.)
 
 ## Blocking all connections
 
@@ -58,9 +61,12 @@ Comme toute requête Internet, ces connexions exposent votre adresse IP au servi
 contacté. Chaque fois que l'application se connecte, elle l'indique à l'écran en
 nommant le service.
 
-Sous Linux (AUR, PPA, COPR, Flatpak), la vérification au démarrage est désactivée
-par défaut : les mises à jour relèvent du gestionnaire de paquets. Sous Flatpak,
-elle n'est jamais lancée.
+**L'OCR n'établit aucune connexion.** Les modèles de reconnaissance de texte (RapidOCR, format ONNX) sont livrés dans l'application : rien n'est téléchargé au premier usage, la fonction marche hors ligne et vos pages scannées ne quittent jamais votre ordinateur.
+
+Sous Linux (AUR, PPA, COPR), la vérification au démarrage est désactivée
+par défaut : les mises à jour relèvent du gestionnaire de paquets. (Le paquet
+Flatpak est temporairement suspendu ; là où il existe, la vérification n'est
+jamais lancée.)
 
 ### Bloquer toutes les connexions
 

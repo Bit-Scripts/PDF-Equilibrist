@@ -50,7 +50,7 @@ OPERATIONS = [
     ("watermark",    "Ajouter un filigrane"),
     ("to_word",      "Convertir en Word (.docx)"),
     ("to_excel",     "Convertir en Excel (.xlsx)"),
-    ("to_powerpoint","Convertir en PowerPoint (.pptx)"),
+    ("to_powerpoint", "Convertir en PowerPoint (.pptx)"),
     ("to_images",    "Convertir en Images (PNG)"),
     ("merge",        "Fusionner en un seul PDF"),
 ]

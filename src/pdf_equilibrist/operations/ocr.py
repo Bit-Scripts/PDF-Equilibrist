@@ -1,6 +1,6 @@
 """
-operations/ocr.py — OCR via PaddleOCR
-======================================
+operations/ocr.py — OCR local via RapidOCR (ONNX Runtime)
+==========================================================
 Reconnaissance de texte sur les pages scannées (images) d'un PDF.
 
 Deux usages
@@ -13,7 +13,7 @@ Deux usages
 2. **Export Markdown** (``ocr_to_markdown``) :
    Extrait le texte de toutes les pages (scannées ou non) et génère un .md.
    Les pages avec une couche texte existante utilisent PyMuPDF directement ;
-   les pages image passent par PaddleOCR.
+   les pages image passent par RapidOCR.
 
 Détection page scannée
 -----------------------
@@ -22,10 +22,19 @@ et qu'elle contient au moins une image (``page.get_images()``).
 
 Dépendances
 -----------
-- ``paddlepaddle``  : moteur d'inférence Paddle (CPU)
-- ``paddleocr``     : modèles PP-OCRv6 + orientation
+- ``rapidocr``      : modèles PP-OCRv6 (détection + reconnaissance) et classifieur
+                      d'orientation, au format ONNX, **livrés dans la wheel**
+- ``onnxruntime``   : moteur d'inférence CPU
 - ``PyMuPDF``       : rastérisation + réinsertion couche texte
-- ``Pillow``        : conversion pixmap → format PaddleOCR
+- ``Pillow``        : conversion pixmap → tableau numpy
+
+Hors-ligne par construction
+---------------------------
+Les trois fichiers ``.onnx`` sont embarqués avec le paquet ``rapidocr``
+(donc dans l'installeur Windows et les paquets Linux). RapidOCR saurait les
+télécharger s'ils manquaient ; ``_get_ocr_engine()`` vérifie leur présence
+avant tout et lève ``OcrModelsMissingError`` au lieu de laisser une requête
+réseau partir : aucune connexion n'est jamais émise par l'OCR.
 """
 from __future__ import annotations
 from pathlib import Path
@@ -49,16 +58,41 @@ def _is_scanned_page(page: fitz.Page) -> bool:
     return (not has_text) and has_image
 
 
+class OcrModelsMissingError(RuntimeError):
+    """Modèles OCR embarqués introuvables (installation incomplète)."""
+
+
+# Modèles livrés dans la wheel rapidocr (dossier ``rapidocr/models``)
+_MODEL_FILES = (
+    "PP-OCRv6_det_small.onnx",
+    "PP-OCRv6_rec_small.onnx",
+    "ch_ppocr_mobile_v2.0_cls_mobile.onnx",
+)
+
+
+def _models_dir() -> Path:
+    import importlib.util
+    spec = importlib.util.find_spec("rapidocr")
+    if spec is None or not spec.submodule_search_locations:
+        raise OcrModelsMissingError("Le paquet rapidocr n'est pas installé.")
+    return Path(next(iter(spec.submodule_search_locations))) / "models"
+
+
+def _check_models() -> None:
+    """Refuse de continuer si un modèle manque : RapidOCR le téléchargerait."""
+    d = _models_dir()
+    missing = [m for m in _MODEL_FILES if not (d / m).is_file()]
+    if missing:
+        raise OcrModelsMissingError(
+            "Modèles OCR embarqués introuvables : " + ", ".join(missing)
+            + f" (dossier {d}). Réinstallez PDF-Equilibrist.")
+
+
 def _get_ocr_engine():
-    """
-    Instancie PaddleOCR (chargement des modèles au premier appel).
-    Utilise le français comme langue principale avec détection d'orientation.
-    """
-    from paddleocr import PaddleOCR
-    return PaddleOCR(
-        use_textline_orientation=True,
-        lang="fr",
-    )
+    """Instancie RapidOCR sur les modèles embarqués (aucun téléchargement)."""
+    _check_models()
+    from rapidocr import RapidOCR
+    return RapidOCR(params={"Global.log_level": "error"})
 
 
 def _page_to_pil(page: fitz.Page):
@@ -71,26 +105,24 @@ def _page_to_pil(page: fitz.Page):
 
 def _ocr_image(ocr_engine, pil_image) -> list[dict]:
     """
-    Lance PaddleOCR sur une image PIL.
+    Lance RapidOCR sur une image PIL.
 
     Retourne une liste de dicts :
     ``{"text": str, "bbox": [[x0,y0],[x1,y1],[x2,y2],[x3,y3]], "score": float}``
     """
     import numpy as np
-    img_array = np.array(pil_image)
-    result = ocr_engine.ocr(img_array)
-    items = []
-    if not result or not result[0]:
-        return items
-    for line in result[0]:
-        bbox_pts, (text, score) = line
-        items.append({"text": text, "score": score, "bbox": bbox_pts})
-    return items
+    out = ocr_engine(np.array(pil_image))
+    if out is None or out.boxes is None or out.txts is None:
+        return []
+    return [
+        {"text": text, "score": float(score), "bbox": [[float(x), float(y)] for x, y in box]}
+        for box, text, score in zip(out.boxes, out.txts, out.scores)
+    ]
 
 
 def _bbox_to_pdf_rect(bbox_pts: list, zoom: float) -> fitz.Rect:
     """
-    Convertit les 4 points du bbox PaddleOCR (coordonnées image @zoom)
+    Convertit les 4 points du bbox OCR (coordonnées image @zoom)
     en fitz.Rect dans le repère PDF (points).
     """
     xs = [p[0] for p in bbox_pts]
@@ -152,7 +184,7 @@ def apply_ocr_to_pdf(
             # Insertion en mode invisible (render_mode=3) : texte cherchable mais non visible
             try:
                 page.insert_text(
-                    rect.tl,
+                    fitz.Point(rect.x0, rect.y1 - rect.height * 0.2),   # ligne de base
                     text,
                     fontsize=fontsize,
                     render_mode=3,
@@ -178,7 +210,7 @@ def ocr_to_markdown(
     Exporte le contenu texte d'un PDF (y compris pages scannées) en Markdown.
 
     - Pages avec couche texte : extraction PyMuPDF directe (rapide, fidèle).
-    - Pages image (scannées)  : OCR PaddleOCR puis mise en forme Markdown.
+    - Pages image (scannées)  : OCR RapidOCR puis mise en forme Markdown.
 
     Parameters
     ----------
@@ -242,3 +274,46 @@ def ocr_to_markdown(
 
     output_path.write_text("\n".join(md_lines), encoding="utf-8")
     return output_path
+
+
+def selftest(report_path: str | None = None) -> int:
+    """
+    Auto-test de l'OCR embarqué : ``PDF-Equilibrist.exe --ocr-selftest [fichier]``.
+
+    Génère une page « scannée », lance l'OCR avec toute connexion réseau interdite
+    et vérifie que le texte (accents compris) est reconnu. Sert à valider un
+    exécutable figé (PyInstaller) ou un paquet Linux sur une machine vierge.
+    Retourne 0 si tout va bien, 1 sinon ; le détail est écrit dans ``report_path``.
+    """
+    import socket
+
+    def _refuse(*_a, **_k):
+        raise RuntimeError("connexion réseau tentée pendant l'OCR")
+    socket.socket.connect = _refuse
+    socket.socket.connect_ex = _refuse
+    socket.getaddrinfo = _refuse
+
+    lines: list[str] = []
+    code = 1
+    try:
+        src = fitz.open()
+        sp = src.new_page()
+        sp.insert_text((50, 100), "Société Équilibre : réglement déjà versé", fontsize=18)
+        pix = sp.get_pixmap(matrix=fitz.Matrix(_OCR_ZOOM, _OCR_ZOOM), alpha=False)
+        doc = fitz.open()
+        page = doc.new_page(width=sp.rect.width, height=sp.rect.height)
+        page.insert_image(page.rect, pixmap=pix)
+        n = apply_ocr_to_pdf(doc)
+        text = doc[0].get_text().strip()
+        lines += [f"models_dir={_models_dir()}", f"pages={n}", f"text={text!r}"]
+        code = 0 if (n == 1 and "Société" in text and "Équilibre" in text and "déjà" in text) else 1
+    except Exception as exc:  # noqa: BLE001 — le rapport doit toujours être écrit
+        lines.append(f"ERREUR: {type(exc).__name__}: {exc}")
+    lines.append("OK" if code == 0 else "ECHEC")
+    out = "\n".join(lines)
+    if report_path:
+        with open(report_path, "w", encoding="utf-8") as fh:
+            fh.write(out + "\n")
+    else:
+        print(out)
+    return code

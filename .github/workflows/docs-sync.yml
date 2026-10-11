@@ -1,0 +1,55 @@
+name: Sync docs to gh-pages
+
+# `main` est la source unique de la documentation (docs/*.md FR, docs/en/*.md EN).
+# Ce workflow la publie sur gh-pages, où le site la lit. Il ne touche qu'aux
+# fichiers .md de docs/ et docs/en/ (voir tools/sync_docs_to_pages.py) : le reste
+# du site (pages HTML, style, stats.json…) n'est jamais écrasé.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**/*.md'
+      - 'tools/sync_docs_to_pages.py'
+      - '.github/workflows/docs-sync.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs-sync
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    name: Contrôles (lint, Bandit, tests)
+    uses: ./.github/workflows/checks.yml
+
+  sync:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main (source)
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: Checkout gh-pages (cible)
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: pages
+
+      - name: Synchroniser docs/ → gh-pages
+        run: python3 main/tools/sync_docs_to_pages.py pages
+
+      - name: Commit et push
+        working-directory: pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet && { echo "Rien à publier."; exit 0; }
+          git commit -m "docs: synchronisation depuis main@${GITHUB_SHA::7}"
+          git push origin gh-pages

@@ -294,6 +294,7 @@ class _PageLabel(QLabel):
         except Exception:  # nosec B110
             pass
 
+
 ACCENT       = "#6BBF4E"
 PAGE_MARGIN  = 24    # marge extérieure autour des pages (px)
 PAGE_SPACING = 12    # espacement entre les pages (px)
@@ -380,7 +381,6 @@ class PdfViewer(QScrollArea):
     zoom_changed       = pyqtSignal(float)       # Ctrl+molette → sync combo zoom
     open_pdf_requested = pyqtSignal(str)         # lien GOTOR → ouvrir PDF dans nouvel onglet
     text_selected      = pyqtSignal(int, list)   # (page_index, [fitz.Quad]) sélection texte
-
 
     def __init__(self, document: Document):
         super().__init__()

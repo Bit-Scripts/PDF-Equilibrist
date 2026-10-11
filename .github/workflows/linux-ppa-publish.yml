@@ -31,7 +31,18 @@ on:
         required: false
 
 jobs:
+  checks:
+    name: Contrôles (lint, Bandit, tests)
+    uses: ./.github/workflows/checks.yml
+
+  # Construit et teste les paquets .deb (noble + resolute) et .rpm AVANT toute publication,
+  # OCR compris : jamais de release Linux dont l'OCR annoncé ne fonctionne pas.
+  packages:
+    name: Paquets Linux (build + OCR)
+    uses: ./.github/workflows/linux-packages-check.yml
+
   publish:
+    needs: [checks, packages]
     name: Build and upload PPA source packages (noble + resolute)
     runs-on: ubuntu-latest
     steps:
@@ -55,40 +66,13 @@ jobs:
           # des Build-Depends, pas de la présence réelle des outils appelés.
           sudo apt-get install -y devscripts dpkg-dev gnupg dput lintian debhelper
 
-      # Python 3.12 réel pour le wheelhouse noble (pas de cross-download
-      # nécessaire, contrairement à resolute où aucun interpréteur 3.14 réel
-      # n'est disponible sur ce runner).
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Download noble wheelhouse (cp312, real interpreter)
-        run: |
-          mkdir -p packaging/ppa/vendor/wheelhouse
-          # cryptography est épinglée à >=50.0.0 (contrairement aux autres
-          # paquets ci-dessous, laissés en "dernière version") : la 49.0.0
-          # est vulnérable à CVE-2026-69247 (GHSA-g6cj-pr64-35w5, oracle
-          # Bleichenbacher sur le déchiffrement PKCS#7 EnvelopedData, corrigé
-          # en 50.0.0) — trouvée par le vérificateur de CVE intégré à l'app
-          # sur un paquet Ubuntu déjà publié, faute de version plancher ici.
-          pip download --no-deps --dest packaging/ppa/vendor/wheelhouse \
-            cffi charset-normalizer "cryptography>=50.0.0" et-xmlfile fire fonttools lxml \
-            numpy opencv-python-headless openpyxl pdf2docx pdfminer.six \
-            pdfplumber Pillow pycparser PyMuPDF pyparsing pypdfium2 \
-            python-docx python-pptx termcolor typing-extensions XlsxWriter
-
-      # Seuls les paquets réellement liés à l'ABI CPython (extensions
-      # compilées, pas de wheel abi3/py3-none-any) ont besoin d'une variante
-      # cp314 séparée — les 17 autres seront retrouvés dans le wheelhouse
-      # noble ci-dessus grâce au double --find-links de debian/rules.
-      - name: Download resolute-specific wheels (cp314, cross-download)
-        run: |
-          mkdir -p packaging/ppa/vendor/wheelhouse-resolute
-          pip download --no-deps --dest packaging/ppa/vendor/wheelhouse-resolute \
-            --python-version 3.14 --implementation cp --abi cp314 \
-            --platform manylinux_2_28_x86_64 --only-binary=:all: \
-            cffi charset-normalizer fonttools lxml numpy pillow
+      # Les wheels vendorisées (builders Launchpad sans réseau) sont téléchargées par
+      # un script unique, partagé avec linux-packages-check.yml : une dépendance
+      # ajoutée (ex. l'OCR RapidOCR/ONNX Runtime) ne peut plus être oubliée d'un côté.
+      # Téléchargement croisé pour noble (cp312) et resolute (cp314) : indépendant du
+      # Python du runner. Voir packaging/ppa/fetch_wheelhouse.sh.
+      - name: Download vendored wheelhouses (noble cp312 + resolute cp314)
+        run: bash packaging/ppa/fetch_wheelhouse.sh
 
       - name: Import CI signing key
         env:

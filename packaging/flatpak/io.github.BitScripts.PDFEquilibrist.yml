@@ -24,7 +24,7 @@ modules:
   # ── Dépendances Python pip-installables (PyMuPDF, pdf2docx, pdfplumber,
   #    openpyxl, python-pptx, Pillow, pyparsing) — PAS bandit (dev-only), PAS
   #    PyQt6 (fourni par le BaseApp ci-dessus, jamais par flatpak-pip-generator),
-  #    et PAS paddleocr/paddlepaddle (OCR exclu de la v1, cf. mémoire projet).
+  #    et PAS rapidocr/onnxruntime (OCR exclu tant que le Flatpak est suspendu — voir README.md).
   #
   #    Le fichier generated-sources.json ci-dessous doit être produit avec
   #    flatpak-pip-generator (nécessite un accès réseau pour résoudre les

@@ -23,7 +23,18 @@ on:
         required: false
 
 jobs:
+  checks:
+    name: Contrôles (lint, Bandit, tests)
+    uses: ./.github/workflows/checks.yml
+
+  # Construit et teste les paquets .deb (noble + resolute) et .rpm AVANT toute publication,
+  # OCR compris : jamais de release Linux dont l'OCR annoncé ne fonctionne pas.
+  packages:
+    name: Paquets Linux (build + OCR)
+    uses: ./.github/workflows/linux-packages-check.yml
+
   publish:
+    needs: [checks, packages]
     name: Build SRPM and submit to COPR
     runs-on: ubuntu-latest
     container:
@@ -68,7 +79,7 @@ jobs:
       - name: Set up rpmbuild tree
         run: rpmdev-setuptree
 
-      # Mêmes 5 wheels vendorisées et mêmes versions figées que celles listées
+      # Mêmes 7 wheels vendorisées (5 historiques + rapidocr/omegaconf pour l'OCR) et mêmes versions figées que celles listées
       # en Source10-14 du .spec (packaging/copr/README.md) — pip download hors
       # réseau côté COPR n'est pas requis ici puisque cette étape tourne en CI,
       # contrairement à la contrainte "aucun accès réseau" du build COPR lui-même.
@@ -79,7 +90,9 @@ jobs:
             pdfplumber==0.11.10 \
             python-pptx==1.0.2 \
             python-docx==1.2.0 \
-            pypdfium2==5.12.1
+            pypdfium2==5.12.1 \
+            rapidocr==3.10.0 \
+            omegaconf==2.4.0
 
       - name: Copy packaging assets and spec
         run: |

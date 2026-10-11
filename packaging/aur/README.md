@@ -43,6 +43,18 @@ sont maintenus par des tiers — vérifier qu'ils sont toujours actifs/à jour a
 publication, sinon les vendoriser directement dans `depends` via leurs propres
 sources ou les prendre en charge soi-même.
 
+### OCR (RapidOCR + ONNX Runtime)
+
+| Dépendance | Source |
+|---|---|
+| `rapidocr` (modèles PP-OCRv6 `.onnx` **inclus dans la wheel**, Apache-2.0) | wheel PyPI épinglée + somme de contrôle dans `source=()` du `PKGBUILD`, installée par `package()` — **toujours en dernière position** de `source=`/`sha256sums=` (le workflow de publication ne réécrit que la 1ʳᵉ somme, celle du tarball) |
+| `onnxruntime` | `python-onnxruntime` (fourni par `python-onnxruntime-cpu`/`-cuda`/`-rocm`, extra) |
+| `shapely`, `pyclipper`, `omegaconf`, `colorlog`, `PyYAML`, `requests`, `tqdm`, `six`, `opencv`, `numpy` | `python-*` officiels (extra) |
+
+Mettre à jour la wheel : nouvelle version + URL + sha256 depuis `https://pypi.org/pypi/rapidocr/<v>/json`.
+`linux-aur.yml` construit le paquet puis lance `python -m pdf_equilibrist.main --ocr-selftest` dessus
+(modèles livrés, réseau interdit) : un OCR cassé fait échouer le workflow.
+
 ## Build local de test (nécessite un environnement Arch)
 
 ```bash

@@ -35,6 +35,13 @@ Source11:       pdfplumber-0.11.10-py3-none-any.whl
 Source12:       python_pptx-1.0.2-py3-none-any.whl
 Source13:       python_docx-1.2.0-py3-none-any.whl
 Source14:       pypdfium2-5.12.1-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+# OCR : rapidocr (non empaqueté pour Fedora) livre ses modèles PP-OCRv6 .onnx
+# DANS la wheel (py3-none-any, ~27 Mo) — rien n'est téléchargé à l'exécution.
+# omegaconf (sa dépendance) n'est pas empaqueté non plus. Leurs autres
+# dépendances (onnxruntime, shapely, pyclipper, PyYAML, colorlog, requests,
+# six, tqdm) viennent des paquets Fedora, voir Requires ci-dessous.
+Source15:       rapidocr-3.10.0-py3-none-any.whl
+Source16:       omegaconf-2.4.0-py3-none-any.whl
 
 BuildArch:      x86_64
 # x86_64 et non noarch : le wheel pypdfium2 vendorisé embarque une
@@ -47,6 +54,20 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
 BuildRequires:  python3-pyqt6
 BuildRequires:  desktop-file-utils
+# Pour %check (auto-test de l'OCR) : mêmes paquets que les Requires d'exécution
+# utilisés par la chaîne OCR.
+BuildRequires:  python3-PyMuPDF
+BuildRequires:  python3-pillow
+BuildRequires:  python3-numpy
+BuildRequires:  python3-opencv
+BuildRequires:  python3-onnxruntime
+BuildRequires:  python3-shapely
+BuildRequires:  python3-pyclipper
+BuildRequires:  python3-pyyaml
+BuildRequires:  python3-colorlog
+BuildRequires:  python3-requests
+BuildRequires:  python3-six
+BuildRequires:  python3-tqdm
 
 Requires:       python3
 Requires:       python3-pyqt6
@@ -62,6 +83,14 @@ Requires:       python3-typing-extensions
 Requires:       python3-fire
 Requires:       python3-fonttools
 Requires:       python3-pdfminer
+Requires:       python3-onnxruntime
+Requires:       python3-shapely
+Requires:       python3-pyclipper
+Requires:       python3-pyyaml
+Requires:       python3-colorlog
+Requires:       python3-requests
+Requires:       python3-six
+Requires:       python3-tqdm
 Requires:       hicolor-icon-theme
 Requires:       desktop-file-utils
 # Le ribbon utilise des emojis couleur comme icônes (🖨, 🖼, 🔒, 🌐…) — sans
@@ -108,7 +137,8 @@ python3 -m venv --system-site-packages venv-build
 # propre en dehors des paquets système, mais on garde le même réflexe
 # défensif.
 venv-build/bin/pip install --no-index --no-deps \
-    %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} %{SOURCE14}
+    %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} %{SOURCE14} \
+    %{SOURCE15} %{SOURCE16}
 venv-build/bin/pip install --no-index --no-build-isolation --no-deps .
 
 # pip n'est jamais invoqué au runtime (l'app n'installe rien elle-même) —
@@ -120,6 +150,12 @@ venv-build/bin/pip install --no-index --no-build-isolation --no-deps .
 rm -rf venv-build/bin/pip venv-build/bin/pip3 venv-build/bin/pip3.* \
     venv-build/lib/python3.*/site-packages/pip \
     venv-build/lib/python3.*/site-packages/pip-*.dist-info
+
+%check
+# Un paquet dont l'OCR annoncé ne fonctionne pas ne doit pas être publié : le
+# build échoue ici si l'auto-test (modèles livrés, aucun réseau permis) échoue.
+venv-build/bin/python -m pdf_equilibrist.main --ocr-selftest ocr-selftest.txt || { cat ocr-selftest.txt; exit 1; }
+cat ocr-selftest.txt
 
 %install
 rm -rf %{buildroot}
