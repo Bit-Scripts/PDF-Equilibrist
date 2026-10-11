@@ -40,7 +40,7 @@ PACKAGES=(
   numpy opencv-python-headless openpyxl pdf2docx pdfminer.six
   pdfplumber Pillow pycparser PyMuPDF pyparsing pypdfium2
   python-docx python-pptx termcolor typing-extensions XlsxWriter
-  rapidocr onnxruntime omegaconf protobuf pyclipper PyYAML shapely six colorlog
+  rapidocr==3.10.0 onnxruntime omegaconf protobuf pyclipper PyYAML shapely six colorlog
   colorama flatbuffers packaging requests idna urllib3 certifi tqdm
 )
 

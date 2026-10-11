@@ -219,6 +219,35 @@ def to_images(
     return paths
 
 
+def _reveal_ocr_text(doc: fitz.Document) -> int:
+    """
+    Rend VISIBLE le texte OCR d'une copie de travail (et retire l'image du scan).
+
+    L'OCR (``ocr.apply_ocr_to_pdf``) ajoute le texte en mode invisible (``render_mode=3``)
+    par-dessus l'image scannée. ``pdf2docx`` ignore ce texte invisible : un scan donnerait
+    un Word contenant seulement l'image, sans texte éditable. Sur une COPIE jetable, on
+    remplace donc, page par page, le calque invisible par le même texte visible (même
+    position, même taille) et on retire l'image du scan qu'il recouvrait.
+
+    Les pages sans texte invisible ne sont pas touchées. Retourne le nombre de pages modifiées.
+    """
+    changed = 0
+    for page in doc:
+        spans = [t for t in page.get_texttrace() if t.get("type") == 3 and t.get("chars")]
+        if not spans:
+            continue
+        runs = [(fitz.Point(t["chars"][0][2]), "".join(chr(c[0]) for c in t["chars"]), t["size"])
+                for t in spans]
+        for t in spans:
+            page.add_redact_annot(fitz.Rect(t["bbox"]))
+        # PDF_REDACT_IMAGE_REMOVE : retire l'image du scan que ces zones recouvrent
+        page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_REMOVE)
+        for origin, text, size in runs:
+            page.insert_text(origin, text, fontsize=size, fontname="helv")
+        changed += 1
+    return changed
+
+
 def to_word(doc: fitz.Document, src_path: Path, output_path: Path) -> Path:
     """
     Convertit un PDF en document Word (.docx) via pdf2docx.
@@ -227,15 +256,17 @@ def to_word(doc: fitz.Document, src_path: Path, output_path: Path) -> Path:
     et tente de reproduire la structure dans un document Word éditable.
     La fidélité dépend de la complexité du PDF original.
 
-    Note : ``pdf2docx`` a besoin du **chemin fichier** (pas du ``fitz.Document``
-    en mémoire) car il ouvre le PDF lui-même en interne.
+    Note : ``pdf2docx`` a besoin d'un **chemin fichier** (il ouvre le PDF lui-même).
+    On lui donne une copie temporaire du document **en mémoire**, et non le fichier
+    d'origine : ainsi la couche OCR tout juste ajoutée (« OCR → Word ») et les
+    modifications non enregistrées sont bien reprises. La copie est supprimée ensuite.
 
     Parameters
     ----------
     doc : fitz.Document
-        Document PyMuPDF (non utilisé directement, présent pour cohérence API).
+        Document PyMuPDF à convertir (état courant, modifications comprises).
     src_path : Path
-        Chemin du fichier PDF source sur le disque.
+        Chemin du PDF d'origine — conservé pour compatibilité d'API, non lu.
     output_path : Path
         Chemin du fichier .docx de sortie.
 
@@ -244,11 +275,29 @@ def to_word(doc: fitz.Document, src_path: Path, output_path: Path) -> Path:
     Path
         Chemin du fichier .docx généré.
     """
+    import tempfile
     from pdf2docx import Converter
-    cv = Converter(str(src_path))
-    cv.convert(str(output_path))
-    cv.close()
+    with tempfile.TemporaryDirectory(prefix="pdfeq_word_") as tmp_dir:
+        tmp_pdf = Path(tmp_dir) / "source.pdf"
+        doc.save(str(tmp_pdf))
+        work = fitz.open(str(tmp_pdf))
+        try:
+            if _reveal_ocr_text(work):
+                tmp_pdf = Path(tmp_dir) / "source_ocr.pdf"
+                work.save(str(tmp_pdf))
+        finally:
+            work.close()
+        cv = Converter(str(tmp_pdf))
+        try:
+            cv.convert(str(output_path))
+        finally:
+            cv.close()
     return output_path
+
+
+def _has_ocr_text(page: fitz.Page) -> bool:
+    """True si la page porte du texte invisible (calque OCR, ``render_mode=3``)."""
+    return any(t.get("type") == 3 for t in page.get_texttrace())
 
 
 def to_excel(doc: fitz.Document, output_path: Path) -> Path:
@@ -294,6 +343,15 @@ def to_excel(doc: fitz.Document, output_path: Path) -> Path:
             # extract_tables() retourne une liste de tableaux,
             # chaque tableau est une liste de lignes (list of list of str)
             tables = page.extract_tables()
+            if not tables and _has_ocr_text(doc[i]):
+                # Page scannée (texte OCR invisible) : les traits du tableau sont dans l'image,
+                # pdfplumber n'en voit aucun. Repli : reconstituer lignes/colonnes d'après la
+                # POSITION du texte OCR (alignements). Réservé aux pages OCR — appliqué à du
+                # texte courant, cette stratégie fabriquerait de faux tableaux.
+                tables = page.extract_tables({"vertical_strategy": "text",
+                                              "horizontal_strategy": "text"})
+                # cette stratégie intercale des lignes vides entre les lignes de texte
+                tables = [[row for row in table if any(row)] for table in tables]
             for table in tables:
                 for row in table:
                     # Remplacer None (cellule vide détectée) par chaîne vide

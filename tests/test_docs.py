@@ -161,3 +161,43 @@ def test_no_windows_only_claim():
     for doc in FR_FILES + EN_FILES:
         text = _read(doc).lower()
         assert "windows-only" not in text and "windows only" not in text, doc.name
+
+
+# ── 6. Affirmations périmées (leçon de l'audit du 2026-10-11) ────────────────
+# Formulations qui ont déjà dérivé de la réalité du code. Chaque entrée dit POURQUOI elle est interdite.
+_STALE_PHRASES = {
+    "desktop windows": "l'application est aussi distribuée sur Linux (PPA, COPR, AUR)",
+    "windows desktop": "l'application est aussi distribuée sur Linux (PPA, COPR, AUR)",
+    "exe onefile": "le .spec construit un dossier onedir",
+    "windows onefile": "le .spec construit un dossier onedir",
+    "téléchargement initial": "l'OCR est embarqué : aucun téléchargement",
+    "initial download": "l'OCR est embarqué : aucun téléchargement",
+    "aucune connexion réseau en fonctionnement normal": "deux connexions optionnelles existent (network.py)",
+    "no network connection during normal operation": "deux connexions optionnelles existent (network.py)",
+}
+
+
+@pytest.mark.parametrize("doc", FR_FILES + EN_FILES, ids=lambda p: f"{p.parent.name}/{p.name}")
+def test_no_known_stale_claims(doc):
+    text = _read(doc).lower()
+    found = {p: why for p, why in _STALE_PHRASES.items() if p in text}
+    assert not found, f"{doc.name} contient des affirmations périmées : {found}"
+
+
+def test_spec_is_onedir_as_documented():
+    spec = _read(ROOT / "PDF-Equilibrist.spec")
+    assert "exclude_binaries=True" in spec, "le .spec n'est plus onedir : mettre à jour la doc d'architecture"
+
+
+def test_security_doc_versions_match_between_languages():
+    def version(p):
+        m = re.search(r"Version\s*:\s*([\d.]+)\s*—\s*(.+)", _read(p))
+        assert m, p
+        return m.group(1)
+    assert version(DOCS / "6.SECURITE.md") == version(DOCS / "en" / "6.SECURITE.md")
+
+
+def test_security_doc_is_not_older_than_the_ocr_and_linux_changes():
+    """La date du document de sécurité ne doit pas rester à « Juin 2026 » : il décrit un état antérieur."""
+    for p in (DOCS / "6.SECURITE.md", DOCS / "en" / "6.SECURITE.md"):
+        assert not re.search(r"(Juin|June) 2026", _read(p)), p.name

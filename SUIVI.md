@@ -105,3 +105,26 @@ nettoyage `.pyc`/`egg-info` dans un commit séparé ; pas de release de producti
 - [ ] Push branche `chore/docs-ci-ocr` + PR → surveiller CI, corriger, merger
 - [ ] Vérifier le site public FR/EN + liens internes
 - [ ] Surveiller `docs-sync.yml`, `linux-packages-check.yml` (Fedora 44, Ubuntu 26.04 en conteneur : tags d'images à confirmer)
+
+---
+
+# Phase 3 — corrections après relecture externe (2026-10-11), branche `fix/ocr-word-cancel-docs`
+
+Constats vérifiés dans le code puis corrigés, dans l'ordre demandé :
+- [x] **OCR → Word** (vrai bug) : `to_word()` rouvrait le PDF d'origine → couche OCR perdue ; de plus pdf2docx ignore le
+      texte invisible. Corrigé : copie temporaire du doc EN MÉMOIRE + texte OCR rendu visible / image du scan retirée sur la
+      copie jetable. Tests : scan→docx, ajout non enregistré, PDF mixte. Au passage `to_excel` : repli par position du texte
+      OCR pour un tableau scanné (avant : classeur vide) — testé.
+- [x] **Annulation** (vrai) : 2 × `QThread.terminate()` (tab_modifier, tab_convertir) remplacés par une annulation
+      coopérative et ATOMIQUE (`cancel_cb`, `OcrCancelled`, `ui/ocr_job.py`) : le texte n'est inséré qu'après l'OCR de toutes
+      les pages → document intact si annulé. Dialogue maintenu jusqu'à l'arrêt réel du thread. Tests unitaires + Qt.
+      Piège évité : `tools/compile_translations.py` (générateur Python de secours) produit un .qm à 47/368 messages valides
+      → .qm régénéré avec pyside6-lrelease (368/368).
+- [x] **Docs** : 6.SECURITE FR/EN (« desktop Windows », « téléchargement initial », tableau Réseau, version/date),
+      2.ARCHITECTURE FR/EN (onefile→onedir), PDF de doc régénérés ; `test_docs.py` : phrases périmées interdites, .spec onedir,
+      version FR=EN, date. Vérifié : ces tests échouent sur les anciennes docs.
+- [x] **Version RapidOCR** : `==3.10.0` partout (requirements, environment, PPA, COPR, AUR, workflows), `>=3.10,<3.11` dans
+      pyproject ; `tests/test_packaging_consistency.py` garde l'alignement.
+- [ ] Reste (checklist de RELEASE, pas des bugs) : entrées `debian/changelog` noble + resolute de la nouvelle version AVANT le tag ;
+      `copr/*.spec` Version + `%changelog` ; vérifier AUR complet (dépendances AUR) ; essais sur vrais documents scannés ;
+      test manuel de l'installeur Windows et d'un paquet Linux. Le tag `v*` déclenche release Windows PUBLIQUE + AUR/PPA/COPR.

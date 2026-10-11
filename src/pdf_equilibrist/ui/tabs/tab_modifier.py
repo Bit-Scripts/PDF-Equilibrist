@@ -229,40 +229,18 @@ class TabModifier(QWidget):
     def _run_ocr(self):
         if not self.document.is_open:
             return
-        from PyQt6.QtWidgets import QProgressDialog
-        from PyQt6.QtCore import Qt, QThread, pyqtSignal as Signal
+        from pdf_equilibrist.ui.ocr_job import is_running, start_ocr_job
+        if is_running(getattr(self, "_ocr_worker", None)):
+            show_info(self, "OCR", self.tr("Un OCR est déjà en cours (ou en cours d'annulation)."))
+            return
 
-        class _OcrWorker(QThread):
-            progress = Signal(int, int, str)
-            finished = Signal(int)
-            error    = Signal(str)
+        fitz_doc = self.document.fitz_doc
 
-            def __init__(self, fitz_doc):
-                super().__init__()
-                self._doc = fitz_doc
-
-            def run(self):
-                try:
-                    from pdf_equilibrist.operations.ocr import apply_ocr_to_pdf
-                    n = apply_ocr_to_pdf(self._doc, self.progress.emit)
-                    self.finished.emit(n)
-                except Exception as e:
-                    self.error.emit(str(e))
-
-        dlg = QProgressDialog(self.tr("Initialisation OCR…"), self.tr("Annuler"), 0, len(self.document.fitz_doc), self)
-        dlg.setWindowTitle(self.tr("OCR — Rendre cherchable"))
-        dlg.setWindowModality(Qt.WindowModality.WindowModal)
-        dlg.setMinimumWidth(380)
-        dlg.show()
-
-        self._ocr_worker = _OcrWorker(self.document.fitz_doc)
-
-        def _on_progress(cur, total, msg):
-            dlg.setLabelText(msg)
-            dlg.setValue(cur)
+        def _work(progress_cb, cancel_cb):
+            from pdf_equilibrist.operations.ocr import apply_ocr_to_pdf
+            return apply_ocr_to_pdf(fitz_doc, progress_cb, cancel_cb)
 
         def _on_done(n):
-            dlg.close()
             self.document.changed.emit()
             if n == 0:
                 show_info(self, "OCR", self.tr(
@@ -271,15 +249,14 @@ class TabModifier(QWidget):
                 show_info(self, "OCR", self.tr(
                     "{0} page(s) rendue(s) cherchables.\nPensez à enregistrer le document.").format(n))
 
-        def _on_error(msg):
-            dlg.close()
-            show_error(self, self.tr("OCR — Erreur"), msg)
-
-        self._ocr_worker.progress.connect(_on_progress)
-        self._ocr_worker.finished.connect(_on_done)
-        self._ocr_worker.error.connect(_on_error)
-        dlg.canceled.connect(self._ocr_worker.terminate)
-        self._ocr_worker.start()
+        # « Annuler » est coopératif (ui/ocr_job.py) : document laissé strictement intact.
+        self._ocr_worker = start_ocr_job(
+            self, self.tr("OCR — Rendre cherchable"), len(fitz_doc), _work, _on_done,
+            lambda msg: show_error(self, self.tr("OCR — Erreur"), msg),
+            init_text=self.tr("Initialisation OCR…"),
+            cancel_text=self.tr("Annuler"),
+            cancelling_text=self.tr("Annulation en cours…"),
+        )
 
     def _compress(self):
         if not self.document.is_open:
