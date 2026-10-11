@@ -128,3 +128,19 @@ Constats vérifiés dans le code puis corrigés, dans l'ordre demandé :
 - [ ] Reste (checklist de RELEASE, pas des bugs) : entrées `debian/changelog` noble + resolute de la nouvelle version AVANT le tag ;
       `copr/*.spec` Version + `%changelog` ; vérifier AUR complet (dépendances AUR) ; essais sur vrais documents scannés ;
       test manuel de l'installeur Windows et d'un paquet Linux. Le tag `v*` déclenche release Windows PUBLIQUE + AUR/PPA/COPR.
+
+---
+
+# Phase 4 — préparation de la release v0.1.25 (branche `release/0.1.25-prep`)
+
+- [x] `debian/changelog` : 0.1.25-1~noble1 + ~resolute1 (validés dpkg-parsechangelog + isolement par série comme le workflow) ;
+      spec COPR : Version 0.1.25 + %changelog
+- [x] AUR COMPLET sous WSL Arch (mise à jour système complète) : dépendances AUR tierces installées via yay
+      (python-pdf2docx 0.5.10, python-pdfplumber 0.11.10, python-pptx 1.0.2) ; `makepkg -s` (sans --nodeps) OK ;
+      paquet installé : `--ocr-selftest` OK, 0 module en erreur, 44 tests contre le paquet installé, lancement offscreen 10 s OK
+- [x] OCR sur scans SIMULÉS dégradés (pas de vrais documents) : ≥200 dpi droit ≈100 % ; 150 dpi incliné 1,5° ≈ 75 % ; 3° ≈ 65 %
+      → limite documentée (docs/0.FONCTIONNALITES FR/EN) ; redressement auto = amélioration future (risque : rebasculer les bbox)
+- [x] `packaging/RELEASE_CHECKLIST.md` ; artefacts .deb/.rpm conservés par `linux-packages-check.yml`
+- [ ] À FAIRE PAR L'UTILISATEUR : essai manuel installeur Windows (hors ligne), essai d'un paquet Linux en GUI, vrais scans
+- [ ] Constat : version pdf2docx AUR (0.5.10) ≠ 0.5.13 des canaux COPR/PPA — comportement de conversion Word potentiellement différent
+- [ ] Tag v0.1.25 : NON créé (déclenche release Windows publique + AUR + PPA + COPR + site)
