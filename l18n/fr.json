@@ -127,6 +127,7 @@
   "docs.nav.features.url": "../#fonctionnalites",
   "docs.loading": "Chargement…",
   "docs.error.load": "Impossible de charger",
+  "docs.file0.title": "0. Fonctionnalités",
   "docs.file1.title": "1. Index",
   "docs.file2.title": "2. Architecture",
   "docs.file3.title": "3. Contributing",

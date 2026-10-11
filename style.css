@@ -339,6 +339,26 @@ footer {
 }
 .docs-loading { color: var(--text-dim); padding: 40px; }
 
+/* Sections repliables « Pour les développeurs » (docs/0.FONCTIONNALITES.md) */
+.docs-content details {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  background: var(--bg-1);
+  border-radius: 6px;
+  margin: 12px 0 24px;
+  padding: 0 16px;
+}
+.docs-content details[open] { padding-bottom: 8px; }
+.docs-content summary {
+  cursor: pointer;
+  padding: 10px 0;
+  font-weight: 600;
+  color: var(--accent);
+  list-style-position: inside;
+}
+.docs-content summary:hover { text-decoration: underline; }
+.docs-content details > :last-child { margin-bottom: 8px; }
+
 @media (max-width: 760px) {
   .docs-layout { grid-template-columns: 1fr; }
   .docs-sidebar { border-right: none; border-bottom: 1px solid var(--border); }
