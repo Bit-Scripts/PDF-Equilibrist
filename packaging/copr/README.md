@@ -45,8 +45,21 @@ convient) :
 python3 -m venv /tmp/wh-venv
 /tmp/wh-venv/bin/pip install --upgrade pip
 /tmp/wh-venv/bin/pip download --no-deps --dest packaging/copr/vendor/wheelhouse \
-    pdf2docx pdfplumber python-pptx python-docx pypdfium2
+    pdf2docx pdfplumber python-pptx python-docx pypdfium2 rapidocr omegaconf
 ```
+
+(Versions figées : voir `Source10`–`Source16` du `.spec` et l'étape « Download vendored wheels » de
+`linux-copr-publish.yml`.)
+
+## OCR (RapidOCR + ONNX Runtime)
+
+Deux wheels de plus sont vendorisées (**7 au total**) : `rapidocr` — qui livre ses modèles `.onnx`
+(~30 Mo) *dans* sa wheel, rien n'est téléchargé — et `omegaconf`, non empaqueté pour Fedora. Le reste de
+la chaîne OCR vient des paquets Fedora (`python3-onnxruntime`, `python3-shapely`, `python3-pyclipper`,
+`python3-pyyaml`, `python3-colorlog`, `python3-requests`, `python3-six`, `python3-tqdm`), déclarés en
+`Requires` ET en `BuildRequires` (le `%check` du `.spec` lance `--ocr-selftest` : un OCR cassé fait échouer
+le build COPR). `linux-packages-check.yml` construit et teste le `.rpm` sur Fedora 44 avant toute
+publication.
 
 `--no-deps` est important : sans lui, `pip download` embarque aussi les
 sous-dépendances déjà fournies par les paquets système Fedora

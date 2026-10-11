@@ -1,0 +1,136 @@
+name: Linux packages check
+
+# Construit les paquets Ubuntu (PPA, noble + resolute) et Fedora (COPR) SANS rien publier,
+# les installe, puis lance l'auto-test OCR (`--ocr-selftest` : modèles livrés dans le
+# paquet, réseau interdit, texte français reconnu) en utilisateur non privilégié.
+# Les builds PPA/COPR de production ont lieu chez Launchpad/COPR, sans réseau et souvent
+# des heures plus tard : ce workflow attrape les régressions AVANT.
+# Appelé aussi par linux-ppa-publish.yml et linux-copr-publish.yml : pas de publication
+# si un paquet n'est pas valide. (L'AUR a son propre test dans linux-aur.yml.)
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'requirements.txt'
+      - 'packaging/ppa/**'
+      - 'packaging/copr/**'
+      - '.github/workflows/linux-packages-check.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packaging/ppa/**'
+      - 'packaging/copr/**'
+      - '.github/workflows/linux-packages-check.yml'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ppa:
+    name: PPA (.deb) — ${{ matrix.series }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - series: noble
+            image: ubuntu:24.04
+          - series: resolute
+            image: ubuntu:26.04
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - name: Install tooling (git before checkout)
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq git build-essential debhelper dh-python devscripts \
+            python3 python3-venv python3-pip python3-setuptools python3-wheel \
+            python3-pyqt6 python3-pyqt6.qtsvg hicolor-icon-theme desktop-file-utils \
+            fonts-noto-color-emoji
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Même préparation que le workflow de publication : source en dossier
+      # pdf-equilibrist-<version>, dossier debian/ injecté, wheelhouses vendorisés.
+      - name: Prepare source tree and vendored wheelhouses
+        run: |
+          python3 -m venv /tmp/dl
+          /tmp/dl/bin/pip install -q --upgrade pip
+          v=$(head -1 packaging/ppa/debian/changelog | sed -E 's/^[^(]*\(([^)]+)\).*/\1/' | cut -d- -f1)
+          mkdir -p /tmp/ppab
+          cp -r "$GITHUB_WORKSPACE" "/tmp/ppab/pdf-equilibrist-${v}"
+          rm -rf "/tmp/ppab/pdf-equilibrist-${v}/.git" "/tmp/ppab/pdf-equilibrist-${v}/debian"
+          cp -r packaging/ppa/debian "/tmp/ppab/pdf-equilibrist-${v}/debian"
+          cd "/tmp/ppab/pdf-equilibrist-${v}"
+          PATH=/tmp/dl/bin:$PATH bash packaging/ppa/fetch_wheelhouse.sh
+          echo "SRCDIR=/tmp/ppab/pdf-equilibrist-${v}" >> "$GITHUB_ENV"
+
+      # debian/rules lance l'auto-test OCR à la fin du build : un échec = build rouge.
+      - name: Build the .deb
+        run: |
+          cd "$SRCDIR"
+          dpkg-buildpackage -us -uc -b
+          ls -la /tmp/ppab/*.deb
+
+      - name: Install the .deb and run the OCR selftest as a normal user
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get install -y -qq /tmp/ppab/pdf-equilibrist_*.deb
+          useradd -m tester
+          su tester -c "cd /tmp && /usr/lib/pdf-equilibrist/venv/bin/python -m pdf_equilibrist.main --ocr-selftest /tmp/tester_report.txt; rc=\$?; cat /tmp/tester_report.txt; exit \$rc"
+
+  copr:
+    name: COPR (.rpm) — Fedora 44
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:44
+    steps:
+      - name: Install tooling (git before checkout)
+        run: |
+          dnf install -y git rpmdevtools rpm-build python3-pip python3-devel python3-setuptools \
+            python3-wheel python3-pyqt6 desktop-file-utils python3-PyMuPDF python3-pillow \
+            python3-numpy python3-opencv python3-onnxruntime python3-shapely python3-pyclipper \
+            python3-pyyaml python3-colorlog python3-requests python3-six python3-tqdm
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Prepare rpmbuild tree (same sources as linux-copr-publish.yml)
+        run: |
+          rpmdev-setuptree
+          v=$(sed -n 's/^Version:[[:space:]]*//p' packaging/copr/pdf-equilibrist.spec | head -1)
+          pip download --no-deps --dest ~/rpmbuild/SOURCES \
+            pdf2docx==0.5.13 pdfplumber==0.11.10 python-pptx==1.0.2 python-docx==1.2.0 \
+            pypdfium2==5.12.1 rapidocr==3.10.0 omegaconf==2.4.0
+          cp packaging/copr/pdf-equilibrist.sh packaging/copr/pdf-equilibrist.desktop \
+             packaging/copr/pdf-equilibrist-128.png packaging/copr/pdf-equilibrist-256.png \
+             ~/rpmbuild/SOURCES/
+          cp packaging/copr/pdf-equilibrist.spec ~/rpmbuild/SPECS/
+          # Archive du code testé (pas du dernier tag) : on valide ce commit.
+          mkdir -p "/tmp/srcb/PDF-Equilibrist-${v}"
+          cp -r "$GITHUB_WORKSPACE"/. "/tmp/srcb/PDF-Equilibrist-${v}/"
+          rm -rf "/tmp/srcb/PDF-Equilibrist-${v}/.git"
+          tar -C /tmp/srcb -czf ~/rpmbuild/SOURCES/pdf-equilibrist-${v}.tar.gz "PDF-Equilibrist-${v}"
+
+      # Le %check du .spec lance l'auto-test OCR : un échec = build rouge.
+      - name: Build the .rpm (runs %check)
+        run: rpmbuild -bb ~/rpmbuild/SPECS/pdf-equilibrist.spec
+
+      - name: Install the .rpm and run the OCR selftest as a normal user
+        run: |
+          dnf install -y ~/rpmbuild/RPMS/x86_64/pdf-equilibrist-*.rpm
+          useradd -m tester
+          su tester -c "cd /tmp && /usr/lib64/pdf-equilibrist/venv/bin/python -m pdf_equilibrist.main --ocr-selftest /tmp/tester_report.txt; rc=\$?; cat /tmp/tester_report.txt; exit \$rc"

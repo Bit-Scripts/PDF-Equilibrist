@@ -47,9 +47,17 @@ Nécessite un environnement Linux + Python 3.12 + réseau (WSL Ubuntu convient) 
 ```bash
 python3 -m venv /tmp/wheelhouse-venv
 /tmp/wheelhouse-venv/bin/pip install --upgrade pip
-/tmp/wheelhouse-venv/bin/pip download --dest packaging/ppa/vendor/wheelhouse \
-    PyMuPDF pdf2docx pdfplumber openpyxl python-pptx Pillow pyparsing
+PATH=/tmp/wheelhouse-venv/bin:$PATH bash packaging/ppa/fetch_wheelhouse.sh
 ```
+
+`fetch_wheelhouse.sh` est la **source unique** de la liste des paquets (noble cp312 + resolute cp314,
+téléchargement croisé) : il est appelé par `linux-ppa-publish.yml` et `linux-packages-check.yml`. Tout
+paquet ajouté doit aussi figurer dans la liste `pip install --no-deps` de `debian/rules`.
+
+**OCR** : `rapidocr` livre ses modèles `.onnx` dans sa wheel ; avec `onnxruntime` et ses dépendances,
+le wheelhouse pèse ~250 Mo (noble ~190 Mo + resolute ~60 Mo). `debian/rules` lance
+`--ocr-selftest` à la fin du build : si l'OCR ne marche pas, le build Launchpad échoue (et
+`linux-packages-check.yml` le détecte avant la publication).
 
 Ne pas inclure `PyQt6` (fourni par `python3-pyqt6`, jamais vendorisé) ni `bandit`
 (dev/scan uniquement, absent des dépôts Ubuntu — dégradation gracieuse déjà en

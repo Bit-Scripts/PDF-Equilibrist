@@ -86,6 +86,22 @@ jobs:
       - name: Validate build against the real release tarball
         run: su builder -c "cd packaging/aur && makepkg --nodeps -f"
 
+      # L'OCR doit marcher dans le paquet construit — sans quoi la release annoncerait
+      # une fonction cassée. On désarchive le .pkg.tar.zst, on installe seulement les
+      # dépendances des dépôts officiels que l'OCR utilise (les dépendances AUR ne sont
+      # pas construites ici) et on lance l'auto-test : modèles livrés dans la wheel,
+      # aucune connexion réseau permise.
+      - name: Verify embedded OCR in the built package (offline selftest)
+        run: |
+          pacman -S --noconfirm --needed python-pymupdf python-pillow python-numpy python-opencv             python-onnxruntime-cpu python-shapely python-pyclipper python-omegaconf python-colorlog             python-yaml python-requests python-tqdm python-six
+          rm -rf /tmp/pkgroot && mkdir /tmp/pkgroot
+          bsdtar -xf packaging/aur/*.pkg.tar.zst -C /tmp/pkgroot
+          SP=$(ls -d /tmp/pkgroot/usr/lib/python3*/site-packages)
+          find "$SP/rapidocr/models" -name '*.onnx' | sort
+          cd /tmp
+          PYTHONPATH="$SP" python -m pdf_equilibrist.main --ocr-selftest /tmp/ocr-selftest.txt || { cat /tmp/ocr-selftest.txt; exit 1; }
+          cat /tmp/ocr-selftest.txt
+
       - name: Commit bumped PKGBUILD to main
         run: |
           # $GITHUB_WORKSPACE appartient maintenant à "builder" (chown de l'étape

@@ -68,8 +68,18 @@ override_dh_auto_build:
 		cffi charset-normalizer cryptography et-xmlfile fire fonttools lxml \
 		numpy opencv-python-headless openpyxl pdf2docx pdfminer.six \
 		pdfplumber Pillow pycparser PyMuPDF pyparsing pypdfium2 \
-		python-docx python-pptx termcolor typing-extensions XlsxWriter
+		python-docx python-pptx termcolor typing-extensions XlsxWriter \
+		rapidocr onnxruntime omegaconf protobuf pyclipper PyYAML shapely six \
+		colorlog colorama flatbuffers packaging requests idna urllib3 certifi tqdm
 	$(CURDIR)/debian/venv-build/bin/pip install --no-index --no-build-isolation --no-deps .
+	# OCR embarqué : un paquet dont l'OCR annoncé ne fonctionne pas ne doit pas
+	# être publié. Auto-test dans le venv fraîchement construit (réseau interdit
+	# par le test lui-même ; les builders Launchpad n'en ont de toute façon pas) :
+	# vérifie que les modèles .onnx livrés dans la wheel rapidocr sont présents et
+	# que le texte français est reconnu. Un échec ici fait échouer le build.
+	$(CURDIR)/debian/venv-build/bin/python -m pdf_equilibrist.main --ocr-selftest /tmp/ocr-selftest.txt \
+		|| { cat /tmp/ocr-selftest.txt; exit 1; }
+	cat /tmp/ocr-selftest.txt
 	# pip n'est jamais invoqué au runtime (l'app n'installe rien elle-même) —
 	# on le retire du venv livré plutôt que de courir après chaque nouvelle
 	# CVE pip (le scanner CVE intégré à l'app le remontait alors qu'il ne
