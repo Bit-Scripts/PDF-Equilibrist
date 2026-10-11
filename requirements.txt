@@ -7,5 +7,5 @@ python-pptx>=1.0
 Pillow>=12
 pyparsing>=3.0
 bandit>=1.7
-rapidocr>=3.10
+rapidocr==3.10.0
 onnxruntime>=1.20

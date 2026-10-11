@@ -17,7 +17,7 @@ dependencies = [
     "Pillow>=12",
     "pyparsing>=3.0",
     "bandit>=1.7",
-    "rapidocr>=3.10",
+    "rapidocr>=3.10,<3.11",
     "onnxruntime>=1.20",
 ]
 
