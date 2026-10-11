@@ -17,6 +17,8 @@ dependencies = [
     "Pillow>=12",
     "pyparsing>=3.0",
     "bandit>=1.7",
+    "rapidocr>=3.10",
+    "onnxruntime>=1.20",
 ]
 
 [project.scripts]
@@ -24,3 +26,6 @@ pdf-equilibrist = "pdf_equilibrist.main:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

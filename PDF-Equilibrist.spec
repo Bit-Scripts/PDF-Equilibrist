@@ -23,8 +23,9 @@ datas = [
     ("translations",        "translations"),
 ]
 datas += collect_data_files("fitz")
-datas += collect_data_files("paddleocr")
-datas += collect_data_files("paddlex")
+# OCR : RapidOCR + modèles ONNX livrés dans la wheel (rapidocr/models/*.onnx) —
+# embarqués tels quels, aucun téléchargement au runtime.
+datas += collect_data_files("rapidocr")
 
 # Métadonnées (dist-info) de tous les paquets installés dans l'environnement
 # de build. PyInstaller ne les embarque pas par défaut, or cve_checker.py
@@ -54,14 +55,13 @@ hidden = [
     "winreg",
     "ctypes", "ctypes.wintypes",
     "PyQt6.QtPrintSupport",
-    # PaddleOCR / PaddlePaddle
-    "paddleocr", "paddlex", "paddle", "paddle.base",
-    "shapely", "pyclipper", "bidi", "bidi.algorithm",
-    "aiohttp", "yarl", "multidict",
+    # RapidOCR / ONNX Runtime
+    "rapidocr", "onnxruntime",
+    "shapely", "pyclipper",
+    "omegaconf", "colorlog",
 ]
 hidden += collect_submodules("pdf_equilibrist")
-hidden += collect_submodules("paddleocr")
-hidden += collect_submodules("paddlex")
+hidden += collect_submodules("rapidocr")
 
 # bandit charge ses tests (B1xx, B3xx, B6xx...) via des entry points (stevedore),
 # invisibles à l'analyse statique d'imports de PyInstaller : sans ce
