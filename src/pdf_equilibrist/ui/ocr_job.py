@@ -76,6 +76,7 @@ def start_ocr_job(
     dlg.setMinimumWidth(380)
     dlg.setAutoClose(False)
     dlg.setAutoReset(False)
+    dlg.setMinimumDuration(0)       # visible tout de suite, pas de réaffichage différé
 
     worker = OcrWorker(fn, parent)
 
@@ -97,7 +98,13 @@ def start_ocr_job(
         dlg.setValue(min(cur, max(total, 1)))
 
     def _finish(callback, *args):
-        dlg.close()
+        # close() ÉMET canceled() (le handler afficherait un faux « Annulation en cours… ») et ne
+        # stoppe pas le minuteur interne de QProgressDialog, qui ré-afficherait le dialogue ~4 s plus
+        # tard par-dessus la boîte « enregistré » (deleteLater n'est pas traité dans la boucle
+        # imbriquée d'un QMessageBox). On coupe donc le signal, puis reset() arrête le minuteur.
+        dlg.canceled.disconnect()
+        dlg.reset()
+        dlg.hide()
         dlg.deleteLater()
         if callback is not None:
             callback(*args)

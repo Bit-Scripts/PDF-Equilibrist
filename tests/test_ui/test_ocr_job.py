@@ -109,3 +109,26 @@ def test_dialog_stays_open_until_the_thread_has_really_stopped(app):
     # le dialogue est fermé puis supprimé (deleteLater) : on ne touche plus à `dlg` après l'arrêt
     assert _wait_until(lambda: parent.findChild(QtWidgets.QProgressDialog) is None)
     assert cancelled == []                              # ni succès ni erreur signalés
+
+
+def test_dialog_does_not_come_back_after_success_while_a_message_box_is_open(app):
+    """Régression « fenêtre zombie » : la boîte « enregistré » s'ouvre dans une boucle imbriquée ;
+    le dialogue de progression doit rester fermé (et ne pas afficher « Annulation en cours… »)
+    même après le délai minimal interne de QProgressDialog (4 s par défaut)."""
+    parent = QWidget()
+    seen = {}
+
+    def on_done(result):
+        # équivalent de show_info() : boucle d'événements imbriquée plus longue que minimumDuration
+        _wait_until(lambda: False, timeout=4.6)
+        dlgs = parent.findChildren(QtWidgets.QProgressDialog)
+        seen["visible"] = [d.isVisible() for d in dlgs]
+        seen["labels"] = [d.labelText() for d in dlgs]
+
+    worker = ocr_job.start_ocr_job(
+        parent, "OCR", 3, lambda p, c: (p(3, 3, "fini"), 7)[1], on_done, lambda m: seen.setdefault("error", m),
+        init_text="Init", cancel_text="Annuler", cancelling_text="Annulation en cours…")
+    assert _wait_until(lambda: "visible" in seen, timeout=15)
+    worker.wait(3000)
+    assert not any(seen["visible"]), seen
+    assert "Annulation en cours…" not in seen["labels"], seen
