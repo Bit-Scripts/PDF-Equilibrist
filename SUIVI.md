@@ -80,3 +80,28 @@ Toujours `git add` des chemins explicites (des `.pyc` sont suivis par git et pol
 - [ ] Linux : wheelhouse PPA/COPR + PKGBUILD AUR à régénérer avec rapidocr (voir étape 1)
 - [ ] Premier vrai run GitHub des workflows à surveiller (checks.yml, docs-sync.yml, build PyInstaller complet avec rapidocr)
 - [ ] Hors périmètre : `.pyc` et `*.egg-info` suivis par git ; `.gitignore` et `.claude/settings.local.json` modifiés avant ma session (non touchés)
+
+---
+
+# Phase 2 — décisions utilisateur du 2026-10-11 (push, Linux, actionlint)
+
+Décisions : push direct gh-pages OK ; nom des contrôles OK ; actionlint ajouté ; OCR Linux (PPA/COPR/AUR) à
+intégrer et valider avant la prochaine release ; **Flatpak suspendu** (documenté, fichiers conservés) ;
+nettoyage `.pyc`/`egg-info` dans un commit séparé ; pas de release de production sans validation.
+
+- [x] Protection de branche : aucune (ni `main`, ni `gh-pages`, aucun ruleset) → rien ne référence « Test and lint »
+- [x] actionlint 1.7.12 (pip `actionlint-py`) : 0 erreur sur tous les workflows ; ajouté à `checks.yml`
+- [x] `--ocr-selftest` (main.py + `ocr.selftest()`) ; vérifié sur l'exe PyInstaller COMPLET local (417 Mo, dossier vierge,
+      profil vide) ; étape ajoutée à `ci.yml` et `release.yml` après le build PyInstaller
+- [x] AUR : PKGBUILD (wheel rapidocr en source + deps officielles), `.SRCINFO` régénéré ; build makepkg + selftest OK sous WSL Arch
+- [x] COPR : spec (wheels rapidocr+omegaconf, Requires/BuildRequires, `%check`) ; rpmbuild + install + selftest OK sous WSL Fedora 43
+- [x] PPA : `fetch_wheelhouse.sh` (source unique), `debian/rules` (liste + selftest) ; dpkg-buildpackage + install + selftest OK
+      sous WSL Ubuntu 24.04 (noble, cp312) ET 26.04 (resolute, cp314)
+- [x] `linux-packages-check.yml` (nouveau, réutilisable) ; `linux-ppa-publish` / `linux-copr-publish` en dépendent
+- [x] Flatpak : bannière « suspendu » (packaging/flatpak/README.md, docs/5.BUILD FR+EN, PRIVACY), fichiers conservés
+- [x] Nettoyage : 34 `.pyc` + `egg-info` + `.claude/settings.local.json` retirés de l'index (commit 2bc79b7) ; `.gitignore` local
+      (`forensic/`) NON commité, préservé ; settings.local.json contenait un mot de passe de compte de test WSL (voir bilan)
+- [x] gh-pages poussé (0c6932f) : entrée « 0 », CSS `<details>`, docs FR/EN ; stats.json/index.html intacts (rebase sur origin)
+- [ ] Push branche `chore/docs-ci-ocr` + PR → surveiller CI, corriger, merger
+- [ ] Vérifier le site public FR/EN + liens internes
+- [ ] Surveiller `docs-sync.yml`, `linux-packages-check.yml` (Fedora 44, Ubuntu 26.04 en conteneur : tags d'images à confirmer)
