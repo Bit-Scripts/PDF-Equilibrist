@@ -35,12 +35,20 @@ Toujours `git add` des chemins explicites (des `.pyc` sont suivis par git et pol
       PKGBUILD AUR ; NON testable depuis Windows. Flatpak : OCR toujours exclu (modifier si souhaité).
 - Remarque qualité : € reconnu comme « · » (modèle small) ; accents OK.
 
-### Étape 2 — CI
-- [ ] Lint : `.flake8` créé, autopep8 appliqué (E225/E231/E261/E302/E303/E305/E401) — **non commité**
-- [ ] Restent : E402 (main_window.py:61-71), E731 print_dialog.py:335, E741 print_dialog_win32.py:118, E501 tab_modifier.py:268/270
-- [ ] pytest : `testpaths = tests` (exclure forensic/)
-- [ ] Bandit en CI + corriger/justifier les findings
-- [ ] flake8 bloquant ; `release.yml` et builds dépendent du job de contrôle
+### Étape 2 — CI bloquante — FAIT localement (non exécutable en vrai sans push)
+- [x] Lint : `.flake8` (max 120 ; ignore volontaire E221/E222/E272/E701/E702/E127/E128/E251 = alignements
+      de style du projet), autopep8 sur E225/E231/E261/E302/E303/E305/E401, 5 corrections manuelles
+      (E402 main_window, E731 print_dialog, E741 win32 `noqa`, E501 tab_modifier) → `flake8 src tests` = 0
+- [x] Bandit : `bandit -r src` = 0 finding (tous niveaux) avec la version locale
+- [x] `pytest` : `testpaths = ["tests"]` (forensic/ n'est plus ramassé) — 32 verts
+- [x] Nouveau workflow réutilisable `.github/workflows/checks.yml` (flake8 → bandit → pytest, bloquants)
+- [x] `ci.yml` : job `test` = appel de checks.yml, `build` en dépend (workflow conservé)
+- [x] Portes sur les workflows de publication : `release`, `linux-aur-publish`, `linux-copr-publish`,
+      `linux-ppa-publish`, `update-site-version` ont un job `checks` et `needs: checks`
+      (`linux-aur.yml` = build de test du PKGBUILD, `stats.yml` = compteurs : laissés tels quels)
+- Limites : YAML validé par parsing (pas d'actionlint) ; le premier vrai run GitHub reste à observer.
+  Le job s'appelle maintenant « test / Contrôles… » côté GitHub (si une règle de protection de branche
+  exige l'ancien nom « Test and lint », la mettre à jour). Une version future de bandit peut ajouter des findings.
 
 ### Étape 3 — Documentation
 - [ ] Rapatrier docs/en/ depuis gh-pages

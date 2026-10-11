@@ -332,7 +332,8 @@ class _PrintWorker(QThread):
         )
 
     def run(self):
-        progress_cb = lambda d, t: self.progress.emit(d, t)
+        def progress_cb(d, t):
+            self.progress.emit(d, t)
         if _IS_WINDOWS:
             ok = _win32_print(**self._args, progress_cb=progress_cb)
         else:

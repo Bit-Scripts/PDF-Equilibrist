@@ -56,8 +56,6 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QAction, QKeySequence, QColor, QPainter, QPen
 from PyQt6.QtCore import Qt, QPoint, QSettings, QThread, pyqtSignal
 
-_RECENT_MAX = 10   # nombre maximum de fichiers dans "Ouvrir récemment"
-
 from pdf_equilibrist.ui.title_bar import TitleBar
 from pdf_equilibrist.ui.tabs.tab_afficher  import TabAfficher
 from pdf_equilibrist.ui.tabs.tab_modifier  import TabModifier
@@ -69,6 +67,8 @@ from pdf_equilibrist.ui.viewer             import PdfViewer
 from pdf_equilibrist.ui.thumbnail_panel    import ThumbnailPanel
 from pdf_equilibrist.ui.dialogs            import ensure_suffix
 from pdf_equilibrist.core.document         import Document
+
+_RECENT_MAX = 10   # nombre maximum de fichiers dans "Ouvrir récemment"
 
 ACCENT       = "#6BBF4E"
 BORDER_COLOR = "#2A2A2A"
@@ -678,7 +678,7 @@ class MainWindow(QWidget):
 
         # Reconnecter les 3 slots essentiels sur le nouveau document
         doc.changed.connect(self._on_doc_changed)        # barre de statut, titre onglet
-        doc.changed.connect(self.viewer._on_doc_changed) # re-render des pages
+        doc.changed.connect(self.viewer._on_doc_changed)  # re-render des pages
         doc.changed.connect(self._thumbs.rebuild)        # re-render des miniatures
 
         # Rebrancher la référence document dans tous les tabs du ribbon.

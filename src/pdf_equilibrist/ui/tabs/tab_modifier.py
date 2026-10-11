@@ -265,9 +265,11 @@ class TabModifier(QWidget):
             dlg.close()
             self.document.changed.emit()
             if n == 0:
-                show_info(self, "OCR", self.tr("Aucune page scannée détectée.\nLe document contient déjà une couche texte."))
+                show_info(self, "OCR", self.tr(
+                    "Aucune page scannée détectée.\nLe document contient déjà une couche texte."))
             else:
-                show_info(self, "OCR", self.tr("{0} page(s) rendue(s) cherchables.\nPensez à enregistrer le document.").format(n))
+                show_info(self, "OCR", self.tr(
+                    "{0} page(s) rendue(s) cherchables.\nPensez à enregistrer le document.").format(n))
 
         def _on_error(msg):
             dlg.close()

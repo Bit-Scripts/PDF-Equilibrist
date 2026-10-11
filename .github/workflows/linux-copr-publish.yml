@@ -23,7 +23,12 @@ on:
         required: false
 
 jobs:
+  checks:
+    name: Contrôles (lint, Bandit, tests)
+    uses: ./.github/workflows/checks.yml
+
   publish:
+    needs: checks
     name: Build SRPM and submit to COPR
     runs-on: ubuntu-latest
     container:

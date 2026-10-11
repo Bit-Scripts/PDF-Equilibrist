@@ -191,7 +191,8 @@ class TabConvertir(QWidget):
 
         def _convert(fitz_doc):
             try:
-                import tempfile, shutil
+                import tempfile
+                import shutil
                 # Sauvegarder le fitz_doc enrichi via fichier temp (chemin réseau safe)
                 with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
                     tmp_path = Path(tmp.name)

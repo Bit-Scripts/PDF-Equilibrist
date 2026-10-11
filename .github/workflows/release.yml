@@ -12,7 +12,12 @@ on:
         default: '0.1.0'
 
 jobs:
+  checks:
+    name: Contrôles (lint, Bandit, tests)
+    uses: ./.github/workflows/checks.yml
+
   build_and_release:
+    needs: checks
     name: Build installer and create release
     runs-on: windows-latest
     env:

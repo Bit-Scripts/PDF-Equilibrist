@@ -1,0 +1,6 @@
+[flake8]
+max-line-length = 120
+exclude = __pycache__,forensic,build,dist,.git
+# Alignements volontaires (colonnes de constantes, if x: y, continuations) :
+# choix de style du projet, pas des défauts.
+extend-ignore = E221,E222,E272,E701,E702,E127,E128,E251

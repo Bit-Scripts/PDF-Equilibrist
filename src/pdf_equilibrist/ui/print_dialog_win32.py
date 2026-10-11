@@ -9,7 +9,8 @@ et le rendu d'impression bas niveau via ``winspool``/``gdi32`` avec la
 stratégie hairline (upsampling + overlay vectoriel) pour les plans AutoCAD.
 """
 from __future__ import annotations
-import ctypes, ctypes.wintypes
+import ctypes
+import ctypes.wintypes
 import logging
 import fitz
 
@@ -94,6 +95,7 @@ class _BITMAPINFOHEADER(ctypes.Structure):
         ("biClrImportant",  ctypes.wintypes.DWORD),
     ]
 
+
 class _DOCINFOW(ctypes.Structure):
     _fields_ = [
         ("cbSize",       ctypes.c_int),
@@ -113,7 +115,7 @@ class _GdiCtx:
     def __init__(self):
         g = ctypes.WinDLL("gdi32")
         H  = ctypes.wintypes.HANDLE
-        I  = ctypes.c_int
+        I  = ctypes.c_int  # noqa: E741
         DW = ctypes.wintypes.DWORD
         VP = ctypes.c_void_p
         WP = ctypes.c_wchar_p
@@ -125,7 +127,7 @@ class _GdiCtx:
         g.EndDoc.restype           = I;  g.EndDoc.argtypes            = [H]
         g.StartPage.restype        = I;  g.StartPage.argtypes         = [H]
         g.EndPage.restype          = I;  g.EndPage.argtypes           = [H]
-        g.SetStretchBltMode.restype= I;  g.SetStretchBltMode.argtypes = [H, I]
+        g.SetStretchBltMode.restype = I;  g.SetStretchBltMode.argtypes = [H, I]
         g.SetBrushOrgEx.restype    = I;  g.SetBrushOrgEx.argtypes     = [H, I, I, VP]
         g.StretchDIBits.restype    = I;  g.StretchDIBits.argtypes     = [
             H, I, I, I, I, I, I, I, I, VP, VP,
@@ -135,7 +137,7 @@ class _GdiCtx:
         g.EndPath.restype          = I;  g.EndPath.argtypes           = [H]
         g.StrokePath.restype       = I;  g.StrokePath.argtypes        = [H]
         g.FillPath.restype         = I;  g.FillPath.argtypes          = [H]
-        g.StrokeAndFillPath.restype= I;  g.StrokeAndFillPath.argtypes = [H]
+        g.StrokeAndFillPath.restype = I;  g.StrokeAndFillPath.argtypes = [H]
         g.MoveToEx.restype         = I;  g.MoveToEx.argtypes          = [H, I, I, VP]
         g.LineTo.restype           = I;  g.LineTo.argtypes            = [H, I, I]
         g.PolyBezierTo.restype     = I;  g.PolyBezierTo.argtypes      = [H, VP, DW]
@@ -259,7 +261,7 @@ def _draw_vector_strokes(gdi: _GdiCtx, hDC, pdf_page: fitz.Page,
             continue
 
         # --- Collecter les segments du path --------------------------------
-        segments: list[tuple[int,int,int,int]] = []
+        segments: list[tuple[int, int, int, int]] = []
 
         for item in items:
             k = item[0]
@@ -304,7 +306,7 @@ def _draw_vector_strokes(gdi: _GdiCtx, hDC, pdf_page: fitz.Page,
 
             # Regrouper les segments consécutifs en chaînes → Polyline GDI
             # pour éviter les pâtés aux jonctions (caps carrés qui se chevauchent).
-            chain: list[tuple[int,int]] = [(segments[0][0], segments[0][1]),
+            chain: list[tuple[int, int]] = [(segments[0][0], segments[0][1]),
                                            (segments[0][2], segments[0][3])]
             for sx0, sy0, sx1, sy1 in segments[1:]:
                 if (sx0, sy0) == chain[-1]:

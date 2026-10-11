@@ -52,8 +52,8 @@ QPushButton#primary:hover { background: #7ED45F; }
 def _ok_cancel(dialog: QDialog, layout: QVBoxLayout):
     btn_row = QHBoxLayout()
     btn_row.addStretch()
-    cancel = QPushButton(QCoreApplication.translate("dialogs","Annuler"))
-    ok = QPushButton(QCoreApplication.translate("dialogs","OK"))
+    cancel = QPushButton(QCoreApplication.translate("dialogs", "Annuler"))
+    ok = QPushButton(QCoreApplication.translate("dialogs", "OK"))
     ok.setObjectName("primary")
     cancel.clicked.connect(dialog.reject)
     ok.clicked.connect(dialog.accept)
@@ -64,7 +64,7 @@ def _ok_cancel(dialog: QDialog, layout: QVBoxLayout):
 
 def ask_password(parent, title: str, label: str | None = None) -> str | None:
     if label is None:
-        label = QCoreApplication.translate("dialogs","Mot de passe :")
+        label = QCoreApplication.translate("dialogs", "Mot de passe :")
     dlg = QDialog(parent)
     dlg.setWindowTitle(title)
     dlg.setStyleSheet(DIALOG_STYLE)
@@ -80,15 +80,15 @@ def ask_password(parent, title: str, label: str | None = None) -> str | None:
 
 def ask_encrypt_passwords(parent) -> tuple[str, str] | None:
     dlg = QDialog(parent)
-    dlg.setWindowTitle(QCoreApplication.translate("dialogs","Chiffrer le PDF"))
+    dlg.setWindowTitle(QCoreApplication.translate("dialogs", "Chiffrer le PDF"))
     dlg.setStyleSheet(DIALOG_STYLE)
     dlg.setMinimumWidth(340)
     layout = QVBoxLayout(dlg)
-    layout.addWidget(QLabel(QCoreApplication.translate("dialogs","Mot de passe utilisateur :")))
+    layout.addWidget(QLabel(QCoreApplication.translate("dialogs", "Mot de passe utilisateur :")))
     user_pw = QLineEdit()
     user_pw.setEchoMode(QLineEdit.EchoMode.Password)
     layout.addWidget(user_pw)
-    layout.addWidget(QLabel(QCoreApplication.translate("dialogs","Mot de passe propriétaire (optionnel) :")))
+    layout.addWidget(QLabel(QCoreApplication.translate("dialogs", "Mot de passe propriétaire (optionnel) :")))
     owner_pw = QLineEdit()
     owner_pw.setEchoMode(QLineEdit.EchoMode.Password)
     layout.addWidget(owner_pw)
@@ -100,9 +100,9 @@ def ask_encrypt_passwords(parent) -> tuple[str, str] | None:
 
 def ask_page_index(parent, max_page: int, label: str | None = None) -> int | None:
     if label is None:
-        label = QCoreApplication.translate("dialogs","Après la page n° :")
+        label = QCoreApplication.translate("dialogs", "Après la page n° :")
     dlg = QDialog(parent)
-    dlg.setWindowTitle(QCoreApplication.translate("dialogs","Numéro de page"))
+    dlg.setWindowTitle(QCoreApplication.translate("dialogs", "Numéro de page"))
     dlg.setStyleSheet(DIALOG_STYLE)
     layout = QVBoxLayout(dlg)
     layout.addWidget(QLabel(label))
@@ -116,13 +116,13 @@ def ask_page_index(parent, max_page: int, label: str | None = None) -> int | Non
 
 def ask_watermark_text(parent) -> str | None:
     dlg = QDialog(parent)
-    dlg.setWindowTitle(QCoreApplication.translate("dialogs","Filigrane"))
+    dlg.setWindowTitle(QCoreApplication.translate("dialogs", "Filigrane"))
     dlg.setStyleSheet(DIALOG_STYLE)
     dlg.setMinimumWidth(320)
     layout = QVBoxLayout(dlg)
-    layout.addWidget(QLabel(QCoreApplication.translate("dialogs","Texte du filigrane :")))
+    layout.addWidget(QLabel(QCoreApplication.translate("dialogs", "Texte du filigrane :")))
     txt = QLineEdit()
-    txt.setPlaceholderText(QCoreApplication.translate("dialogs","ex: CONFIDENTIEL"))
+    txt.setPlaceholderText(QCoreApplication.translate("dialogs", "ex: CONFIDENTIEL"))
     layout.addWidget(txt)
     _ok_cancel(dlg, layout)
     return txt.text().strip() or None if dlg.exec() == QDialog.DialogCode.Accepted else None
@@ -143,10 +143,10 @@ def ask_text_input(parent, title: str, label: str) -> str | None:
 
 def ask_image_format(parent) -> str | None:
     dlg = QDialog(parent)
-    dlg.setWindowTitle(QCoreApplication.translate("dialogs","Format d'image"))
+    dlg.setWindowTitle(QCoreApplication.translate("dialogs", "Format d'image"))
     dlg.setStyleSheet(DIALOG_STYLE)
     layout = QVBoxLayout(dlg)
-    layout.addWidget(QLabel(QCoreApplication.translate("dialogs","Format :")))
+    layout.addWidget(QLabel(QCoreApplication.translate("dialogs", "Format :")))
     combo = QComboBox()
     combo.addItems(["png", "jpg", "bmp", "tiff"])
     layout.addWidget(combo)
