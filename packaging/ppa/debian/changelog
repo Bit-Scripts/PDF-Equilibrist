@@ -1,3 +1,39 @@
+pdf-equilibrist (0.1.25-1~noble1) noble; urgency=medium
+
+  * New upstream release: local OCR that works offline on every channel.
+    - OCR is now RapidOCR + ONNX Runtime with the recognition models
+      shipped inside the package (about 30 MB): nothing is downloaded at
+      first use, and OCR never opens a network connection. It replaces the
+      previous engine.
+    - OCR -> Word now keeps the recognised text (it used to export the
+      scanned image only), and OCR -> Excel rebuilds a scanned table from
+      the position of the recognised text.
+    - Cancelling an OCR is now clean: the document is left untouched
+      instead of the worker thread being killed mid-operation.
+    - New `--ocr-selftest` command-line check, run at package build time.
+    - Documentation: security analysis and architecture brought up to date
+      (Linux channels, network behaviour, bundled OCR models).
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 11 Oct 2026 12:00:00 +0000
+
+pdf-equilibrist (0.1.25-1~resolute1) resolute; urgency=medium
+
+  * New upstream release: local OCR that works offline on every channel.
+    - OCR is now RapidOCR + ONNX Runtime with the recognition models
+      shipped inside the package (about 30 MB): nothing is downloaded at
+      first use, and OCR never opens a network connection. It replaces the
+      previous engine.
+    - OCR -> Word now keeps the recognised text (it used to export the
+      scanned image only), and OCR -> Excel rebuilds a scanned table from
+      the position of the recognised text.
+    - Cancelling an OCR is now clean: the document is left untouched
+      instead of the worker thread being killed mid-operation.
+    - New `--ocr-selftest` command-line check, run at package build time.
+    - Documentation: security analysis and architecture brought up to date
+      (Linux channels, network behaviour, bundled OCR models).
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 11 Oct 2026 12:00:00 +0000
+
 pdf-equilibrist (0.1.24-1~noble1) noble; urgency=medium
 
   * New upstream release: user control over every network connection.
