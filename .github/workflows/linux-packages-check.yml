@@ -81,6 +81,15 @@ jobs:
           dpkg-buildpackage -us -uc -b
           ls -la /tmp/ppab/*.deb
 
+      - name: Keep the .deb for manual testing
+        run: mkdir -p "$GITHUB_WORKSPACE/out" && cp /tmp/ppab/*.deb "$GITHUB_WORKSPACE/out/"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pdf-equilibrist-deb-${{ matrix.series }}
+          path: out/*.deb
+          retention-days: 14
+
       - name: Install the .deb and run the OCR selftest as a normal user
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -128,6 +137,15 @@ jobs:
       # Le %check du .spec lance l'auto-test OCR : un échec = build rouge.
       - name: Build the .rpm (runs %check)
         run: rpmbuild -bb ~/rpmbuild/SPECS/pdf-equilibrist.spec
+
+      - name: Keep the .rpm for manual testing
+        run: mkdir -p "$GITHUB_WORKSPACE/out" && cp ~/rpmbuild/RPMS/x86_64/*.rpm "$GITHUB_WORKSPACE/out/"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pdf-equilibrist-rpm-fedora44
+          path: out/*.rpm
+          retention-days: 14
 
       - name: Install the .rpm and run the OCR selftest as a normal user
         run: |
