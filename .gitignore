@@ -20,6 +20,7 @@ PDF Equilibrist.zip
 # PyInstaller
 *.spec
 !packaging/copr/pdf-equilibrist.spec
+!packaging/appimage/PDF-Equilibrist-linux.spec
 
 # Logs and temp files
 *.log
