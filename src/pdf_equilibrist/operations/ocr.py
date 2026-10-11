@@ -37,6 +37,7 @@ avant tout et lève ``OcrModelsMissingError`` au lieu de laisser une requête
 réseau partir : aucune connexion n'est jamais émise par l'OCR.
 """
 from __future__ import annotations
+import re
 from pathlib import Path
 from typing import Callable
 import fitz
@@ -124,7 +125,8 @@ def _ocr_image(ocr_engine, pil_image) -> list[dict]:
     if out is None or out.boxes is None or out.txts is None:
         return []
     return [
-        {"text": text, "score": float(score), "bbox": [[float(x), float(y)] for x, y in box]}
+        {"text": _repair_currency_in_text(text), "score": float(score),
+         "bbox": [[float(x), float(y)] for x, y in box]}
         for box, text, score in zip(out.boxes, out.txts, out.scores)
     ]
 
@@ -301,6 +303,198 @@ def ocr_to_markdown(
         progress_cb(n_pages, n_pages, "Export Markdown terminé.")
 
     output_path.write_text("\n".join(md_lines), encoding="utf-8")
+    return output_path
+
+
+# ── Tableaux scannés → Excel ──────────────────────────────────────────────────
+# Un tableau scanné n'est qu'une image : ni traits ni cellules exploitables par pdfplumber. On
+# retrouve donc la grille dans l'IMAGE (traits horizontaux/verticaux, OpenCV), puis on range chaque
+# texte reconnu dans la cellule qui contient son centre. Sans grille (tableau « aéré », sans bordures),
+# repli : chaque boîte de texte détectée par l'OCR devient une cellule, rangée par ligne.
+
+_AMOUNT_CELL = re.compile(r"^(-?\d[\d\s .]*,\d{2})\s*[·•.]$")
+_AMOUNT_IN_TEXT = re.compile(r"(?<=\d,\d\d)\s*[·•](?=\s|$)")
+
+
+def _repair_currency_in_text(text: str) -> str:
+    """« 1 284,60 · TTC » → « 1 284,60 € TTC » : le modèle lit souvent « € » comme un point médian."""
+    return _AMOUNT_IN_TEXT.sub(" €", text)
+
+
+def _repair_currency_in_cell(text: str) -> str:
+    """Cellule réduite à un montant suivi d'un point/point médian (« 420,00. ») : c'est un « € » mal lu."""
+    m = _AMOUNT_CELL.match(text.strip())
+    return f"{m.group(1)} €" if m else text.strip()
+
+
+def _cluster(values: list[float], tol: float) -> list[float]:
+    """Regroupe des positions proches (traits épais ou dédoublés) et renvoie leurs moyennes, triées."""
+    out: list[list[float]] = []
+    for v in sorted(values):
+        if out and v - out[-1][-1] <= tol:
+            out[-1].append(v)
+        else:
+            out.append([v])
+    return [sum(g) / len(g) for g in out]
+
+
+def _detect_grid(pil_image) -> tuple[list[float], list[float]]:
+    """
+    Positions (en pixels) des traits verticaux ``xs`` et horizontaux ``ys`` d'un tableau à bordures.
+
+    Retourne ``([], [])`` si l'image n'a pas de grille (au moins 2 traits dans chaque sens).
+    """
+    import cv2
+    import numpy as np
+
+    gray = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2GRAY)
+    binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 15)
+    h, w = binary.shape
+    h_len, v_len = max(w // 25, 40), max(h // 25, 40)
+    hmask = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (h_len, 1)))
+    vmask = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1, v_len)))
+    ys = [y + bh / 2 for (_x, y, bw, bh) in
+          (cv2.boundingRect(c) for c in cv2.findContours(hmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0])
+          if bw >= h_len]
+    xs = [x + bw / 2 for (x, _y, bw, bh) in
+          (cv2.boundingRect(c) for c in cv2.findContours(vmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0])
+          if bh >= v_len]
+    xs, ys = _cluster(xs, 12), _cluster(ys, 12)
+    return (xs, ys) if len(xs) >= 2 and len(ys) >= 2 else ([], [])
+
+
+def _box_center_and_height(item: dict) -> tuple[float, float, float]:
+    xs = [p[0] for p in item["bbox"]]
+    ys = [p[1] for p in item["bbox"]]
+    return (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, max(ys) - min(ys)
+
+
+def _slot(value: float, edges: list[float]) -> int | None:
+    """Indice de l'intervalle [edges[i], edges[i+1]) contenant ``value`` (None si hors grille)."""
+    import bisect
+    if value < edges[0] or value >= edges[-1]:
+        return None
+    return bisect.bisect_right(edges, value) - 1
+
+
+def _rows_from_boxes(items: list[dict]) -> list[list[str]]:
+    """Repli sans grille : une boîte de texte OCR = une cellule, rangée par ligne visuelle."""
+    boxes = sorted((_box_center_and_height(it) + (it["text"],) for it in items), key=lambda b: b[1])
+    rows: list[list[tuple[float, str]]] = []
+    last_y, last_h = None, 0.0
+    for cx, cy, bh, text in boxes:
+        if last_y is not None and abs(cy - last_y) <= max(last_h, bh) * 0.6:
+            rows[-1].append((cx, text))
+        else:
+            rows.append([(cx, text)])
+        last_y, last_h = cy, bh
+    return [[_repair_currency_in_cell(t) for _x, t in sorted(r)] for r in rows]
+
+
+_BARE_AMOUNT = re.compile(r"^-?\d[\d\s ]*,\d{2}$")
+_EURO_AMOUNT = re.compile(r"^-?\d[\d\s ]*,\d{2}\s*€$")
+
+
+def _restore_currency_by_column(table: list[list[str]]) -> None:
+    """
+    Le modèle lit « € » de façon instable (€, point, point médian, ou rien du tout). Si au moins une
+    cellule d'une colonne porte « € », les autres montants nus de cette même colonne
+    (``420,00``) l'ont perdu : on le remet. Modifie ``table`` en place.
+    """
+    for c in range(len(table[0]) if table else 0):
+        if not any(_EURO_AMOUNT.match(row[c]) for row in table):
+            continue
+        for row in table:
+            if _BARE_AMOUNT.match(row[c]):
+                row[c] = f"{row[c]} €"
+
+
+def table_rows_from_items(items: list[dict], xs: list[float], ys: list[float]) -> list[list[str]]:
+    """
+    Construit les lignes d'un tableau à partir des textes OCR (``items``) et de la grille détectée.
+
+    Les textes hors de la grille (titre, mentions) deviennent des lignes à une seule cellule, placées
+    avant ou après le tableau selon leur position verticale.
+    """
+    if not xs or not ys:
+        return _rows_from_boxes(items)
+    n_rows, n_cols = len(ys) - 1, len(xs) - 1
+    cells: dict[tuple[int, int], list[tuple[float, float, str]]] = {}
+    before: list[dict] = []
+    after: list[dict] = []
+    for it in items:
+        cx, cy, _h = _box_center_and_height(it)
+        r, c = _slot(cy, ys), _slot(cx, xs)
+        if r is None or c is None:
+            (before if cy < ys[0] else after).append(it)
+        else:
+            cells.setdefault((r, c), []).append((cy, cx, it["text"]))
+    table = [[""] * n_cols for _ in range(n_rows)]
+    for (r, c), parts in cells.items():
+        table[r][c] = _repair_currency_in_cell(" ".join(t for _cy, _cx, t in sorted(parts)))
+    _restore_currency_by_column(table)
+    rows = [[_line_text(g)] for g in _group_lines(before)]
+    rows += table
+    rows += [[_line_text(g)] for g in _group_lines(after)]
+    return rows
+
+
+def _line_text(group: list[dict]) -> str:
+    return " ".join(i["text"] for i in sorted(group, key=lambda i: _box_center_and_height(i)[0]))
+
+
+def _group_lines(items: list[dict]) -> list[list[dict]]:
+    """Regroupe des boîtes de texte en lignes visuelles (même ordonnée à ~60 % de la hauteur près)."""
+    groups: list[list[dict]] = []
+    last_y, last_h = None, 0.0
+    for it in sorted(items, key=lambda i: _box_center_and_height(i)[1]):
+        _cx, cy, bh = _box_center_and_height(it)
+        if last_y is not None and abs(cy - last_y) <= max(last_h, bh) * 0.6:
+            groups[-1].append(it)
+        else:
+            groups.append([it])
+        last_y, last_h = cy, bh
+    return groups
+
+
+def ocr_to_excel(
+    doc: fitz.Document,
+    output_path: Path,
+    progress_cb: Callable[[int, int, str], None] | None = None,
+    cancel_cb: Callable[[], bool] | None = None,
+) -> Path:
+    """
+    Exporte les tableaux d'un PDF — scanné ou non — vers un fichier Excel (.xlsx), sans modifier ``doc``.
+
+    - Page scannée : OCR, détection de la grille dans l'image, une cellule Excel par cellule du tableau.
+    - Page avec couche texte : extraction ``pdfplumber`` habituelle (``convert.to_excel``).
+
+    Annulable entre deux pages (``OcrCancelled`` ; aucun fichier n'est écrit dans ce cas).
+    """
+    from pdf_equilibrist.operations import convert
+
+    ocr_engine = None
+    n_pages = len(doc)
+    scanned_tables: dict[int, list[list[str]]] = {}
+    for i, page in enumerate(doc):
+        _check_cancel(cancel_cb)
+        if progress_cb:
+            progress_cb(i, n_pages, f"Page {i + 1}/{n_pages}…")
+        if not _is_scanned_page(page):
+            continue
+        if ocr_engine is None:
+            if progress_cb:
+                progress_cb(i, n_pages, "Chargement du moteur OCR…")
+            ocr_engine = _get_ocr_engine()
+            _check_cancel(cancel_cb)
+        pil = _page_to_pil(page)
+        items = _ocr_image(ocr_engine, pil)
+        xs, ys = _detect_grid(pil)
+        scanned_tables[i] = table_rows_from_items(items, xs, ys)
+    _check_cancel(cancel_cb)
+    convert.to_excel(doc, output_path, ocr_tables=scanned_tables)
+    if progress_cb:
+        progress_cb(n_pages, n_pages, "Export Excel terminé.")
     return output_path
 
 

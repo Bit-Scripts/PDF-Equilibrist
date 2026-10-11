@@ -226,14 +226,26 @@ class TabConvertir(QWidget):
             return
         path = ensure_suffix(path, ".xlsx")
 
-        def _convert(fitz_doc):
-            try:
-                convert.to_excel(fitz_doc, Path(path))
-                show_info(self, self.tr("OCR → Excel"), self.tr("Excel enregistré :\n{0}").format(path))
-            except Exception as e:
-                show_error(self, self.tr("Erreur"), str(e))
+        from pdf_equilibrist.ui.ocr_job import is_running, start_ocr_job
+        if is_running(getattr(self, "_ocr_worker_ref", None)):
+            show_info(self, self.tr("OCR → Excel"), self.tr("Un OCR est déjà en cours (ou en cours d'annulation)."))
+            return
 
-        self._run_ocr_then(self.tr("OCR → Excel"), _convert)
+        fitz_doc = self.document.fitz_doc
+
+        def _work(progress_cb, cancel_cb):
+            # Reconstitue les tableaux scannés d'après la grille de l'image ; ne modifie pas le document
+            from pdf_equilibrist.operations.ocr import ocr_to_excel
+            return ocr_to_excel(fitz_doc, Path(path), progress_cb, cancel_cb)
+
+        self._ocr_worker_ref = start_ocr_job(
+            self, self.tr("OCR → Excel"), len(fitz_doc), _work,
+            lambda _r: show_info(self, self.tr("OCR → Excel"), self.tr("Excel enregistré :\n{0}").format(path)),
+            lambda msg: show_error(self, self.tr("OCR — Erreur"), msg),
+            init_text=self.tr("Initialisation OCR…"),
+            cancel_text=self.tr("Annuler"),
+            cancelling_text=self.tr("Annulation en cours…"),
+        )
 
     def _to_word(self):
         if not self.document.is_open:

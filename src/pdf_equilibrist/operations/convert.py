@@ -300,7 +300,8 @@ def _has_ocr_text(page: fitz.Page) -> bool:
     return any(t.get("type") == 3 for t in page.get_texttrace())
 
 
-def to_excel(doc: fitz.Document, output_path: Path) -> Path:
+def to_excel(doc: fitz.Document, output_path: Path,
+             ocr_tables: dict[int, list[list[str]]] | None = None) -> Path:
     """
     Extrait les tableaux du PDF et les écrit dans un fichier Excel (.xlsx).
 
@@ -342,6 +343,11 @@ def to_excel(doc: fitz.Document, output_path: Path) -> Path:
 
             # extract_tables() retourne une liste de tableaux,
             # chaque tableau est une liste de lignes (list of list of str)
+            if ocr_tables is not None and i in ocr_tables:
+                # Page scannée traitée par ocr.ocr_to_excel() : lignes déjà reconstituées
+                for row in ocr_tables[i]:
+                    ws.append(row)
+                continue
             tables = page.extract_tables()
             if not tables and _has_ocr_text(doc[i]):
                 # Page scannée (texte OCR invisible) : les traits du tableau sont dans l'image,
