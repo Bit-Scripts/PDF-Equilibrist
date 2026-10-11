@@ -1,12 +1,12 @@
 from pathlib import Path
 
-import fitz
+import pymupdf
 
 from pdf_equilibrist.core.document import Document
 
 
 def _create_pdf(path: Path, page_texts):
-    doc = fitz.open()
+    doc = pymupdf.open()
     for text in page_texts:
         page = doc.new_page()
         page.insert_text((72, 72), text)
@@ -30,7 +30,7 @@ def test_document_open_and_save(tmp_path: Path):
     document.save(output_path)
     assert output_path.exists()
 
-    saved_doc = fitz.open(str(output_path))
+    saved_doc = pymupdf.open(str(output_path))
     assert saved_doc.page_count == 2
     saved_doc.close()
 

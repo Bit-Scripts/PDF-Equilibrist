@@ -24,12 +24,12 @@ Paramètre ``quads``
 Les annotations de marquage (highlight, strikeout, underline) prennent des
 ``quads`` (quadrilatères) plutôt que de simples rectangles, ce qui permet
 d'annoter du texte en ligne même s'il est légèrement incliné.
-Obtenir les quads depuis PyMuPDF : ``fitz.Rect(bbox).quad``
+Obtenir les quads depuis PyMuPDF : ``pymupdf.Rect(bbox).quad``
 """
-import fitz
+import pymupdf
 
 
-def highlight(page: fitz.Page, quads) -> fitz.Annot:
+def highlight(page: pymupdf.Page, quads) -> pymupdf.Annot:
     """
     Ajoute une annotation de surlignage sur les quads de texte spécifiés.
 
@@ -38,15 +38,15 @@ def highlight(page: fitz.Page, quads) -> fitz.Annot:
 
     Parameters
     ----------
-    page : fitz.Page
+    page : pymupdf.Page
         Page sur laquelle ajouter l'annotation.
-    quads : list[fitz.Quad] | fitz.Quad
+    quads : list[pymupdf.Quad] | pymupdf.Quad
         Un ou plusieurs quadrilatères couvrant le texte à surligner.
-        Typiquement obtenu avec ``fitz.Rect(word_bbox).quad``.
+        Typiquement obtenu avec ``pymupdf.Rect(word_bbox).quad``.
 
     Returns
     -------
-    fitz.Annot
+    pymupdf.Annot
         L'objet annotation créé et mis à jour.
     """
     annot = page.add_highlight_annot(quads)
@@ -54,7 +54,7 @@ def highlight(page: fitz.Page, quads) -> fitz.Annot:
     return annot
 
 
-def strikeout(page: fitz.Page, quads) -> fitz.Annot:
+def strikeout(page: pymupdf.Page, quads) -> pymupdf.Annot:
     """
     Ajoute une annotation de biffure (texte barré) sur les quads spécifiés.
 
@@ -63,14 +63,14 @@ def strikeout(page: fitz.Page, quads) -> fitz.Annot:
 
     Parameters
     ----------
-    page : fitz.Page
+    page : pymupdf.Page
         Page cible.
-    quads : list[fitz.Quad] | fitz.Quad
+    quads : list[pymupdf.Quad] | pymupdf.Quad
         Quadrilatères couvrant le texte à barrer.
 
     Returns
     -------
-    fitz.Annot
+    pymupdf.Annot
         L'objet annotation créé.
     """
     annot = page.add_strikeout_annot(quads)
@@ -78,20 +78,20 @@ def strikeout(page: fitz.Page, quads) -> fitz.Annot:
     return annot
 
 
-def underline(page: fitz.Page, quads) -> fitz.Annot:
+def underline(page: pymupdf.Page, quads) -> pymupdf.Annot:
     """
     Ajoute une annotation de soulignement sous les quads spécifiés.
 
     Parameters
     ----------
-    page : fitz.Page
+    page : pymupdf.Page
         Page cible.
-    quads : list[fitz.Quad] | fitz.Quad
+    quads : list[pymupdf.Quad] | pymupdf.Quad
         Quadrilatères couvrant le texte à souligner.
 
     Returns
     -------
-    fitz.Annot
+    pymupdf.Annot
         L'objet annotation créé.
     """
     annot = page.add_underline_annot(quads)
@@ -100,12 +100,12 @@ def underline(page: fitz.Page, quads) -> fitz.Annot:
 
 
 def add_text_box(
-    page: fitz.Page,
-    rect: fitz.Rect,
+    page: pymupdf.Page,
+    rect: pymupdf.Rect,
     text: str,
     fontsize: int = 11,
     color: tuple = (0, 0, 0),
-) -> fitz.Annot:
+) -> pymupdf.Annot:
     """
     Ajoute une annotation de type « zone de texte libre » (FreeText).
 
@@ -114,9 +114,9 @@ def add_text_box(
 
     Parameters
     ----------
-    page : fitz.Page
+    page : pymupdf.Page
         Page sur laquelle ajouter la zone de texte.
-    rect : fitz.Rect
+    rect : pymupdf.Rect
         Rectangle de la zone en coordonnées PDF.
     text : str
         Contenu textuel de la zone.
@@ -127,7 +127,7 @@ def add_text_box(
 
     Returns
     -------
-    fitz.Annot
+    pymupdf.Annot
         L'objet annotation créé.
     """
     annot = page.add_freetext_annot(
@@ -143,10 +143,10 @@ def add_text_box(
 
 
 def add_stamp(
-    page: fitz.Page,
-    rect: fitz.Rect,
+    page: pymupdf.Page,
+    rect: pymupdf.Rect,
     stamp_id: int = 0,
-) -> fitz.Annot:
+) -> pymupdf.Annot:
     """
     Ajoute un tampon PDF standard (Rubber Stamp annotation).
 
@@ -159,16 +159,16 @@ def add_stamp(
 
     Parameters
     ----------
-    page : fitz.Page
+    page : pymupdf.Page
         Page sur laquelle ajouter le tampon.
-    rect : fitz.Rect
+    rect : pymupdf.Rect
         Rectangle de placement du tampon en coordonnées PDF.
     stamp_id : int
         Identifiant du tampon prédéfini (0 = Draft par défaut).
 
     Returns
     -------
-    fitz.Annot
+    pymupdf.Annot
         L'objet annotation créé.
     """
     annot = page.add_stamp_annot(rect, stamp=stamp_id)

@@ -21,7 +21,7 @@ Le résultat est un nouveau fichier (le document actif n'est pas modifié).
 
 Inverser
 ---------
-``invert_pages()`` retourne un **nouveau** ``fitz.Document``.
+``invert_pages()`` retourne un **nouveau** ``pymupdf.Document``.
 L'ancien document est fermé, le nouveau est assigné à ``document.fitz_doc``,
 puis ``changed`` est émis. Ce pattern de remplacement du doc est
 différent des autres opérations qui modifient en place.

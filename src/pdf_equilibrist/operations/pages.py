@@ -4,7 +4,7 @@ operations/pages.py — Organisation et structure des pages PDF
 Ce module regroupe toutes les opérations qui modifient la **structure** du document
 (ordre, nombre, taille des pages) sans toucher au contenu textuel ou graphique.
 
-Toutes les fonctions reçoivent un ``fitz.Document`` et le modifient en place,
+Toutes les fonctions reçoivent un ``pymupdf.Document`` et le modifient en place,
 sauf ``invert_pages`` et ``merge_pdfs`` qui retournent un **nouveau** document
 (car PyMuPDF ne permet pas de réordonner les pages in-place de façon fiable).
 
@@ -12,11 +12,11 @@ Après chaque appel, le tab appelant doit émettre ``document.changed.emit()``
 pour rafraîchir le viewer et les miniatures.
 """
 from pathlib import Path
-import fitz
+import pymupdf
 
 
 def rotate_pages(
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     angle: int,
     page_indices: list[int] | None = None,
 ):
@@ -29,7 +29,7 @@ def rotate_pages(
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document à modifier en place.
     angle : int
         Angle en degrés à ajouter. Positif = sens anti-horaire (convention PDF).
@@ -44,7 +44,7 @@ def rotate_pages(
         doc[i].set_rotation((doc[i].rotation + angle) % 360)
 
 
-def invert_pages(doc: fitz.Document) -> fitz.Document:
+def invert_pages(doc: pymupdf.Document) -> pymupdf.Document:
     """
     Inverse l'ordre de toutes les pages du document.
 
@@ -56,22 +56,22 @@ def invert_pages(doc: fitz.Document) -> fitz.Document:
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document source (non modifié).
 
     Returns
     -------
-    fitz.Document
+    pymupdf.Document
         Nouveau document avec pages en ordre inverse.
     """
-    result = fitz.open()
+    result = pymupdf.open()
     # Itérer de la dernière page (len-1) vers la première (0)
     for i in range(len(doc) - 1, -1, -1):
         result.insert_pdf(doc, from_page=i, to_page=i)
     return result
 
 
-def split_pdf(doc: fitz.Document, output_dir: Path) -> list[Path]:
+def split_pdf(doc: pymupdf.Document, output_dir: Path) -> list[Path]:
     """
     Divise le document en autant de fichiers PDF que de pages.
 
@@ -81,7 +81,7 @@ def split_pdf(doc: fitz.Document, output_dir: Path) -> list[Path]:
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document source à diviser.
     output_dir : Path
         Dossier de destination des fichiers générés.
@@ -94,7 +94,7 @@ def split_pdf(doc: fitz.Document, output_dir: Path) -> list[Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     paths = []
     for i in range(len(doc)):
-        out = fitz.open()
+        out = pymupdf.open()
         out.insert_pdf(doc, from_page=i, to_page=i)
         p = output_dir / f"page_{i + 1}.pdf"
         out.save(str(p))
@@ -103,7 +103,7 @@ def split_pdf(doc: fitz.Document, output_dir: Path) -> list[Path]:
     return paths
 
 
-def extract_pages(doc: fitz.Document, page_indices: list[int]) -> fitz.Document:
+def extract_pages(doc: pymupdf.Document, page_indices: list[int]) -> pymupdf.Document:
     """
     Extrait un sous-ensemble de pages dans un **nouveau** document en mémoire.
 
@@ -112,23 +112,23 @@ def extract_pages(doc: fitz.Document, page_indices: list[int]) -> fitz.Document:
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document source (non modifié).
     page_indices : list[int]
         Indices 0-based des pages à extraire.
 
     Returns
     -------
-    fitz.Document
+    pymupdf.Document
         Nouveau document ne contenant que les pages demandées, non sauvegardé.
     """
-    result = fitz.open()
+    result = pymupdf.open()
     for i in sorted(set(page_indices)):
         result.insert_pdf(doc, from_page=i, to_page=i)
     return result
 
 
-def merge_pdfs(paths: list[Path]) -> fitz.Document:
+def merge_pdfs(paths: list[Path]) -> pymupdf.Document:
     """
     Fusionne plusieurs fichiers PDF en un seul document en mémoire.
 
@@ -143,19 +143,19 @@ def merge_pdfs(paths: list[Path]) -> fitz.Document:
 
     Returns
     -------
-    fitz.Document
+    pymupdf.Document
         Nouveau document contenant toutes les pages, non sauvegardé.
     """
-    result = fitz.open()
+    result = pymupdf.open()
     for p in paths:
-        src = fitz.open(str(p))
+        src = pymupdf.open(str(p))
         result.insert_pdf(src)
         src.close()
     return result
 
 
 def insert_page(
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     after_index: int,
     src_path: Path | None = None,
 ):
@@ -170,7 +170,7 @@ def insert_page(
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document cible (modifié en place).
     after_index : int
         Index 0-based de la page **après laquelle** insérer.
@@ -180,7 +180,7 @@ def insert_page(
         Si ``None``, une page blanche est insérée.
     """
     if src_path:
-        src = fitz.open(str(src_path))
+        src = pymupdf.open(str(src_path))
         # start_at = position d'insertion dans le doc cible
         doc.insert_pdf(src, start_at=after_index + 1)
         src.close()
@@ -189,7 +189,7 @@ def insert_page(
         doc.insert_page(after_index + 1)
 
 
-def crop_page(doc: fitz.Document, page_index: int, rect: fitz.Rect):
+def crop_page(doc: pymupdf.Document, page_index: int, rect: pymupdf.Rect):
     """
     Rogne une page en définissant sa CropBox.
 
@@ -199,18 +199,18 @@ def crop_page(doc: fitz.Document, page_index: int, rect: fitz.Rect):
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document à modifier en place.
     page_index : int
         Numéro de page 0-based.
-    rect : fitz.Rect
+    rect : pymupdf.Rect
         Nouveau rectangle visible en coordonnées PDF (points).
     """
     doc[page_index].set_cropbox(rect)
 
 
 def set_page_size(
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     page_index: int,
     width: float,
     height: float,
@@ -223,7 +223,7 @@ def set_page_size(
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document à modifier en place.
     page_index : int
         Numéro de page 0-based.
@@ -238,4 +238,4 @@ def set_page_size(
     A4 paysage   : width=842, height=595
     Letter       : width=612, height=792
     """
-    doc[page_index].set_mediabox(fitz.Rect(0, 0, width, height))
+    doc[page_index].set_mediabox(pymupdf.Rect(0, 0, width, height))

@@ -616,7 +616,7 @@ class MainWindow(QWidget):
         if idx < 0 or idx >= len(self._documents):
             return
 
-        self._documents[idx].close()  # libère fitz.Document (mémoire)
+        self._documents[idx].close()  # libère pymupdf.Document (mémoire)
         self._documents.pop(idx)
         self._title_bar.remove_tab(idx)
 

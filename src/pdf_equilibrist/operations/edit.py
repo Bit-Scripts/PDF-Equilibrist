@@ -6,7 +6,7 @@ ou graphique** d'un document PDF existant.
 
 Principe de conception
 ----------------------
-Les fonctions de ce module sont **sans UI** : elles reçoivent un ``fitz.Document``
+Les fonctions de ce module sont **sans UI** : elles reçoivent un ``pymupdf.Document``
 et le modifient directement. Elles ne connaissent pas Qt et sont donc testables
 unitairement sans lancer d'interface graphique.
 
@@ -35,7 +35,7 @@ qui est exactement ce point baseline.
 from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
-import fitz
+import pymupdf
 
 
 # ── Modèle de bloc texte ──────────────────────────────────────────────────────
@@ -56,7 +56,7 @@ class TextBlock:
         Utilisé pour retrouver un bloc dans ``edited_texts`` lors de l'application.
     page_index : int
         Numéro de page 0-based d'où provient ce bloc.
-    rect : fitz.Rect
+    rect : pymupdf.Rect
         Rectangle englobant du span en coordonnées PDF (points, origine haut-gauche).
         Utilisé pour la zone de redaction.
     text : str
@@ -66,7 +66,7 @@ class TextBlock:
         Taille de police en points PDF.
     color : tuple[float, float, float]
         Couleur RGB normalisée 0.0–1.0, telle qu'attendue par ``page.insert_text()``.
-    origin : fitz.Point
+    origin : pymupdf.Point
         Point baseline du span — position exacte d'insertion pour ``insert_text()``.
         IMPORTANT : utiliser ce point et non ``rect.tl`` pour éviter le décalage vertical.
     fontname : str
@@ -79,11 +79,11 @@ class TextBlock:
     """
     block_id:    int
     page_index:  int
-    rect:        fitz.Rect
+    rect:        pymupdf.Rect
     text:        str
     fontsize:    float
     color:       tuple[float, float, float]
-    origin:      fitz.Point
+    origin:      pymupdf.Point
     fontname:    str = "helv"
     font_buffer: bytes | None = None
 
@@ -94,7 +94,7 @@ def _int_color_to_tuple(c: int) -> tuple[float, float, float]:
     normalisé (r, g, b) avec valeurs entre 0.0 et 1.0.
 
     PyMuPDF retourne les couleurs de span sous forme d'un entier 24 bits :
-    ``0xRRGGBB``. Qt et fitz.insert_text() attendent des floats 0–1.
+    ``0xRRGGBB``. Qt et pymupdf.insert_text() attendent des floats 0–1.
 
     Examples
     --------
@@ -112,7 +112,7 @@ def _int_color_to_tuple(c: int) -> tuple[float, float, float]:
 
 # ── Extraction ────────────────────────────────────────────────────────────────
 
-def extract_text_blocks(doc: fitz.Document, page_index: int) -> list[TextBlock]:
+def extract_text_blocks(doc: pymupdf.Document, page_index: int) -> list[TextBlock]:
     """
     Extrait tous les spans de texte d'une page sous forme de ``TextBlock``.
 
@@ -126,7 +126,7 @@ def extract_text_blocks(doc: fitz.Document, page_index: int) -> list[TextBlock]:
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document PyMuPDF ouvert.
     page_index : int
         Numéro de page 0-based à analyser.
@@ -164,7 +164,7 @@ def extract_text_blocks(doc: fitz.Document, page_index: int) -> list[TextBlock]:
 
     # get_text("dict") retourne un dict avec "blocks" contenant :
     # type 0 = texte, type 1 = image
-    raw = page.get_text("dict", flags=fitz.TEXT_PRESERVE_WHITESPACE)
+    raw = page.get_text("dict", flags=pymupdf.TEXT_PRESERVE_WHITESPACE)
 
     for block in raw.get("blocks", []):
         if block.get("type") != 0:
@@ -178,8 +178,8 @@ def extract_text_blocks(doc: fitz.Document, page_index: int) -> list[TextBlock]:
                     continue   # ignorer les spans vides ou purement whitespace
 
                 # Extraire les métadonnées du span
-                rect     = fitz.Rect(span["bbox"])
-                origin   = fitz.Point(span["origin"])  # point baseline
+                rect     = pymupdf.Rect(span["bbox"])
+                origin   = pymupdf.Point(span["origin"])  # point baseline
                 color    = _int_color_to_tuple(span.get("color", 0))
                 fontname = span.get("font", "helv")
                 fontsize = span.get("size", 12.0)
@@ -204,7 +204,7 @@ def extract_text_blocks(doc: fitz.Document, page_index: int) -> list[TextBlock]:
 # ── Application des modifications ─────────────────────────────────────────────
 
 def apply_text_edits(
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     page_index: int,
     original_blocks: list[TextBlock],
     edited_texts: dict[int, str],
@@ -220,7 +220,7 @@ def apply_text_edits(
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document PyMuPDF à modifier (modifié en place).
     page_index : int
         Numéro de page 0-based contenant les blocs à modifier.
@@ -283,7 +283,7 @@ def apply_text_edits(
         if nearest_below_y0 < float("inf"):
             y1 = min(y1, nearest_below_y0 - 0.5)   # garantit y1 < bloc suivant
 
-        safe_rect = fitz.Rect(
+        safe_rect = pymupdf.Rect(
             block.rect.x0 + 0.5,
             block.origin.y - ascent,
             block.rect.x1 - 0.5,
@@ -294,7 +294,7 @@ def apply_text_edits(
     # apply_redactions() exécute réellement les redactions dans le flux PDF.
     # PDF_REDACT_IMAGE_NONE = ne pas toucher aux images qui se trouvent
     # sous les zones redactées (performance + préservation du fond).
-    page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
+    page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
 
     # --- Passe 2 : Réinsertion avec style original ---
     for block in original_blocks:
@@ -325,7 +325,7 @@ def apply_text_edits(
 
 # ── Opérations de mise en page ────────────────────────────────────────────────
 
-def compress(doc: fitz.Document, save_path: Path):
+def compress(doc: pymupdf.Document, save_path: Path):
     """
     Sauvegarde le document avec une compression maximale.
 
@@ -337,7 +337,7 @@ def compress(doc: fitz.Document, save_path: Path):
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document source (non modifié).
     save_path : Path
         Chemin du fichier compressé de sortie.
@@ -351,7 +351,7 @@ def compress(doc: fitz.Document, save_path: Path):
     )
 
 
-def add_watermark(doc: fitz.Document, text: str,
+def add_watermark(doc: pymupdf.Document, text: str,
                   color: tuple = (0.6, 0.6, 0.6)):
     """
     Ajoute un texte en filigrane diagonal sur toutes les pages du document.
@@ -361,7 +361,7 @@ def add_watermark(doc: fitz.Document, text: str,
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document à modifier en place.
     text : str
         Texte du filigrane (ex. "CONFIDENTIEL").
@@ -380,7 +380,7 @@ def add_watermark(doc: fitz.Document, text: str,
         x = rect.width  / 2 - len(text) * 13
         y = rect.height / 2
         page.insert_text(
-            fitz.Point(x, y),
+            pymupdf.Point(x, y),
             text,
             fontsize=48,
             color=color,
@@ -390,10 +390,10 @@ def add_watermark(doc: fitz.Document, text: str,
 
 
 def add_text(
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     page_index: int,
     text: str,
-    point: fitz.Point,
+    point: pymupdf.Point,
     fontsize: int = 12,
     color: tuple = (0, 0, 0),
 ):
@@ -402,13 +402,13 @@ def add_text(
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document à modifier en place.
     page_index : int
         Numéro de page 0-based.
     text : str
         Texte à insérer.
-    point : fitz.Point
+    point : pymupdf.Point
         Point baseline d'insertion en coordonnées PDF.
     fontsize : int
         Taille en points (défaut 12).
@@ -423,8 +423,8 @@ def add_text(
     )
 
 
-def add_image(doc: fitz.Document, page_index: int,
-              image_path: Path, rect: fitz.Rect):
+def add_image(doc: pymupdf.Document, page_index: int,
+              image_path: Path, rect: pymupdf.Rect):
     """
     Insère une image dans un rectangle donné sur une page.
 
@@ -433,13 +433,13 @@ def add_image(doc: fitz.Document, page_index: int,
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document à modifier en place.
     page_index : int
         Numéro de page 0-based.
     image_path : Path
         Chemin vers le fichier image à insérer.
-    rect : fitz.Rect
+    rect : pymupdf.Rect
         Rectangle de destination en coordonnées PDF.
     """
     doc[page_index].insert_image(rect, filename=str(image_path))

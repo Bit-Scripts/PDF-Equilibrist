@@ -30,7 +30,7 @@ Le viewer a deux modes distincts :
     Activé par ``enter_edit_mode(blocks_by_page)``.
     Les ``QLabel`` sont remplacés par des ``PageEditWidget`` qui permettent
     le survol et le clic pour éditer les blocs de texte individuellement.
-    Les modifications sont appliquées directement dans ``fitz.Document``
+    Les modifications sont appliquées directement dans ``pymupdf.Document``
     à chaque validation de bloc, sans re-render global.
 
 Zoom
@@ -54,7 +54,7 @@ from pathlib import Path
 from PyQt6.QtWidgets import QScrollArea, QLabel, QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt, pyqtSignal, QPoint, QRect
 from PyQt6.QtGui import QPixmap, QPainter, QColor, QFont, QPen
-import fitz
+import pymupdf
 from pdf_equilibrist.core.document import Document
 
 
@@ -77,10 +77,10 @@ class _PageLabel(QLabel):
     # Émis quand un PDF externe doit être ouvert
     open_pdf = pyqtSignal(str)
     # Émis quand l'utilisateur sélectionne du texte par glissement
-    # (page_index, [(fitz.Quad, ...)])
+    # (page_index, [(pymupdf.Quad, ...)])
     text_selected = pyqtSignal(int, list)
 
-    def __init__(self, fitz_page: fitz.Page, zoom: float,
+    def __init__(self, fitz_page: pymupdf.Page, zoom: float,
                  pixmap: QPixmap, doc_path: Path | None = None,
                  page_index: int = 0):
         super().__init__()
@@ -93,7 +93,7 @@ class _PageLabel(QLabel):
         self._sel_start: QPoint | None = None
         self._sel_rect:  QRect  | None = None
         self._dragging   = False
-        # Résultats de recherche : liste de fitz.Rect en coords PDF
+        # Résultats de recherche : liste de pymupdf.Rect en coords PDF
         self._search_rects: list = []
 
         self.setPixmap(pixmap)
@@ -107,9 +107,9 @@ class _PageLabel(QLabel):
         """Retourne le lien PDF sous le curseur ou None."""
         px = pos.x() / max(self._zoom, 0.01)
         py = pos.y() / max(self._zoom, 0.01)
-        pt = fitz.Point(px, py)
+        pt = pymupdf.Point(px, py)
         for link in self._fitz_page.get_links():
-            if fitz.Rect(link["from"]).contains(pt):
+            if pymupdf.Rect(link["from"]).contains(pt):
                 return link
         return None
 
@@ -188,15 +188,15 @@ class _PageLabel(QLabel):
     def _emit_selection(self, rect: QRect):
         """Convertit le rect écran en quads PDF et émet text_selected."""
         z = max(self._zoom, 0.01)
-        pdf_rect = fitz.Rect(
+        pdf_rect = pymupdf.Rect(
             rect.left()   / z, rect.top()    / z,
             rect.right()  / z, rect.bottom() / z,
         )
         words = self._fitz_page.get_text("words")
         quads = [
-            fitz.Rect(w[:4]).quad
+            pymupdf.Rect(w[:4]).quad
             for w in words
-            if fitz.Rect(w[:4]).intersects(pdf_rect)
+            if pymupdf.Rect(w[:4]).intersects(pdf_rect)
         ]
         if quads:
             self.text_selected.emit(self._page_index, quads)
@@ -206,14 +206,14 @@ class _PageLabel(QLabel):
     def _handle_link(self, link: dict):
         kind = link.get("kind")
 
-        if kind == fitz.LINK_URI:
+        if kind == pymupdf.LINK_URI:
             # Lien web → navigateur par défaut, après confirmation : un lien
             # peut servir à pister l'ouverture du document (URL unique).
             uri = link.get("uri", "")
             if uri:
                 self._confirm_and_open_uri(uri)
 
-        elif kind == fitz.LINK_GOTOR:
+        elif kind == pymupdf.LINK_GOTOR:
             # Lien vers un autre PDF — résoudre le chemin relatif
             file_rel = link.get("file", "")
             if not file_rel:
@@ -230,12 +230,12 @@ class _PageLabel(QLabel):
                 # Fallback : ouvrir avec le viewer système
                 self._open_with_system(str(target))
 
-        elif kind == fitz.LINK_GOTO:
+        elif kind == pymupdf.LINK_GOTO:
             # Lien interne → scrolle vers la page cible
             page = link.get("page", 0)
             self.goto_page.emit(int(page))
 
-        elif kind == fitz.LINK_LAUNCH:
+        elif kind == pymupdf.LINK_LAUNCH:
             file = link.get("file", "")
             if file:
                 self._confirm_and_launch(file)
@@ -380,7 +380,7 @@ class PdfViewer(QScrollArea):
 
     zoom_changed       = pyqtSignal(float)       # Ctrl+molette → sync combo zoom
     open_pdf_requested = pyqtSignal(str)         # lien GOTOR → ouvrir PDF dans nouvel onglet
-    text_selected      = pyqtSignal(int, list)   # (page_index, [fitz.Quad]) sélection texte
+    text_selected      = pyqtSignal(int, list)   # (page_index, [pymupdf.Quad]) sélection texte
 
     def __init__(self, document: Document):
         super().__init__()
@@ -622,7 +622,7 @@ class PdfViewer(QScrollArea):
     def search_in_doc(self, text: str) -> list[tuple[int, list]]:
         """
         Cherche ``text`` dans toutes les pages du document.
-        Retourne [(page_index, [fitz.Rect, ...]), ...] pour les pages avec des résultats.
+        Retourne [(page_index, [pymupdf.Rect, ...]), ...] pour les pages avec des résultats.
         Met à jour l'affichage avec les surlignages jaunes.
         """
         if not self.document.is_open or not text:

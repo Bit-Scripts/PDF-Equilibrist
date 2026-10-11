@@ -22,7 +22,7 @@ et NON par ``_ThumbList`` (la liste Qt). Ce choix est délibéré :
 Pourquoi pas le DnD natif de QListWidget ?
 -------------------------------------------
 ``QListWidget`` avec ``InternalMove`` gère le déplacement visuel des items
-mais ne permet pas de hook fiable sur l'ordre réel des pages dans ``fitz.Document``.
+mais ne permet pas de hook fiable sur l'ordre réel des pages dans ``pymupdf.Document``.
 De plus, les drops externes (fichiers PDF depuis l'explorateur) ne sont pas
 gérés nativement. Le contrôle total via ``ThumbnailPanel`` est plus robuste.
 
@@ -51,7 +51,7 @@ from PyQt6.QtGui import (QIcon, QPixmap, QImage, QAction,
                           QPainter, QPen, QColor, QDrag)
 from PyQt6.QtCore import (Qt, pyqtSignal, QSize, QPoint,
                            QMimeData, QEvent)
-import fitz
+import pymupdf
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations.pages import rotate_pages, extract_pages
 from pdf_equilibrist.ui.dialogs import show_info, show_error, ensure_suffix
@@ -243,7 +243,7 @@ class ThumbnailPanel(QWidget):
         """Rendu à l'aspect ratio exact de la page, hauteur = THUMB_H."""
         page  = self.document.fitz_doc[idx]
         zoom  = THUMB_H / max(page.rect.height, 1)
-        pix   = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
+        pix   = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False)
         img   = QImage(pix.samples, pix.width, pix.height,
                        pix.stride, QImage.Format.Format_RGB888)
         return QPixmap.fromImage(img)
@@ -369,7 +369,7 @@ class ThumbnailPanel(QWidget):
             self.open_pdf_requested.emit(path)
             return
         try:
-            src = fitz.open(path)
+            src = pymupdf.open(path)
         except Exception as e:
             show_error(self, self.tr("Insertion PDF"), self.tr("Impossible d'ouvrir :\n{0}").format(e))
             return
@@ -518,7 +518,7 @@ class ThumbnailPanel(QWidget):
         doc = self.document.fitz_doc
         rows = sorted(rows)
         self.document.checkpoint()
-        tmp = fitz.open()
+        tmp = pymupdf.open()
         for i in rows:
             tmp.insert_pdf(doc, from_page=i, to_page=i)
         at = rows[-1] + 1

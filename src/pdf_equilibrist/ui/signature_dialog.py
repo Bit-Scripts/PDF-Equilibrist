@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
-import fitz
+import pymupdf
 
 ACCENT = "#6BBF4E"
 
@@ -77,7 +77,7 @@ class SignatureDialog(QDialog):
       {'type': 'image', 'path': str, 'page': int, 'x': int, 'y': int, 'w': int, 'h': int}
     """
 
-    def __init__(self, doc: fitz.Document, parent=None):
+    def __init__(self, doc: pymupdf.Document, parent=None):
         super().__init__(parent)
         self.setWindowTitle(self.tr("Signature / Tampon"))
         self.setStyleSheet(DIALOG_STYLE)

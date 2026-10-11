@@ -29,7 +29,7 @@ Dépendances externes
 - ``PyMuPDF``    : rastérisation des pages PDF
 """
 from pathlib import Path
-import fitz
+import pymupdf
 import io
 # subprocess : toujours appelé en argv liste, jamais shell=True (voir plus bas)
 import subprocess  # nosec B404
@@ -179,7 +179,7 @@ def office_to_pdf(input_path: Path, output_path: Path) -> Path:
 # ── PDF → Formats externes ────────────────────────────────────────────────────
 
 def to_images(
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     output_dir: Path,
     zoom: float = 2.0,
     fmt: str = "png",
@@ -192,7 +192,7 @@ def to_images(
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document PDF source.
     output_dir : Path
         Dossier de destination (créé si absent).
@@ -209,7 +209,7 @@ def to_images(
         Chemins des fichiers image créés, dans l'ordre des pages.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
-    mat = fitz.Matrix(zoom, zoom)
+    mat = pymupdf.Matrix(zoom, zoom)
     paths = []
     for i, page in enumerate(doc):
         pix = page.get_pixmap(matrix=mat, alpha=False)
@@ -219,7 +219,7 @@ def to_images(
     return paths
 
 
-def _reveal_ocr_text(doc: fitz.Document) -> int:
+def _reveal_ocr_text(doc: pymupdf.Document) -> int:
     """
     Rend VISIBLE le texte OCR d'une copie de travail (et retire l'image du scan).
 
@@ -236,19 +236,19 @@ def _reveal_ocr_text(doc: fitz.Document) -> int:
         spans = [t for t in page.get_texttrace() if t.get("type") == 3 and t.get("chars")]
         if not spans:
             continue
-        runs = [(fitz.Point(t["chars"][0][2]), "".join(chr(c[0]) for c in t["chars"]), t["size"])
+        runs = [(pymupdf.Point(t["chars"][0][2]), "".join(chr(c[0]) for c in t["chars"]), t["size"])
                 for t in spans]
         for t in spans:
-            page.add_redact_annot(fitz.Rect(t["bbox"]))
+            page.add_redact_annot(pymupdf.Rect(t["bbox"]))
         # PDF_REDACT_IMAGE_REMOVE : retire l'image du scan que ces zones recouvrent
-        page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_REMOVE)
+        page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_REMOVE)
         for origin, text, size in runs:
             page.insert_text(origin, text, fontsize=size, fontname="helv")
         changed += 1
     return changed
 
 
-def to_word(doc: fitz.Document, src_path: Path, output_path: Path) -> Path:
+def to_word(doc: pymupdf.Document, src_path: Path, output_path: Path) -> Path:
     """
     Convertit un PDF en document Word (.docx) via pdf2docx.
 
@@ -263,7 +263,7 @@ def to_word(doc: fitz.Document, src_path: Path, output_path: Path) -> Path:
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document PyMuPDF à convertir (état courant, modifications comprises).
     src_path : Path
         Chemin du PDF d'origine — conservé pour compatibilité d'API, non lu.
@@ -280,7 +280,7 @@ def to_word(doc: fitz.Document, src_path: Path, output_path: Path) -> Path:
     with tempfile.TemporaryDirectory(prefix="pdfeq_word_") as tmp_dir:
         tmp_pdf = Path(tmp_dir) / "source.pdf"
         doc.save(str(tmp_pdf))
-        work = fitz.open(str(tmp_pdf))
+        work = pymupdf.open(str(tmp_pdf))
         try:
             if _reveal_ocr_text(work):
                 tmp_pdf = Path(tmp_dir) / "source_ocr.pdf"
@@ -295,12 +295,12 @@ def to_word(doc: fitz.Document, src_path: Path, output_path: Path) -> Path:
     return output_path
 
 
-def _has_ocr_text(page: fitz.Page) -> bool:
+def _has_ocr_text(page: pymupdf.Page) -> bool:
     """True si la page porte du texte invisible (calque OCR, ``render_mode=3``)."""
     return any(t.get("type") == 3 for t in page.get_texttrace())
 
 
-def to_excel(doc: fitz.Document, output_path: Path,
+def to_excel(doc: pymupdf.Document, output_path: Path,
              ocr_tables: dict[int, list[list[str]]] | None = None) -> Path:
     """
     Extrait les tableaux du PDF et les écrit dans un fichier Excel (.xlsx).
@@ -315,7 +315,7 @@ def to_excel(doc: fitz.Document, output_path: Path,
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document PyMuPDF (converti en bytes pour pdfplumber via ``io.BytesIO``).
     output_path : Path
         Chemin du fichier .xlsx de sortie.
@@ -328,7 +328,7 @@ def to_excel(doc: fitz.Document, output_path: Path,
     import pdfplumber
     import openpyxl
 
-    # pdfplumber ne peut pas lire un fitz.Document directement →
+    # pdfplumber ne peut pas lire un pymupdf.Document directement →
     # on sérialise le doc en bytes en mémoire pour l'ouvrir via BytesIO
     buf = io.BytesIO(doc.tobytes())
     wb = openpyxl.Workbook()
@@ -369,7 +369,7 @@ def to_excel(doc: fitz.Document, output_path: Path,
 
 
 def to_powerpoint(
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     output_path: Path,
     zoom: float = 1.5,
 ) -> Path:
@@ -385,7 +385,7 @@ def to_powerpoint(
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document PDF source.
     output_path : Path
         Chemin du fichier .pptx de sortie.
@@ -400,7 +400,7 @@ def to_powerpoint(
     from pptx import Presentation
     from pptx.util import Inches
 
-    mat = fitz.Matrix(zoom, zoom)
+    mat = pymupdf.Matrix(zoom, zoom)
     prs = Presentation()
     blank_layout = prs.slide_layouts[6]   # layout "Vierge" sans placeholder
 
@@ -447,7 +447,7 @@ def image_to_pdf(image_paths: list[Path], output_path: Path) -> Path:
     Path
         Chemin du PDF généré.
     """
-    doc = fitz.open()
+    doc = pymupdf.open()
     for img_path in image_paths:
         # Créer une page A4 et y insérer l'image en plein cadre
         page = doc.new_page(width=595, height=842)   # A4 en points PDF
@@ -459,7 +459,7 @@ def image_to_pdf(image_paths: list[Path], output_path: Path) -> Path:
 
 # ── PDF → Markdown ────────────────────────────────────────────────────────────
 
-def to_markdown(doc: fitz.Document, output_path: Path) -> Path:
+def to_markdown(doc: pymupdf.Document, output_path: Path) -> Path:
     """
     Convertit un PDF en fichier Markdown (.md).
 
@@ -484,7 +484,7 @@ def to_markdown(doc: fitz.Document, output_path: Path) -> Path:
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document PDF source ouvert.
     output_path : Path
         Chemin du fichier .md de sortie.
@@ -505,7 +505,7 @@ def to_markdown(doc: fitz.Document, output_path: Path) -> Path:
     # ── Passe 1 : collecter toutes les tailles pour déduire le corps ──────────
     all_sizes: list[float] = []
     for page in doc:
-        raw = page.get_text("dict", flags=fitz.TEXT_PRESERVE_WHITESPACE)
+        raw = page.get_text("dict", flags=pymupdf.TEXT_PRESERVE_WHITESPACE)
         for block in raw.get("blocks", []):
             if block.get("type") != 0:
                 continue
@@ -603,7 +603,7 @@ def to_markdown(doc: fitz.Document, output_path: Path) -> Path:
                 elements.append((ty0, "table", md_table))
 
             # Extraire les blocs texte hors tableaux
-            raw = page.get_text("dict", flags=fitz.TEXT_PRESERVE_WHITESPACE)
+            raw = page.get_text("dict", flags=pymupdf.TEXT_PRESERVE_WHITESPACE)
             for block in raw.get("blocks", []):
                 if block.get("type") != 0:
                     continue

@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QWidget, QTextEdit
 from PyQt6.QtGui import (QPixmap, QPainter, QColor, QFont, QPen,
                           QTextOption, QKeyEvent)
 from PyQt6.QtCore import Qt, QRect, pyqtSignal
-import fitz
+import pymupdf
 from pdf_equilibrist.operations.edit import TextBlock, apply_text_edits
 
 ACCENT       = "#6BBF4E"
@@ -77,7 +77,7 @@ class PageEditWidget(QWidget):
     page_changed = pyqtSignal()   # émis quand un bloc est modifié
 
     def __init__(self, pixmap: QPixmap, blocks: list[TextBlock],
-                 zoom: float, doc: fitz.Document, page_index: int,
+                 zoom: float, doc: pymupdf.Document, page_index: int,
                  page_origin: tuple[int, int] = (0, 0),
                  parent=None):
         super().__init__(parent)
@@ -100,7 +100,7 @@ class PageEditWidget(QWidget):
         ox, oy = self._page_origin
         px = (qx + ox) / self._zoom
         py = (qy + oy) / self._zoom
-        pt = fitz.Point(px, py)
+        pt = pymupdf.Point(px, py)
         for block in self._blocks:
             if block.rect.contains(pt):
                 return block
@@ -153,7 +153,7 @@ class PageEditWidget(QWidget):
             block.text = new_text
             # re-render la page
             pix = self._doc[self._page_idx].get_pixmap(
-                matrix=fitz.Matrix(self._zoom, self._zoom), alpha=False
+                matrix=pymupdf.Matrix(self._zoom, self._zoom), alpha=False
             )
             img_data = pix.samples
             from PyQt6.QtGui import QImage

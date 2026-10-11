@@ -5,7 +5,7 @@ Ce module contient la classe ``Document``, pièce centrale de l'architecture.
 
 Rôle dans l'architecture
 -------------------------
-``Document`` est le **seul détenteur** du ``fitz.Document`` ouvert à un instant T.
+``Document`` est le **seul détenteur** du ``pymupdf.Document`` ouvert à un instant T.
 Aucun autre module n'ouvre ou ne ferme directement un fichier PDF.
 
 Le signal ``changed`` est le mécanisme de communication vers l'UI :
@@ -36,7 +36,7 @@ from collections import deque
 from pathlib import Path
 import shutil
 import tempfile
-import fitz
+import pymupdf
 from PyQt6.QtCore import QObject, pyqtSignal
 from PyQt6.QtGui import QPixmap, QImage
 
@@ -51,7 +51,7 @@ class Document(QObject):
 
     Attributes
     ----------
-    fitz_doc : fitz.Document | None
+    fitz_doc : pymupdf.Document | None
         Le document PyMuPDF sous-jacent. ``None`` si aucun fichier n'est ouvert.
     path : Path | None
         Chemin du fichier sur le disque. ``None`` si aucun fichier n'est ouvert.
@@ -68,7 +68,7 @@ class Document(QObject):
 
     def __init__(self):
         super().__init__()
-        self.fitz_doc: fitz.Document | None = None
+        self.fitz_doc: pymupdf.Document | None = None
         self.path: Path | None = None
         self._undo_stack: deque[bytes] = deque(maxlen=_UNDO_MAX)
 
@@ -98,7 +98,7 @@ class Document(QObject):
             self.fitz_doc.close()
 
         self.path = Path(path)
-        self.fitz_doc = fitz.open(str(self.path))
+        self.fitz_doc = pymupdf.open(str(self.path))
         self._undo_stack.clear()
         self.changed.emit()
 
@@ -172,7 +172,7 @@ class Document(QObject):
             return False
         state = self._undo_stack.pop()
         self.fitz_doc.close()
-        self.fitz_doc = fitz.open(stream=state, filetype="pdf")
+        self.fitz_doc = pymupdf.open(stream=state, filetype="pdf")
         self.changed.emit()
         return True
 
@@ -206,14 +206,14 @@ class Document(QObject):
 
         Note
         ----
-        ``fitz.Matrix(zoom, zoom)`` applique le zoom uniformément en X et Y.
+        ``pymupdf.Matrix(zoom, zoom)`` applique le zoom uniformément en X et Y.
         ``alpha=False`` améliore les performances (pas de canal transparence).
         ``QImage.Format.Format_RGB888`` correspond au format 24 bits RGB de PyMuPDF.
         """
         page = self.fitz_doc[page_num]
 
         # Matrice de transformation : zoom uniforme horizontal et vertical
-        mat = fitz.Matrix(zoom, zoom)
+        mat = pymupdf.Matrix(zoom, zoom)
 
         # Rasterisation PyMuPDF → objet Pixmap (données brutes RGB en mémoire)
         pix = page.get_pixmap(matrix=mat, alpha=False)

@@ -1,11 +1,11 @@
 from pathlib import Path
 
-import fitz
+import pymupdf
 from pdf_equilibrist.operations.protect import encrypt, decrypt, is_encrypted
 
 
 def _create_sample_pdf(path: Path):
-    doc = fitz.open()
+    doc = pymupdf.open()
     page = doc.new_page()
     page.insert_text((72, 72), "Secret")
     doc.save(str(path))
@@ -18,11 +18,11 @@ def test_encrypt_decrypt(tmp_path: Path):
     encrypted = tmp_path / "encrypted.pdf"
 
     _create_sample_pdf(source)
-    doc = fitz.open(str(source))
+    doc = pymupdf.open(str(source))
     encrypt(doc, encrypted, user_password="user123", owner_password="owner456")
     doc.close()
 
-    enc_doc = fitz.open(str(encrypted))
+    enc_doc = pymupdf.open(str(encrypted))
     assert is_encrypted(enc_doc)
     assert not decrypt(enc_doc, "wrongpass")
     assert decrypt(enc_doc, "user123")
