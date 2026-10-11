@@ -63,6 +63,8 @@ img { max-width: 100%; display: block; }
   color: var(--text);
 }
 .topnav .brand img { width: 28px; height: 28px; }
+.topnav a.brand, .topnav a.brand:hover { color: var(--text); text-decoration: none; }
+.topnav a.brand:hover { opacity: 0.85; }
 .topnav nav a {
   color: var(--text-dim);
   margin-left: 22px;

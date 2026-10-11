@@ -108,10 +108,10 @@
 <body>
 
 <div class="topnav">
-  <div class="brand">
+  <a class="brand" href="./">
     <img src="{{base.url}}assets/logo/PDF-Equilibrist-logo.png" alt="{{img.logo.alt}}">
     PDF-Equilibrist
-  </div>
+  </a>
   <nav>
     <a href="#apropos">{{nav.about}}</a>
     <a href="#fonctionnalites">{{nav.features}}</a>
@@ -457,6 +457,23 @@ sudo dnf install pdf-equilibrist</code></pre>
       /* pas de chiffres, pas de section : la page reste valide */
     }
   })();
+</script>
+
+<script>
+// Le sélecteur de langue garde l'ancre courante : la même page de doc (ou la même section) dans l'autre langue.
+(function () {
+  var links = document.querySelectorAll(".lang-switch a:not(.lang-current)");
+  var banner = document.getElementById("lang-banner-switch");
+  var bases = [];
+  links.forEach(function (a) { bases.push(a.getAttribute("href")); });
+  function sync() {
+    var h = location.hash || "";
+    links.forEach(function (a, i) { a.setAttribute("href", bases[i] + h); });
+    if (banner && links.length) { banner.setAttribute("href", bases[0] + h); }
+  }
+  window.addEventListener("hashchange", sync);
+  sync();
+})();
 </script>
 
 </body>

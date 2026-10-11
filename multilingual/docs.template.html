@@ -15,10 +15,10 @@
 <body>
 
 <div class="topnav">
-  <div class="brand">
+  <a class="brand" href="{{docs.nav.home.url}}">
     <img src="{{docs.base.url}}assets/logo/PDF-Equilibrist-logo.png" alt="{{img.logo.alt}}">
     PDF-Equilibrist
-  </div>
+  </a>
   <nav>
     <a href="{{docs.nav.home.url}}">{{nav.home}}</a>
     <a href="{{docs.nav.features.url}}">{{nav.features}}</a>
@@ -133,6 +133,23 @@ loadDoc(currentFile());
       try { localStorage.setItem("langBannerDismissed", "1"); } catch (e) {}
     });
   } catch (e) { /* localStorage indisponible : pas de bandeau, pas grave */ }
+})();
+</script>
+
+<script>
+// Le sélecteur de langue garde l'ancre courante : la même page de doc (ou la même section) dans l'autre langue.
+(function () {
+  var links = document.querySelectorAll(".lang-switch a:not(.lang-current)");
+  var banner = document.getElementById("lang-banner-switch");
+  var bases = [];
+  links.forEach(function (a) { bases.push(a.getAttribute("href")); });
+  function sync() {
+    var h = location.hash || "";
+    links.forEach(function (a, i) { a.setAttribute("href", bases[i] + h); });
+    if (banner && links.length) { banner.setAttribute("href", bases[0] + h); }
+  }
+  window.addEventListener("hashchange", sync);
+  sync();
 })();
 </script>
 
