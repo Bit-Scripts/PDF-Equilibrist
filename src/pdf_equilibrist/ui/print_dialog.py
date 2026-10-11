@@ -11,7 +11,7 @@ Modes d'échelle :
 """
 from __future__ import annotations
 import sys
-import fitz
+import pymupdf
 import logging
 from PyQt6.QtPrintSupport import QPrinter, QPrinterInfo
 from PyQt6.QtWidgets import (
@@ -70,7 +70,7 @@ QScrollArea { border: none; background: #2A2A2A; }
 
 # ── Aperçu custom ─────────────────────────────────────────────────────────────
 
-def _compose_page(pdf_page: fitz.Page,
+def _compose_page(pdf_page: pymupdf.Page,
                   paper_w_px: int, paper_h_px: int,
                   scale_mode: str,
                   orient: str) -> QPixmap:
@@ -98,7 +98,7 @@ def _compose_page(pdf_page: fitz.Page,
         if zoom > 1.0:
             zoom = 1.0   # ne jamais agrandir
 
-    mat = fitz.Matrix(zoom, zoom)
+    mat = pymupdf.Matrix(zoom, zoom)
     pix = pdf_page.get_pixmap(matrix=mat, alpha=False)
     img = QImage(pix.samples, pix.width, pix.height,
                  pix.stride, QImage.Format.Format_RGB888)
@@ -135,7 +135,7 @@ class _PreviewArea(QScrollArea):
     # Largeur fixe du papier dans l'aperçu (px) — pas de resize dynamique
     _PAPER_W_PX = 500
 
-    def __init__(self, fitz_doc: fitz.Document, parent=None):
+    def __init__(self, fitz_doc: pymupdf.Document, parent=None):
         super().__init__(parent)
         self._fitz_doc   = fitz_doc
         self._paper_w_mm = 210.0
@@ -201,7 +201,7 @@ class _PreviewArea(QScrollArea):
 
         self._container.adjustSize()
 
-    def _effective_paper(self, pdf_page: fitz.Page) -> tuple[float, float]:
+    def _effective_paper(self, pdf_page: pymupdf.Page) -> tuple[float, float]:
         short = min(self._paper_w_mm, self._paper_h_mm)
         long_ = max(self._paper_w_mm, self._paper_h_mm)
         if self._orient == "paysage":
@@ -259,7 +259,7 @@ def _qt_print(printer_name: str, doc_bytes: bytes, pages: list[int],
         else QPageLayout.Orientation.Portrait
     )
 
-    fitz_doc = fitz.open(stream=doc_bytes, filetype="pdf")
+    fitz_doc = pymupdf.open(stream=doc_bytes, filetype="pdf")
     painter = QPainter()
     try:
         if not painter.begin(printer):
@@ -288,7 +288,7 @@ def _qt_print(printer_name: str, doc_bytes: bytes, pages: list[int],
             else:
                 zoom = base_zoom
 
-            mat = fitz.Matrix(zoom, zoom)
+            mat = pymupdf.Matrix(zoom, zoom)
             pix = pdf_page.get_pixmap(matrix=mat, alpha=False)
             img = QImage(pix.samples, pix.width, pix.height,
                          pix.stride, QImage.Format.Format_RGB888)
@@ -345,7 +345,7 @@ class _PrintWorker(QThread):
 
 # ── Helpers impression ────────────────────────────────────────────────────────
 
-def _page_is_landscape(page: fitz.Page) -> bool:
+def _page_is_landscape(page: pymupdf.Page) -> bool:
     return page.rect.width > page.rect.height
 
 

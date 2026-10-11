@@ -40,7 +40,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 from typing import Callable
-import fitz
+import pymupdf
 
 
 # ── Résolution de rastérisation pour l'OCR ───────────────────────────────────
@@ -48,7 +48,7 @@ _OCR_DPI = 300          # DPI de rastérisation (300 dpi = bon compromis précis
 _OCR_ZOOM = _OCR_DPI / 72.0   # facteur zoom PyMuPDF (1 pt PDF = 1/72 pouce)
 
 
-def _is_scanned_page(page: fitz.Page) -> bool:
+def _is_scanned_page(page: pymupdf.Page) -> bool:
     """
     Retourne True si la page est une image sans couche texte.
 
@@ -105,10 +105,10 @@ def _get_ocr_engine():
     return RapidOCR(params={"Global.log_level": "error"})
 
 
-def _page_to_pil(page: fitz.Page):
+def _page_to_pil(page: pymupdf.Page):
     """Rastérise une page PDF en image PIL à _OCR_DPI."""
     from PIL import Image
-    mat = fitz.Matrix(_OCR_ZOOM, _OCR_ZOOM)
+    mat = pymupdf.Matrix(_OCR_ZOOM, _OCR_ZOOM)
     pix = page.get_pixmap(matrix=mat, alpha=False)
     return Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
 
@@ -131,21 +131,21 @@ def _ocr_image(ocr_engine, pil_image) -> list[dict]:
     ]
 
 
-def _bbox_to_pdf_rect(bbox_pts: list, zoom: float) -> fitz.Rect:
+def _bbox_to_pdf_rect(bbox_pts: list, zoom: float) -> pymupdf.Rect:
     """
     Convertit les 4 points du bbox OCR (coordonnées image @zoom)
-    en fitz.Rect dans le repère PDF (points).
+    en pymupdf.Rect dans le repère PDF (points).
     """
     xs = [p[0] for p in bbox_pts]
     ys = [p[1] for p in bbox_pts]
-    return fitz.Rect(min(xs) / zoom, min(ys) / zoom,
+    return pymupdf.Rect(min(xs) / zoom, min(ys) / zoom,
                      max(xs) / zoom, max(ys) / zoom)
 
 
 # ── API publique ──────────────────────────────────────────────────────────────
 
 def apply_ocr_to_pdf(
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     progress_cb: Callable[[int, int, str], None] | None = None,
     cancel_cb: Callable[[], bool] | None = None,
 ) -> int:
@@ -163,7 +163,7 @@ def apply_ocr_to_pdf(
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document PyMuPDF ouvert, modifié en place (seulement en cas de succès).
     progress_cb : callable | None
         Fonction ``(page_actuelle, total_pages, message)`` pour la progression.
@@ -210,7 +210,7 @@ def apply_ocr_to_pdf(
             # Insertion en mode invisible (render_mode=3) : texte cherchable mais non visible
             try:
                 page.insert_text(
-                    fitz.Point(rect.x0, rect.y1 - rect.height * 0.2),   # ligne de base
+                    pymupdf.Point(rect.x0, rect.y1 - rect.height * 0.2),   # ligne de base
                     text,
                     fontsize=fontsize,
                     render_mode=3,
@@ -226,7 +226,7 @@ def apply_ocr_to_pdf(
 
 
 def ocr_to_markdown(
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     output_path: Path,
     progress_cb: Callable[[int, int, str], None] | None = None,
     cancel_cb: Callable[[], bool] | None = None,
@@ -239,7 +239,7 @@ def ocr_to_markdown(
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document source.
     output_path : Path
         Chemin du fichier .md de sortie.
@@ -458,7 +458,7 @@ def _group_lines(items: list[dict]) -> list[list[dict]]:
 
 
 def ocr_to_excel(
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     output_path: Path,
     progress_cb: Callable[[int, int, str], None] | None = None,
     cancel_cb: Callable[[], bool] | None = None,
@@ -518,11 +518,11 @@ def selftest(report_path: str | None = None) -> int:
     lines: list[str] = []
     code = 1
     try:
-        src = fitz.open()
+        src = pymupdf.open()
         sp = src.new_page()
         sp.insert_text((50, 100), "Société Équilibre : réglement déjà versé", fontsize=18)
-        pix = sp.get_pixmap(matrix=fitz.Matrix(_OCR_ZOOM, _OCR_ZOOM), alpha=False)
-        doc = fitz.open()
+        pix = sp.get_pixmap(matrix=pymupdf.Matrix(_OCR_ZOOM, _OCR_ZOOM), alpha=False)
+        doc = pymupdf.open()
         page = doc.new_page(width=sp.rect.width, height=sp.rect.height)
         page.insert_image(page.rect, pixmap=pix)
         n = apply_ocr_to_pdf(doc)

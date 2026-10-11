@@ -19,7 +19,7 @@ from pdf_equilibrist.ui.widgets import RibbonButton, RibbonGroup
 from pdf_equilibrist.ui.dialogs import ask_text_input, show_error, show_info
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations import annotate
-import fitz
+import pymupdf
 
 
 class TabAnnoter(QWidget):
@@ -28,7 +28,7 @@ class TabAnnoter(QWidget):
         self.document = document
         self.viewer   = viewer
 
-        # Sélection courante : (page_index, [fitz.Quad])
+        # Sélection courante : (page_index, [pymupdf.Quad])
         self._selection: tuple[int, list] | None = None
 
         layout = QHBoxLayout(self)
@@ -121,7 +121,7 @@ class TabAnnoter(QWidget):
             page_index = self.viewer.current_page_index
             self.document.checkpoint()
             annotate.add_text_box(self.document.fitz_doc[page_index],
-                                  fitz.Rect(50, 50, 250, 100), text)
+                                  pymupdf.Rect(50, 50, 250, 100), text)
             self.document.changed.emit()
         except Exception as e:
             show_error(self, self.tr("Zone de texte"), str(e))

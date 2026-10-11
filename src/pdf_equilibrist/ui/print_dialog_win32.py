@@ -12,12 +12,12 @@ from __future__ import annotations
 import ctypes
 import ctypes.wintypes
 import logging
-import fitz
+import pymupdf
 
 _log = logging.getLogger(__name__)
 
 
-def _page_is_landscape(page: fitz.Page) -> bool:
+def _page_is_landscape(page: pymupdf.Page) -> bool:
     return page.rect.width > page.rect.height
 
 
@@ -176,7 +176,7 @@ def _make_coord_transform(rotate_90: bool, angle: float, pw: float, ph: float, z
     return to_dc
 
 
-def _draw_vector_strokes(gdi: _GdiCtx, hDC, pdf_page: fitz.Page,
+def _draw_vector_strokes(gdi: _GdiCtx, hDC, pdf_page: pymupdf.Page,
                           zoom_dest: float, zoom_native: float,
                           rotate_90: bool, angle: float,
                           page_w: int, page_h: int):
@@ -276,7 +276,7 @@ def _draw_vector_strokes(gdi: _GdiCtx, hDC, pdf_page: fitz.Page,
                 segments += [(rx0, ry0, rx1, ry0), (rx1, ry0, rx1, ry1),
                               (rx1, ry1, rx0, ry1), (rx0, ry1, rx0, ry0)]
             elif k == 'qu':
-                q = item[1]   # fitz.Quad : ul, ur, ll, lr
+                q = item[1]   # pymupdf.Quad : ul, ur, ll, lr
                 corners = [to_dc(q.ul.x, q.ul.y), to_dc(q.ur.x, q.ur.y),
                            to_dc(q.lr.x, q.lr.y), to_dc(q.ll.x, q.ll.y)]
                 for i in range(4):
@@ -363,7 +363,7 @@ def win32_print(printer_name: str, devmode_bytes: bytes | None,
                    printer_name, kernel32.GetLastError())
         return False
 
-    fitz_doc = fitz.open(stream=doc_bytes, filetype="pdf")
+    fitz_doc = pymupdf.open(stream=doc_bytes, filetype="pdf")
     try:
         dpi    = gdi.GetDeviceCaps(hDC, LOGPIXELSX) or 300
         page_w = gdi.GetDeviceCaps(hDC, HORZRES)
@@ -420,8 +420,8 @@ def win32_print(printer_name: str, devmode_bytes: bytes | None,
             zoom_dest = zoom
             zoom_render = max(base_zoom, zoom_dest) / UPSAMPLE
 
-            mat = (fitz.Matrix(zoom_render, zoom_render).prerotate(angle)
-                   if rotate_90 else fitz.Matrix(zoom_render, zoom_render))
+            mat = (pymupdf.Matrix(zoom_render, zoom_render).prerotate(angle)
+                   if rotate_90 else pymupdf.Matrix(zoom_render, zoom_render))
             pix = pdf_page.get_pixmap(matrix=mat, alpha=False)
 
             img_w, img_h = pix.width, pix.height

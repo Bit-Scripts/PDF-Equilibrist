@@ -22,7 +22,7 @@ datas = [
     ("src/pdf_equilibrist", "pdf_equilibrist"),
     ("translations",        "translations"),
 ]
-datas += collect_data_files("fitz")
+datas += collect_data_files("pymupdf")
 # OCR : RapidOCR + modèles ONNX livrés dans la wheel (rapidocr/models/*.onnx) —
 # embarqués tels quels, aucun téléchargement au runtime.
 datas += collect_data_files("rapidocr")
@@ -44,7 +44,7 @@ for _dist in importlib.metadata.distributions():
 hidden = [
     "PyQt6.QtCore", "PyQt6.QtGui", "PyQt6.QtWidgets",
     "PyQt6.QtNetwork", "PyQt6.sip",
-    "fitz", "fitz.utils",
+    "pymupdf", "pymupdf.utils", "pymupdf.table",   # `fitz` n'est qu'un alias créé à l'exécution (voir pdf_equilibrist/__init__.py)
     "zlib", "zipfile", "struct",
     "pdf2docx", "pdfplumber", "pdfminer",
     "openpyxl", "pptx", "docx",

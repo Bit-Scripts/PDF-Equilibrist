@@ -35,7 +35,7 @@ from pdf_equilibrist.operations.edit import (
     compress, add_watermark,
     extract_text_blocks,
 )
-import fitz
+import pymupdf
 
 ACCENT = "#6BBF4E"
 
@@ -201,12 +201,12 @@ class TabModifier(QWidget):
         x0, y0, x1, y1 = result["pdf_rect"]
         angle = result.get("angle", 0.0)
         page  = self.document.fitz_doc[page_index]
-        rect  = fitz.Rect(x0, y0, x1, y1)
+        rect  = pymupdf.Rect(x0, y0, x1, y1)
 
         dtype = result.get("type")
         if dtype == "text":
             page.insert_text(
-                fitz.Point(x0, y1),
+                pymupdf.Point(x0, y1),
                 result.get("text", ""),
                 fontsize=result.get("fontsize", 14),
                 color=result.get("color", (0, 0, 0)),
@@ -220,7 +220,7 @@ class TabModifier(QWidget):
             text  = result.get("text", "TAMPON")
             page.draw_rect(rect, color=color, fill=None, width=2)
             page.insert_text(
-                fitz.Point(x0 + 4, y1 - 6),
+                pymupdf.Point(x0 + 4, y1 - 6),
                 text, fontsize=14, color=color,
                 rotate=int(-angle), overlay=True,
             )

@@ -67,9 +67,9 @@ DOCS = [
 
 def new_page(doc) -> tuple:
     """Crée une nouvelle page avec fond sombre et retourne (page, y_courant)."""
-    import fitz
+    import pymupdf
     page = doc.new_page(width=PAGE_W, height=PAGE_H)
-    page.draw_rect(fitz.Rect(0, 0, PAGE_W, PAGE_H),
+    page.draw_rect(pymupdf.Rect(0, 0, PAGE_W, PAGE_H),
                    color=None, fill=BG_DARK)
     return page, MARGIN
 
@@ -78,10 +78,10 @@ def insert_text(page, x: float, y: float, text: str,
                 fontsize: float = 11, color=FG_WHITE,
                 fontname: str = "helv", bold: bool = False) -> float:
     """Insère du texte et retourne la nouvelle position Y."""
-    import fitz
+    import pymupdf
     fn = "hebo" if bold else fontname   # hebo = Helvetica Bold dans fitz
     page.insert_text(
-        fitz.Point(x, y), text,
+        pymupdf.Point(x, y), text,
         fontname=fn, fontsize=fontsize, color=color
     )
     return y + fontsize * 1.4
@@ -89,8 +89,8 @@ def insert_text(page, x: float, y: float, text: str,
 
 def draw_hline(page, y: float, color=FG_DARK_GREY, width: float = 0.5):
     """Dessine une ligne horizontale."""
-    import fitz
-    page.draw_line(fitz.Point(MARGIN, y), fitz.Point(PAGE_W - MARGIN, y),
+    import pymupdf
+    page.draw_line(pymupdf.Point(MARGIN, y), pymupdf.Point(PAGE_W - MARGIN, y),
                    color=color, width=width)
 
 
@@ -98,7 +98,7 @@ def insert_wrapped(page, x: float, y: float, text: str,
                    fontsize: float = 10, color=FG_WHITE,
                    max_width: float = CONTENT_W) -> float:
     """Insère du texte avec retour à la ligne automatique."""
-    import fitz
+    import pymupdf
     # Estimation de la largeur : ~0.55 * fontsize par caractère (Helvetica)
     chars_per_line = max(1, int(max_width / (fontsize * 0.55)))
     words = text.split()
@@ -115,7 +115,7 @@ def insert_wrapped(page, x: float, y: float, text: str,
         lines.append(current)
 
     for line in lines:
-        page.insert_text(fitz.Point(x, y), line,
+        page.insert_text(pymupdf.Point(x, y), line,
                          fontname="helv", fontsize=fontsize, color=color)
         y += fontsize * 1.5
     return y
@@ -124,14 +124,14 @@ def insert_wrapped(page, x: float, y: float, text: str,
 def badge(page, x: float, y: float, label: str,
           color: tuple, width: float = 90) -> None:
     """Dessine un badge coloré avec label."""
-    import fitz
+    import pymupdf
     h = 16
-    r = fitz.Rect(x, y - h + 3, x + width, y + 3)
+    r = pymupdf.Rect(x, y - h + 3, x + width, y + 3)
     page.draw_rect(r, color=None, fill=color + (0.25,)
                    if len(color) == 3 else color, width=0)
     page.draw_rect(r, color=color, fill=None, width=1)
     cx = x + width / 2 - len(label) * 3
-    page.insert_text(fitz.Point(cx, y - 2), label,
+    page.insert_text(pymupdf.Point(cx, y - 2), label,
                      fontname="helv", fontsize=9, color=color)
 
 
@@ -217,20 +217,20 @@ def parse_md(md_path: Path) -> list[dict]:
 def render_doc(fitz_doc, blocks: list[dict],
                title: str, color: tuple) -> None:
     """Rend tous les blocs d'un document Markdown dans fitz_doc."""
-    import fitz
+    import pymupdf
 
     page, y = new_page(fitz_doc)
 
     # En-tête du document
-    page.draw_rect(fitz.Rect(0, 0, PAGE_W, 70), color=None, fill=BG_MID)
-    page.insert_text(fitz.Point(MARGIN, 30),
+    page.draw_rect(pymupdf.Rect(0, 0, PAGE_W, 70), color=None, fill=BG_MID)
+    page.insert_text(pymupdf.Point(MARGIN, 30),
                      "PDF Equilibrist",
                      fontname="helv", fontsize=10, color=FG_GREY)
-    page.insert_text(fitz.Point(MARGIN, 52),
+    page.insert_text(pymupdf.Point(MARGIN, 52),
                      title,
                      fontname="hebo", fontsize=18, color=color)
     # Badge couleur sur le côté droit
-    page.draw_rect(fitz.Rect(PAGE_W - 8, 0, PAGE_W, 70),
+    page.draw_rect(pymupdf.Rect(PAGE_W - 8, 0, PAGE_W, 70),
                    color=None, fill=color)
     y = 90
 
@@ -242,28 +242,28 @@ def render_doc(fitz_doc, blocks: list[dict],
         if y > PAGE_H - MARGIN - 20:
             page, y = new_page(fitz_doc)
             # En-tête de continuation
-            page.draw_rect(fitz.Rect(0, 0, PAGE_W, 28),
+            page.draw_rect(pymupdf.Rect(0, 0, PAGE_W, 28),
                            color=None, fill=BG_MID)
-            page.insert_text(fitz.Point(MARGIN, 20), title,
+            page.insert_text(pymupdf.Point(MARGIN, 20), title,
                              fontname="helv", fontsize=9, color=FG_GREY)
-            page.draw_rect(fitz.Rect(PAGE_W - 8, 0, PAGE_W, 28),
+            page.draw_rect(pymupdf.Rect(PAGE_W - 8, 0, PAGE_W, 28),
                            color=None, fill=color)
             y = 40
 
         if btype == "h1":
             y += 6
-            page.draw_rect(fitz.Rect(MARGIN, y - 14, PAGE_W - MARGIN, y + 6),
+            page.draw_rect(pymupdf.Rect(MARGIN, y - 14, PAGE_W - MARGIN, y + 6),
                            color=None, fill=(color[0]*0.3, color[1]*0.3, color[2]*0.3))
-            page.insert_text(fitz.Point(MARGIN + 4, y),
+            page.insert_text(pymupdf.Point(MARGIN + 4, y),
                              text, fontname="hebo", fontsize=15, color=color)
             y += 20
 
         elif btype == "h2":
             y += 10
-            page.draw_line(fitz.Point(MARGIN, y - 4),
-                           fitz.Point(MARGIN + 4, y - 4),
+            page.draw_line(pymupdf.Point(MARGIN, y - 4),
+                           pymupdf.Point(MARGIN + 4, y - 4),
                            color=color, width=3)
-            page.insert_text(fitz.Point(MARGIN + 10, y),
+            page.insert_text(pymupdf.Point(MARGIN + 10, y),
                              text, fontname="hebo", fontsize=13, color=FG_WHITE)
             y += 8
             draw_hline(page, y, color=color, width=0.5)
@@ -271,12 +271,12 @@ def render_doc(fitz_doc, blocks: list[dict],
 
         elif btype == "h3":
             y += 6
-            page.insert_text(fitz.Point(MARGIN, y),
+            page.insert_text(pymupdf.Point(MARGIN, y),
                              text, fontname="hebo", fontsize=11, color=ACCENT)
             y += 16
 
         elif btype == "h4":
-            page.insert_text(fitz.Point(MARGIN + 8, y),
+            page.insert_text(pymupdf.Point(MARGIN + 8, y),
                              text, fontname="hebo", fontsize=10, color=FG_GREY)
             y += 14
 
@@ -285,7 +285,7 @@ def render_doc(fitz_doc, blocks: list[dict],
             y += 2
 
         elif btype == "li":
-            page.draw_circle(fitz.Point(MARGIN + 6, y - 3), 2,
+            page.draw_circle(pymupdf.Point(MARGIN + 6, y - 3), 2,
                              color=color, fill=color)
             y = insert_wrapped(page, MARGIN + 16, y, text,
                                fontsize=10, color=FG_WHITE,
@@ -295,14 +295,14 @@ def render_doc(fitz_doc, blocks: list[dict],
             lines = text.split("\n")
             code_h = len(lines) * 13 + 10
             # Fond de code
-            page.draw_rect(fitz.Rect(MARGIN, y, PAGE_W - MARGIN, y + code_h),
+            page.draw_rect(pymupdf.Rect(MARGIN, y, PAGE_W - MARGIN, y + code_h),
                            color=None,
                            fill=(0.15, 0.15, 0.15))
-            page.draw_rect(fitz.Rect(MARGIN, y, MARGIN + 3, y + code_h),
+            page.draw_rect(pymupdf.Rect(MARGIN, y, MARGIN + 3, y + code_h),
                            color=None, fill=color)
             cy = y + 8
             for cl in lines:
-                page.insert_text(fitz.Point(MARGIN + 8, cy), cl,
+                page.insert_text(pymupdf.Point(MARGIN + 8, cy), cl,
                                  fontname="cour", fontsize=8,
                                  color=(0.75, 0.92, 0.65))
                 cy += 13
@@ -318,18 +318,18 @@ def render_doc(fitz_doc, blocks: list[dict],
             fill = (0.20, 0.20, 0.20) if is_first else (0.16, 0.16, 0.16)
             txt_color = color if is_first else FG_WHITE
 
-            page.draw_rect(fitz.Rect(MARGIN, y - 12, PAGE_W - MARGIN, y + 4),
+            page.draw_rect(pymupdf.Rect(MARGIN, y - 12, PAGE_W - MARGIN, y + 4),
                            color=None, fill=fill)
             for ci, col in enumerate(cols):
                 cx = MARGIN + 4 + ci * col_w
-                page.insert_text(fitz.Point(cx, y),
+                page.insert_text(pymupdf.Point(cx, y),
                                  col[:40],   # tronquer si trop long
                                  fontname="hebo" if is_first else "helv",
                                  fontsize=9, color=txt_color)
                 if ci < n - 1:
                     page.draw_line(
-                        fitz.Point(MARGIN + (ci + 1) * col_w, y - 12),
-                        fitz.Point(MARGIN + (ci + 1) * col_w, y + 4),
+                        pymupdf.Point(MARGIN + (ci + 1) * col_w, y - 12),
+                        pymupdf.Point(MARGIN + (ci + 1) * col_w, y + 4),
                         color=FG_DARK_GREY, width=0.4)
             y += row_h
 
@@ -339,16 +339,16 @@ def render_doc(fitz_doc, blocks: list[dict],
 
         elif btype == "nav_links":
             # Ligne de navigation retour avec liens GoToR cliquables
-            import fitz as _fitz
+            import pymupdf as _fitz
             links = block.get("links", [])
             x = MARGIN
-            page.insert_text(fitz.Point(x, y), "<-",
+            page.insert_text(pymupdf.Point(x, y), "<-",
                              fontname="helv", fontsize=8, color=FG_DARK_GREY)
             x += 16
             for i, (label, pdf_file) in enumerate(links):
                 lw = len(label) * 5.5 + 4
-                link_rect = fitz.Rect(x, y - 9, x + lw, y + 2)
-                page.insert_text(fitz.Point(x, y), label,
+                link_rect = pymupdf.Rect(x, y - 9, x + lw, y + 2)
+                page.insert_text(pymupdf.Point(x, y), label,
                                  fontname="helv", fontsize=8, color=ACCENT)
                 # Lien GoToR relatif vers le PDF correspondant
                 page.insert_link({
@@ -359,7 +359,7 @@ def render_doc(fitz_doc, blocks: list[dict],
                 })
                 x += lw
                 if i < len(links) - 1:
-                    page.insert_text(fitz.Point(x, y), " · ",
+                    page.insert_text(pymupdf.Point(x, y), " · ",
                                      fontname="helv", fontsize=8,
                                      color=FG_DARK_GREY)
                     x += 12
@@ -374,27 +374,27 @@ def render_doc(fitz_doc, blocks: list[dict],
 
 def render_index(fitz_doc, pdf_dir: Path) -> None:
     """Génère la page INDEX avec liens cliquables vers chaque document."""
-    import fitz
+    import pymupdf
 
     page, y = new_page(fitz_doc)
 
     # En-tête
-    page.draw_rect(fitz.Rect(0, 0, PAGE_W, 90), color=None, fill=BG_MID)
+    page.draw_rect(pymupdf.Rect(0, 0, PAGE_W, 90), color=None, fill=BG_MID)
     # Logo / nom
-    page.insert_text(fitz.Point(MARGIN, 35),
+    page.insert_text(pymupdf.Point(MARGIN, 35),
                      "PDF Equilibrist",
                      fontname="hebo", fontsize=22, color=ACCENT)
-    page.insert_text(fitz.Point(MARGIN, 60),
+    page.insert_text(pymupdf.Point(MARGIN, 60),
                      "Documentation technique — Index",
                      fontname="helv", fontsize=12, color=FG_GREY)
     draw_hline(page, 90, color=ACCENT, width=1.5)
     y = 115
 
-    page.insert_text(fitz.Point(MARGIN, y),
+    page.insert_text(pymupdf.Point(MARGIN, y),
                      "Cette documentation couvre l'architecture, le développement,",
                      fontname="helv", fontsize=10, color=FG_WHITE)
     y += 15
-    page.insert_text(fitz.Point(MARGIN, y),
+    page.insert_text(pymupdf.Point(MARGIN, y),
                      "les opérations PDF disponibles et le processus de build.",
                      fontname="helv", fontsize=10, color=FG_WHITE)
     y += 35
@@ -405,31 +405,31 @@ def render_index(fitz_doc, pdf_dir: Path) -> None:
         pdf_name = f"{num}.{doc_name}.pdf"
 
         card_h    = 70
-        card_rect = fitz.Rect(MARGIN, y, PAGE_W - MARGIN, y + card_h)
+        card_rect = pymupdf.Rect(MARGIN, y, PAGE_W - MARGIN, y + card_h)
 
         page.draw_rect(card_rect, color=None, fill=(0.15, 0.15, 0.15))
         page.draw_rect(card_rect, color=color, fill=None, width=1)
 
         # Barre de couleur + numero
-        page.draw_rect(fitz.Rect(MARGIN, y, MARGIN + 28, y + card_h),
+        page.draw_rect(pymupdf.Rect(MARGIN, y, MARGIN + 28, y + card_h),
                        color=None, fill=color)
-        page.insert_text(fitz.Point(MARGIN + 8, y + 42),
+        page.insert_text(pymupdf.Point(MARGIN + 8, y + 42),
                          str(num), fontname="hebo", fontsize=16,
                          color=(0.08, 0.08, 0.08))
 
         # Titre + description + nom fichier
-        page.insert_text(fitz.Point(MARGIN + 36, y + 22),
+        page.insert_text(pymupdf.Point(MARGIN + 36, y + 22),
                          doc_name, fontname="hebo", fontsize=14, color=color)
-        page.insert_text(fitz.Point(MARGIN + 36, y + 40),
+        page.insert_text(pymupdf.Point(MARGIN + 36, y + 40),
                          doc_desc, fontname="helv", fontsize=10, color=FG_WHITE)
-        page.insert_text(fitz.Point(MARGIN + 36, y + 56),
+        page.insert_text(pymupdf.Point(MARGIN + 36, y + 56),
                          f"-> {pdf_name}",
                          fontname="helv", fontsize=9, color=FG_DARK_GREY)
 
         # LINK_GOTOR = GoTo Remote = standard PDF cross-document
         # Chemin RELATIF pour qu'Acrobat Reader accepte le lien
         link = {
-            "kind": fitz.LINK_GOTOR,
+            "kind": pymupdf.LINK_GOTOR,
             "from": card_rect,
             "file": pdf_name,   # relatif : meme dossier que INDEX.pdf
             "page": 0,
@@ -441,11 +441,11 @@ def render_index(fitz_doc, pdf_dir: Path) -> None:
     # Pied de page
     y = PAGE_H - 40
     draw_hline(page, y - 10, color=FG_DARK_GREY)
-    page.insert_text(fitz.Point(MARGIN, y),
+    page.insert_text(pymupdf.Point(MARGIN, y),
                      "Genere automatiquement par tools/build_docs_pdf.py",
                      fontname="helv", fontsize=8, color=FG_DARK_GREY)
     from datetime import date
-    page.insert_text(fitz.Point(PAGE_W - MARGIN - 60, y),
+    page.insert_text(pymupdf.Point(PAGE_W - MARGIN - 60, y),
                      str(date.today()), fontname="helv",
                      fontsize=8, color=FG_DARK_GREY)
 
@@ -453,7 +453,7 @@ def render_index(fitz_doc, pdf_dir: Path) -> None:
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    import fitz
+    import pymupdf
 
     root    = Path(__file__).parent.parent
     docs_md = root / "docs"
@@ -472,7 +472,7 @@ def main():
             continue
 
         blocks   = parse_md(md_path)
-        fitz_doc = fitz.open()
+        fitz_doc = pymupdf.open()
         color    = DOC_COLORS.get(doc_name, ACCENT)
         render_doc(fitz_doc, blocks, doc_desc, color)
         fitz_doc.save(str(pdf_path))
@@ -481,7 +481,7 @@ def main():
 
     # 2. Generer l'INDEX (1.INDEX.pdf) avec liens GoToR relatifs
     index_path = pdf_dir / "1.INDEX.pdf"
-    fitz_doc = fitz.open()
+    fitz_doc = pymupdf.open()
     render_index(fitz_doc, pdf_dir)
     fitz_doc.save(str(index_path))
     fitz_doc.close()

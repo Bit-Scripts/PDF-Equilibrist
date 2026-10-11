@@ -24,11 +24,11 @@ Toutes les autres permissions (modification, remplissage de formulaires,
 annotations...) sont refusées.
 """
 from pathlib import Path
-import fitz
+import pymupdf
 
 
 def encrypt(  # nosec B107
-    doc: fitz.Document,
+    doc: pymupdf.Document,
     save_path: Path,
     user_password: str,
     # owner_password="" = pas de mot de passe propriétaire distinct, pas un secret
@@ -43,7 +43,7 @@ def encrypt(  # nosec B107
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document PyMuPDF à chiffrer.
     save_path : Path
         Chemin du fichier de sortie chiffré.
@@ -59,31 +59,31 @@ def encrypt(  # nosec B107
         En cas d'erreur d'écriture ou de paramètre invalide PyMuPDF.
     """
     # Permissions accordées : impression + copie texte seulement
-    perm = fitz.PDF_PERM_PRINT | fitz.PDF_PERM_COPY
+    perm = pymupdf.PDF_PERM_PRINT | pymupdf.PDF_PERM_COPY
 
     # Si owner_password vide, utiliser user_password pour les deux rôles
     owner_pw = owner_password or user_password
 
     doc.save(
         str(save_path),
-        encryption=fitz.PDF_ENCRYPT_AES_256,  # chiffrement AES 256 bits
+        encryption=pymupdf.PDF_ENCRYPT_AES_256,  # chiffrement AES 256 bits
         user_pw=user_password,
         owner_pw=owner_pw,
         permissions=perm,
     )
 
 
-def decrypt(doc: fitz.Document, password: str) -> bool:
+def decrypt(doc: pymupdf.Document, password: str) -> bool:
     """
     Tente de déchiffrer un document PDF avec le mot de passe fourni.
 
-    ``fitz.Document.authenticate()`` retourne un entier non nul en cas de succès.
+    ``pymupdf.Document.authenticate()`` retourne un entier non nul en cas de succès.
     La valeur exacte indique quel mot de passe a fonctionné (utilisateur ou propriétaire),
     mais pour l'usage de cette application un bool suffit.
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document chiffré à déchiffrer (modifié en place si succès).
     password : str
         Mot de passe à tester (utilisateur ou propriétaire).
@@ -102,13 +102,13 @@ def decrypt(doc: fitz.Document, password: str) -> bool:
     return True
 
 
-def is_encrypted(doc: fitz.Document) -> bool:
+def is_encrypted(doc: pymupdf.Document) -> bool:
     """
     Indique si le document est actuellement chiffré (nécessite un mot de passe).
 
     Parameters
     ----------
-    doc : fitz.Document
+    doc : pymupdf.Document
         Document à tester.
 
     Returns

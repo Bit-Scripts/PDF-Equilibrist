@@ -69,7 +69,7 @@ class _Worker(QThread):
         self.watermark_text = watermark_text
 
     def run(self):
-        import fitz
+        import pymupdf
         from pdf_equilibrist.operations.edit    import compress, add_watermark
         from pdf_equilibrist.operations.convert import (
             to_word, to_excel, to_powerpoint, to_images
@@ -81,9 +81,9 @@ class _Worker(QThread):
         # Cas spécial : fusion
         if self.operation == "merge":
             try:
-                merged = fitz.open()
+                merged = pymupdf.open()
                 for f in files:
-                    src = fitz.open(f)
+                    src = pymupdf.open(f)
                     merged.insert_pdf(src)
                     src.close()
                 out = self.output_dir / self.tr("fusionné.pdf")
@@ -100,7 +100,7 @@ class _Worker(QThread):
         for i, f in enumerate(files):
             name = Path(f).stem
             try:
-                doc = fitz.open(f)
+                doc = pymupdf.open(f)
 
                 if self.operation == "compress":
                     out = self.output_dir / f"{name}_compressé.pdf"

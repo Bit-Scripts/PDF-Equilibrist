@@ -69,7 +69,7 @@ def main():
     try:
         # PyMuPDF est la bibliothèque la plus lourde (~20 Mo) — chargée en premier
         splash.set_progress(5, QCoreApplication.translate("main", "Chargement de PyMuPDF…"))
-        import fitz                                             # noqa: F401
+        import pymupdf                                             # noqa: F401
 
         splash.set_progress(20, QCoreApplication.translate("main", "Chargement de PyQt6…"))
         from PyQt6.QtCore import Qt                             # noqa: F401

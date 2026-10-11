@@ -12,7 +12,7 @@ Cycle de vie
 2. L'utilisateur interagit : déplace, redimensionne, pivote l'élément.
 3. Clic sur "✔ Valider" → ``committed(result_dict)`` est émis.
    ``result_dict`` contient ``pdf_rect`` en coordonnées PDF (points).
-4. Le tab appelant grave l'élément dans ``fitz.Document`` et émet ``changed``.
+4. Le tab appelant grave l'élément dans ``pymupdf.Document`` et émet ``changed``.
    Ou : clic sur "✘" → ``cancelled()`` est émis, le widget est détruit.
 
 Système de coordonnées

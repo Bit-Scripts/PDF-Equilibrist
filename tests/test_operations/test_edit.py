@@ -1,11 +1,11 @@
 from pathlib import Path
 
-import fitz
+import pymupdf
 from pdf_equilibrist.operations.edit import extract_text_blocks, apply_text_edits
 
 
 def _create_sample_pdf(path: Path):
-    doc = fitz.open()
+    doc = pymupdf.open()
     page = doc.new_page()
     page.insert_text((72, 72), "Bonjour PDF")
     doc.save(str(path))
@@ -15,7 +15,7 @@ def _create_sample_pdf(path: Path):
 
 def test_extract_text_blocks_and_apply_text_edits(tmp_path: Path):
     pdf_path = _create_sample_pdf(tmp_path / "sample.pdf")
-    doc = fitz.open(str(pdf_path))
+    doc = pymupdf.open(str(pdf_path))
 
     blocks = extract_text_blocks(doc, 0)
     assert len(blocks) >= 1

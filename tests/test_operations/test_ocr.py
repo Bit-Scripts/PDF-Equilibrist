@@ -1,7 +1,7 @@
 """Tests de operations/ocr.py — moteur embarqué, hors-ligne, accents français."""
 import socket
 
-import fitz
+import pymupdf
 import pytest
 
 pytest.importorskip("rapidocr")
@@ -11,13 +11,13 @@ from pdf_equilibrist.operations import ocr  # noqa: E402
 PHRASE = "Société Équilibre : réglement déjà versé, façade où"
 
 
-def _scanned_doc() -> fitz.Document:
+def _scanned_doc() -> pymupdf.Document:
     """PDF d'une page ne contenant qu'une image (aucune couche texte)."""
-    src = fitz.open()
+    src = pymupdf.open()
     sp = src.new_page()
     sp.insert_text((50, 100), PHRASE, fontsize=18)
-    pix = sp.get_pixmap(matrix=fitz.Matrix(300 / 72, 300 / 72), alpha=False)
-    doc = fitz.open()
+    pix = sp.get_pixmap(matrix=pymupdf.Matrix(300 / 72, 300 / 72), alpha=False)
+    doc = pymupdf.open()
     page = doc.new_page(width=sp.rect.width, height=sp.rect.height)
     page.insert_image(page.rect, pixmap=pix)
     return doc
@@ -65,7 +65,7 @@ def test_ocr_to_markdown_offline(no_network, tmp_path):
 
 
 def test_text_pdf_is_not_ocred(no_network):
-    doc = fitz.open()
+    doc = pymupdf.open()
     doc.new_page().insert_text((50, 100), "Déjà du texte", fontsize=14)
     assert ocr.apply_ocr_to_pdf(doc) == 0
 
@@ -101,7 +101,7 @@ def test_ocr_text_reaches_the_word_export(tmp_path):
     original = tmp_path / "scan.pdf"
     doc = _scanned_doc()
     doc.save(str(original))
-    doc = fitz.open(str(original))          # comme l'application : document ouvert depuis le disque
+    doc = pymupdf.open(str(original))          # comme l'application : document ouvert depuis le disque
     assert ocr.apply_ocr_to_pdf(doc) == 1   # couche OCR en mémoire uniquement
     out = tmp_path / "out.docx"
     convert.to_word(doc, original, out)
@@ -113,10 +113,10 @@ def test_word_export_includes_unsaved_in_memory_changes(tmp_path):
     pytest.importorskip("pdf2docx")
     from pdf_equilibrist.operations import convert
     original = tmp_path / "plain.pdf"
-    d = fitz.open()
+    d = pymupdf.open()
     d.new_page().insert_text((50, 100), "Texte enregistré", fontsize=14)
     d.save(str(original))
-    doc = fitz.open(str(original))
+    doc = pymupdf.open(str(original))
     doc[0].insert_text((50, 140), "Ajout non enregistré", fontsize=14)
     out = tmp_path / "plain.docx"
     convert.to_word(doc, original, out)
@@ -127,13 +127,13 @@ def test_word_export_mixed_digital_and_scanned_pages(tmp_path):
     """Un PDF mêlant page numérique et page scannée : les deux textes sont là, le texte numérique une seule fois."""
     pytest.importorskip("pdf2docx")
     from pdf_equilibrist.operations import convert
-    digital = fitz.open()
+    digital = pymupdf.open()
     digital.new_page().insert_text((50, 100), "Page numérique unique", fontsize=14)
     scanned = _scanned_doc()
     digital.insert_pdf(scanned)
     original = tmp_path / "mixed.pdf"
     digital.save(str(original))
-    doc = fitz.open(str(original))
+    doc = pymupdf.open(str(original))
     assert ocr.apply_ocr_to_pdf(doc) == 1          # seule la page scannée est OCRisée
     out = tmp_path / "mixed.docx"
     convert.to_word(doc, original, out)
@@ -149,15 +149,15 @@ def test_excel_export_rebuilds_a_scanned_table_from_ocr_positions(tmp_path):
     pytest.importorskip("pdfplumber")
     from pdf_equilibrist.operations import convert
     words = [["Alpha", "Bravo", "Charlie"], ["Delta", "Echo", "Foxtrot"], ["Golf", "Hotel", "India"]]
-    src = fitz.open()
+    src = pymupdf.open()
     sp = src.new_page()
     for r, row in enumerate(words):
         for c, word in enumerate(row):
-            rect = fitz.Rect(50 + c * 150, 80 + r * 40, 200 + c * 150, 120 + r * 40)
+            rect = pymupdf.Rect(50 + c * 150, 80 + r * 40, 200 + c * 150, 120 + r * 40)
             sp.draw_rect(rect, width=1)
             sp.insert_text((rect.x0 + 8, rect.y0 + 26), word, fontsize=16)
-    pix = sp.get_pixmap(matrix=fitz.Matrix(300 / 72, 300 / 72), alpha=False)
-    doc = fitz.open()
+    pix = sp.get_pixmap(matrix=pymupdf.Matrix(300 / 72, 300 / 72), alpha=False)
+    doc = pymupdf.open()
     page = doc.new_page(width=sp.rect.width, height=sp.rect.height)
     page.insert_image(page.rect, pixmap=pix)
     assert ocr.apply_ocr_to_pdf(doc) == 1
@@ -167,7 +167,7 @@ def test_excel_export_rebuilds_a_scanned_table_from_ocr_positions(tmp_path):
     assert rows == words, rows
 
 
-def _two_scanned_pages() -> fitz.Document:
+def _two_scanned_pages() -> pymupdf.Document:
     doc = _scanned_doc()
     doc.insert_pdf(_scanned_doc())
     return doc
@@ -218,21 +218,21 @@ _INVOICE = [
 ]
 
 
-def _invoice_doc() -> fitz.Document:
+def _invoice_doc() -> pymupdf.Document:
     """Page « scannée » : tableau à bordures + titre, uniquement sous forme d'image."""
-    src = fitz.open()
+    src = pymupdf.open()
     sp = src.new_page()
     sp.insert_text((50, 70), "FACTURE F-2026-0412", fontsize=18, fontname="hebo")
     widths = [80, 200, 40, 90, 90]
     for r, row in enumerate(_INVOICE):
         x = 50
         for c, cell in enumerate(row):
-            rect = fitz.Rect(x, 110 + r * 28, x + widths[c], 110 + (r + 1) * 28)
+            rect = pymupdf.Rect(x, 110 + r * 28, x + widths[c], 110 + (r + 1) * 28)
             sp.draw_rect(rect, color=(0, 0, 0), width=1)
             sp.insert_text((rect.x0 + 6, rect.y0 + 18), cell, fontsize=11, fontname="helv")
             x += widths[c]
-    pix = sp.get_pixmap(matrix=fitz.Matrix(200 / 72, 200 / 72), alpha=False)
-    doc = fitz.open()
+    pix = sp.get_pixmap(matrix=pymupdf.Matrix(200 / 72, 200 / 72), alpha=False)
+    doc = pymupdf.open()
     page = doc.new_page(width=sp.rect.width, height=sp.rect.height)
     page.insert_image(page.rect, pixmap=pix)
     return doc

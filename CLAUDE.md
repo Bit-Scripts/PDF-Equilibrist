@@ -96,6 +96,12 @@ src/pdf_equilibrist/
   ci.yml et par tous les workflows de publication — rien n'est buildé ni publié s'il échoue.
 - En local : `flake8 src tests && bandit -r src -q && pytest -q` (`QT_QPA_PLATFORM=offscreen`).
 
+## PyMuPDF
+
+Toujours `import pymupdf` (jamais `import fitz` : module de compatibilité déprécié qui affiche un avertissement).
+`pdf_equilibrist/__init__.py` enregistre `pymupdf` sous le nom `fitz` pour que `pdf2docx`, qui importe encore `fitz`,
+ne le déclenche pas ; `tests/test_no_fitz_warning.py` garde les deux.
+
 ## Flux de données
 
 ```
