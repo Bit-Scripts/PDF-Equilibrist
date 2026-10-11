@@ -1,5 +1,5 @@
 Name:           pdf-equilibrist
-Version:        0.1.19
+Version:        0.1.25
 Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
@@ -197,6 +197,17 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Sun Oct 11 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.25-1
+- New upstream release: local OCR that works offline on every channel.
+  OCR is now RapidOCR + ONNX Runtime with the recognition models shipped
+  inside the package (about 30 MB): nothing is downloaded at first use and
+  OCR never opens a network connection. rapidocr and omegaconf are vendored
+  wheels; onnxruntime, shapely, pyclipper and the rest come from Fedora.
+  OCR -> Word now keeps the recognised text, OCR -> Excel rebuilds a scanned
+  table from the position of the recognised text, and cancelling an OCR
+  leaves the document untouched. A new --ocr-selftest check runs in %check,
+  so a build whose OCR does not work fails instead of being published.
+
 * Tue Sep 22 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.24-1
 - New upstream release: user control over every network connection. Every
   outbound request (api.github.com, api.osv.dev) now goes through a single

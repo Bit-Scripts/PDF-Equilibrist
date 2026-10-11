@@ -206,3 +206,79 @@ def test_not_cancelled_ocr_still_processes_every_page():
     doc = _two_scanned_pages()
     assert ocr.apply_ocr_to_pdf(doc, cancel_cb=lambda: False) == 2
     assert "Société" in doc[0].get_text() and "Société" in doc[1].get_text()
+
+
+# ── Tableaux scannés → Excel (grille détectée dans l'image) ───────────────────
+
+_INVOICE = [
+    ["Référence", "Désignation", "Qté", "Prix HT", "Total HT"],
+    ["EQ-1001", "Bureau en chêne massif", "2", "420,00 €", "840,00 €"],
+    ["EQ-1017", "Fauteuil ergonomique", "4", "189,50 €", "758,00 €"],
+    ["EQ-2040", "Lampe de bureau LED", "6", "34,90 €", "209,40 €"],
+]
+
+
+def _invoice_doc() -> fitz.Document:
+    """Page « scannée » : tableau à bordures + titre, uniquement sous forme d'image."""
+    src = fitz.open()
+    sp = src.new_page()
+    sp.insert_text((50, 70), "FACTURE F-2026-0412", fontsize=18, fontname="hebo")
+    widths = [80, 200, 40, 90, 90]
+    for r, row in enumerate(_INVOICE):
+        x = 50
+        for c, cell in enumerate(row):
+            rect = fitz.Rect(x, 110 + r * 28, x + widths[c], 110 + (r + 1) * 28)
+            sp.draw_rect(rect, color=(0, 0, 0), width=1)
+            sp.insert_text((rect.x0 + 6, rect.y0 + 18), cell, fontsize=11, fontname="helv")
+            x += widths[c]
+    pix = sp.get_pixmap(matrix=fitz.Matrix(200 / 72, 200 / 72), alpha=False)
+    doc = fitz.open()
+    page = doc.new_page(width=sp.rect.width, height=sp.rect.height)
+    page.insert_image(page.rect, pixmap=pix)
+    return doc
+
+
+def _no_euro(rows):
+    return [[c.replace(" €", "").replace("€", "").strip() for c in r] for r in rows]
+
+
+def test_detect_grid_finds_the_ruled_lines():
+    doc = _invoice_doc()
+    xs, ys = ocr._detect_grid(ocr._page_to_pil(doc[0]))
+    assert len(xs) == 6 and len(ys) == 5, (xs, ys)      # 5 colonnes / 4 lignes → 6 et 5 traits
+
+
+def test_ocr_to_excel_rebuilds_a_ruled_scanned_table(tmp_path):
+    openpyxl = pytest.importorskip("openpyxl")
+    pytest.importorskip("pdfplumber")
+    doc = _invoice_doc()
+    out = tmp_path / "facture.xlsx"
+    ocr.ocr_to_excel(doc, out)
+    rows = [[(c.value or "") for c in r] for r in openpyxl.load_workbook(out).active.iter_rows()]
+    rows = [r for r in rows if any(r)]
+    assert rows[0][0].startswith("FACTURE")                 # titre hors grille : ligne à une cellule
+    assert _no_euro(rows[1:]) == _no_euro(_INVOICE), rows   # grille exacte, cellule par cellule
+    # le symbole € instable du modèle est rétabli de façon homogène sur les colonnes de montants
+    assert all(r[3].endswith("€") and r[4].endswith("€") for r in rows[2:]), rows
+    # le document ouvert n'a pas été modifié (pas de couche OCR ajoutée)
+    assert not doc[0].get_texttrace()
+
+
+def test_ocr_to_excel_cancel_writes_nothing(tmp_path):
+    out = tmp_path / "x.xlsx"
+    with pytest.raises(ocr.OcrCancelled):
+        ocr.ocr_to_excel(_invoice_doc(), out, cancel_cb=lambda: True)
+    assert not out.exists()
+
+
+def test_currency_repair_helpers():
+    assert ocr._repair_currency_in_text("Total 1 284,60 · TTC") == "Total 1 284,60 € TTC"
+    assert ocr._repair_currency_in_text("Version 1.2 · beta") == "Version 1.2 · beta"      # pas un montant
+    assert ocr._repair_currency_in_cell("420,00.") == "420,00 €"
+    assert ocr._repair_currency_in_cell("Fin de phrase.") == "Fin de phrase."
+    table = [["Ref", "Prix"], ["A", "10,00 €"], ["B", "20,00"], ["C", "x"]]
+    ocr._restore_currency_by_column(table)
+    assert table == [["Ref", "Prix"], ["A", "10,00 €"], ["B", "20,00 €"], ["C", "x"]]
+    nu = [["Qté"], ["2"], ["3,50"]]                                                        # aucune colonne en €
+    ocr._restore_currency_by_column(nu)
+    assert nu == [["Qté"], ["2"], ["3,50"]]
