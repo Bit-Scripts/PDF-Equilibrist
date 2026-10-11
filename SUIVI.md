@@ -50,14 +50,33 @@ Toujours `git add` des chemins explicites (des `.pyc` sont suivis par git et pol
   Le job s'appelle maintenant « test / Contrôles… » côté GitHub (si une règle de protection de branche
   exige l'ancien nom « Test and lint », la mettre à jour). Une version future de bandit peut ajouter des findings.
 
-### Étape 3 — Documentation
-- [ ] Rapatrier docs/en/ depuis gh-pages
-- [ ] Corriger CONTRIBUTING (Windows-only), OPERATIONS (impression 2 backends), ARCHITECTURE (parité gh-pages)
-- [ ] Page FONCTIONNALITES (FR/EN) avec `<details>`
-- [ ] Workflow de sync main → gh-pages (docs/ uniquement)
-- [ ] tests/test_docs.py (parité FR/EN, modules cités existants, hôtes réseau cités)
-- [ ] Fichiers parasites : `crash.log`, `debug_text.py`, `D:DeveloppementPDF-Equilibristenvironment.yml`, `forensic/` — inspecter contenu avant toute suppression
+### Étape 3 — Documentation — FAIT localement
+- [x] `docs/en/` rapatrié depuis gh-pages dans main, remis à niveau (sélection multiple, extract_pages, OCR)
+- [x] Corrigés : CONTRIBUTING (plus « Windows-only »), OPERATIONS + ARCHITECTURE (impression 2 backends),
+      BUILD (lien cassé `CONTRIBUTING.md` → `3.CONTRIBUTING.md`, FR+EN), 6.SECURITE (OCR)
+- [x] `docs/0.FONCTIONNALITES.md` (FR) et `docs/en/0.FONCTIONNALITES.md` : 13 blocs `<details>`
+      « 🛠 Pour les développeurs » ; INDEX FR/EN mis à jour
+- [x] `tests/test_docs.py` (56 tests) : parité FR/EN (fichiers, hiérarchie des titres, nb de `<details>`),
+      fichiers `.py` et fonctions citées existent, hôtes réseau cités ⊂ `network.py` + liste doc, `PRIVACY.md`
+      liste les hôtes de l'app, plus de trace de l'ancien OCR, liens internes, plus de « Windows-only »
+- [x] `tools/sync_docs_to_pages.py` + `tests/test_docs_sync.py` (4 tests : ne touche que les `.md` de docs/ et
+      docs/en/, préserve index.html/style.css/stats.json/pages générées, idempotent, dry-run)
+- [x] Workflow `docs-sync.yml` (push main sur docs/** → checks → copie vers gh-pages → commit/push si diff)
+- [x] Site (worktree `I:\PDF-Equilibrist-site`, branche gh-pages, commit LOCAL `cc45c44`) : entrée « 0 » dans
+      le viewer (template + l18n FR/EN), CSS `<details>`, pages régénérées par `build_i18n.py`, docs synchronisées.
+      Rendu vérifié dans le navigateur (FR et EN : 13 panneaux repliés, dépliables, nav 0→6).
+- [x] CLAUDE.md : OCR, backends d'impression, section Documentation et CI
+- [x] Fichiers parasites : `crash.log` + `debug_text.py` (logs/script de débogage de juillet, suivis par git, non
+      référencés, sans donnée sensible) retirés via `git rm` (récupérables dans l'historique) ; fichier
+      `D:DeveloppementPDF-Equilibristenvironment.yml` (export conda cassé, 193 octets, non suivi) supprimé.
+      `forensic/` (57 Mo, preuves d'antériorité, ignoré par git, politique de sauvegarde cloud) : **conservé**.
 
-## Problèmes / remarques
-- Le dépôt suit des `.pyc` et `*.egg-info` (devrait être ignoré) — hors périmètre, à traiter à part.
-- `D:\Developpement\CONDA\envs\Equilibrist` absent de cette machine (d'où l'env conda local).
+## Vérifications finales (locales)
+- `flake8 src tests` : 0 · `bandit -r src` : exit 0 · `pytest` : 92 passés
+
+## Reste à faire / à décider
+- [ ] PUSH (attendre l'accord) : branche `chore/docs-ci-ocr` → main ; puis gh-pages (commit local `cc45c44`) — ou laisser
+      `docs-sync.yml` le faire (mais le template/CSS/l18n du viewer ne passent QUE par un push gh-pages direct)
+- [ ] Linux : wheelhouse PPA/COPR + PKGBUILD AUR à régénérer avec rapidocr (voir étape 1)
+- [ ] Premier vrai run GitHub des workflows à surveiller (checks.yml, docs-sync.yml, build PyInstaller complet avec rapidocr)
+- [ ] Hors périmètre : `.pyc` et `*.egg-info` suivis par git ; `.gitignore` et `.claude/settings.local.json` modifiés avant ma session (non touchés)

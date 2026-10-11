@@ -57,8 +57,9 @@ src/pdf_equilibrist/
 │   ├── batch_dialog.py      # traitement par lot (QThread) avec progression
 │   ├── widgets.py           # RibbonButton (vertical), RibbonGroup (avec titre)
 │   ├── dialogs.py           # ask_password, ask_encrypt_passwords, ask_watermark…
-│   ├── print_dialog.py      # print_document() — impression Win32 GDI directe
-│   │                        #   _win32_print() : StretchDIBits UPSAMPLE=2 + overlay GDI
+│   ├── print_dialog.py      # PrintDialog + print_document() ; _qt_print() = Linux/macOS (QPrinter/CUPS)
+│   ├── print_dialog_win32.py # backend Windows (importé seulement sur Windows)
+│   │                        #   win32_print() : StretchDIBits UPSAMPLE=2 + overlay GDI
 │   │                        #   _draw_vector_strokes() : re-trace les traits vectoriels
 │   │                        #   _GdiCtx : bindings ctypes gdi32 (Pen, Polyline…)
 │   └── tabs/
@@ -79,8 +80,21 @@ src/pdf_equilibrist/
     ├── annotate.py          # highlight, strikeout, underline, add_text_box, add_stamp
     ├── convert.py           # to_images, to_word, to_excel, to_powerpoint,
     │                        #   image_to_pdf, office_to_pdf, detect_office_engine
+    ├── ocr.py               # OCR RapidOCR/ONNX — modèles .onnx embarqués dans la wheel,
+    │                        #   JAMAIS de téléchargement (OcrModelsMissingError) ; testé hors-ligne
     └── protect.py           # encrypt (AES-256), decrypt, is_encrypted
 ```
+
+## Documentation et CI
+
+- **Source unique : `docs/*.md` (FR) et `docs/en/*.md` (EN) sur `main`.** Ne jamais éditer la
+  copie de `gh-pages` : `docs-sync.yml` (`tools/sync_docs_to_pages.py`) la republie, sans toucher au reste du site.
+- `docs/0.FONCTIONNALITES.md` : page grand public, détail développeur dans des `<details>`.
+- Toute modification de doc FR doit être reflétée en EN (même hiérarchie de titres) : `tests/test_docs.py` vérifie la parité,
+  les fichiers/fonctions cités, les hôtes réseau (`network.py` ↔ `PRIVACY.md`) et les liens internes.
+- CI : `.github/workflows/checks.yml` (flake8 via `.flake8`, `bandit -r src`, `pytest`) est **bloquant** et appelé par
+  ci.yml et par tous les workflows de publication — rien n'est buildé ni publié s'il échoue.
+- En local : `flake8 src tests && bandit -r src -q && pytest -q` (`QT_QPA_PLATFORM=offscreen`).
 
 ## Flux de données
 
