@@ -36,6 +36,12 @@ import traceback
 
 
 def main():
+    # Auto-test de l'OCR embarqué (CI, validation d'un exe/paquet) — sans interface.
+    if "--ocr-selftest" in sys.argv:
+        from pdf_equilibrist.operations.ocr import selftest
+        i = sys.argv.index("--ocr-selftest")
+        sys.exit(selftest(sys.argv[i + 1] if len(sys.argv) > i + 1 else None))
+
     # ── Phase 1 : QApplication et splash ─────────────────────────────────────
     # QApplication DOIT être créée avant tout widget Qt (y compris le splash).
     from PyQt6.QtWidgets import QApplication

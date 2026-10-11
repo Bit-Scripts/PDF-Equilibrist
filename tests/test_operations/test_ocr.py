@@ -68,3 +68,14 @@ def test_text_pdf_is_not_ocred(no_network):
     doc = fitz.open()
     doc.new_page().insert_text((50, 100), "Déjà du texte", fontsize=14)
     assert ocr.apply_ocr_to_pdf(doc) == 0
+
+
+def test_cli_selftest_passes_in_a_fresh_process(tmp_path):
+    """`--ocr-selftest` (utilisé en CI sur l'exe figé) : processus isolé, car il coupe le réseau."""
+    import subprocess
+    import sys
+    report = tmp_path / "report.txt"
+    r = subprocess.run([sys.executable, "-m", "pdf_equilibrist.main", "--ocr-selftest", str(report)],
+                       capture_output=True, text=True, timeout=300)
+    assert r.returncode == 0, r.stderr
+    assert report.read_text(encoding="utf-8").rstrip().endswith("OK")

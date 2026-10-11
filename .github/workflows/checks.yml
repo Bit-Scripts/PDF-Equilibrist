@@ -29,6 +29,9 @@ jobs:
           pip install -r requirements-dev.txt
           pip install -e .
 
+      - name: Actionlint (validation des workflows GitHub Actions)
+        run: actionlint
+
       - name: Flake8 (bloquant — configuration dans .flake8)
         run: flake8 src tests
 

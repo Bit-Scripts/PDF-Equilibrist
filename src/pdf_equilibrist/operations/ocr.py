@@ -274,3 +274,46 @@ def ocr_to_markdown(
 
     output_path.write_text("\n".join(md_lines), encoding="utf-8")
     return output_path
+
+
+def selftest(report_path: str | None = None) -> int:
+    """
+    Auto-test de l'OCR embarqué : ``PDF-Equilibrist.exe --ocr-selftest [fichier]``.
+
+    Génère une page « scannée », lance l'OCR avec toute connexion réseau interdite
+    et vérifie que le texte (accents compris) est reconnu. Sert à valider un
+    exécutable figé (PyInstaller) ou un paquet Linux sur une machine vierge.
+    Retourne 0 si tout va bien, 1 sinon ; le détail est écrit dans ``report_path``.
+    """
+    import socket
+
+    def _refuse(*_a, **_k):
+        raise RuntimeError("connexion réseau tentée pendant l'OCR")
+    socket.socket.connect = _refuse
+    socket.socket.connect_ex = _refuse
+    socket.getaddrinfo = _refuse
+
+    lines: list[str] = []
+    code = 1
+    try:
+        src = fitz.open()
+        sp = src.new_page()
+        sp.insert_text((50, 100), "Société Équilibre : réglement déjà versé", fontsize=18)
+        pix = sp.get_pixmap(matrix=fitz.Matrix(_OCR_ZOOM, _OCR_ZOOM), alpha=False)
+        doc = fitz.open()
+        page = doc.new_page(width=sp.rect.width, height=sp.rect.height)
+        page.insert_image(page.rect, pixmap=pix)
+        n = apply_ocr_to_pdf(doc)
+        text = doc[0].get_text().strip()
+        lines += [f"models_dir={_models_dir()}", f"pages={n}", f"text={text!r}"]
+        code = 0 if (n == 1 and "Société" in text and "Équilibre" in text and "déjà" in text) else 1
+    except Exception as exc:  # noqa: BLE001 — le rapport doit toujours être écrit
+        lines.append(f"ERREUR: {type(exc).__name__}: {exc}")
+    lines.append("OK" if code == 0 else "ECHEC")
+    out = "\n".join(lines)
+    if report_path:
+        with open(report_path, "w", encoding="utf-8") as fh:
+            fh.write(out + "\n")
+    else:
+        print(out)
+    return code
