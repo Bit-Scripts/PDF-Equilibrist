@@ -50,3 +50,6 @@ packaging/copr/*.src.rpm
 *.pyc
 *.pyo
 *.pyd
+
+# Réglages locaux de Claude Code (chemins, permissions) — ne pas versionner
+.claude/settings.local.json
