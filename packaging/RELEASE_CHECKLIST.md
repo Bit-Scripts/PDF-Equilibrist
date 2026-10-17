@@ -66,3 +66,8 @@ git push origin v0.1.26      # ← déclenche TOUT : release publique + AUR + PP
       Run workflow avec `tag` = `vX.Y.Z`.
 - [ ] Site : `softwareVersion` mis à jour, liens de téléchargement valides
 - [ ] Si un canal échoue : corriger puis bump du dernier chiffre (le PPA refuse de réutiliser une version avec un contenu différent)
+- [ ] **PPA : envoi coupé sur UNE série** (ex. `exit 124` du `dput` de l'orig, vu en 0.1.26 sur resolute) : ne pas relancer
+      le run entier. Relancer seulement la série manquante, sur le contenu du tag, sans renvoyer l'orig déjà accepté :
+      `gh workflow run linux-ppa-publish.yml --ref main -f version=X.Y.Z -f series=resolute -f source_ref=vX.Y.Z -f skip_orig=true`
+      (`source_ref` : l'orig est reproductible à l'octet près, il doit venir du tag et pas de `main`, où `chore(aur): bump
+      PKGBUILD` a déjà modifié des fichiers). Vérifier ensuite `+builds` sur Launchpad.

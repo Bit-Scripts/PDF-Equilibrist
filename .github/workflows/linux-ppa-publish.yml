@@ -29,6 +29,22 @@ on:
       version:
         description: 'Version à publier (ex. 0.1.19) — pour tester sans attendre un vrai tag'
         required: false
+      # Réparation d'un envoi interrompu (ex. dput de l'orig coupé par le délai sur UNE série) :
+      # relancer SEULEMENT cette série, sur le contenu du tag (l'orig est reproductible à l'octet
+      # près, il doit donc venir exactement du tag, pas de main), sans renvoyer l'orig déjà
+      # accepté par Launchpad avec l'autre série. Les valeurs par défaut gardent le comportement
+      # d'un tag normal (deux séries, orig inclus).
+      series:
+        description: 'Séries à envoyer : noble, resolute ou « noble resolute » (défaut : les deux)'
+        required: false
+      source_ref:
+        description: 'Tag ou branche à construire (ex. v0.1.26) — défaut : la référence du déclenchement'
+        required: false
+      skip_orig:
+        description: 'Ne pas renvoyer l''orig.tar.gz (déjà chez Launchpad) : envoi source seule (-sd)'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   checks:
@@ -48,6 +64,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.source_ref || github.ref }}
 
       - name: Determine version from tag
         id: version
@@ -151,9 +169,20 @@ jobs:
             | gzip -n > "/tmp/ppa-build/pdf-equilibrist_${v}.orig.tar.gz"
 
       - name: Build and upload for each series
+        env:
+          INPUT_SERIES: ${{ github.event.inputs.series }}
+          SKIP_ORIG: ${{ github.event.inputs.skip_orig }}
         run: |
           v="${{ steps.version.outputs.version }}"
-          for series in noble resolute; do
+          read -r -a series_arr <<< "${INPUT_SERIES:-noble resolute}"
+          for s in "${series_arr[@]}"; do
+            case "$s" in noble|resolute) ;; *) echo "::error::série inconnue : $s" >&2; exit 1;; esac
+          done
+          # -sa : l'orig est joint à l'envoi ; -sd : source seule, l'orig est déjà chez Launchpad
+          orig_flag="-sa"
+          if [ "$SKIP_ORIG" = "true" ]; then orig_flag="-sd"; fi
+          echo "séries : ${series_arr[*]} ; indicateur d'orig : $orig_flag"
+          for series in "${series_arr[@]}"; do
             echo "::group::${series}"
             workdir="/tmp/ppa-build/${series}"
             rm -rf "$workdir"
@@ -190,7 +219,7 @@ jobs:
               # source-only ne compile rien localement, c'est le build farm
               # Launchpad qui installera les vraies dépendances pour le build
               # binaire réel.
-              debuild -S -sa -d -k"${GPG_KEY_FPR}"
+              debuild -S "$orig_flag" -d -k"${GPG_KEY_FPR}"
             )
 
             changes=$(find "$workdir" -maxdepth 1 -name "*_source.changes")
