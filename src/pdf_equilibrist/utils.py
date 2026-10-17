@@ -119,4 +119,13 @@ def open_external(target: str) -> bool:
     elif sys.platform == "win32" and not target.startswith(("http://", "https://")):
         os.startfile(target)  # nosec B606
         return True
-    return webbrowser.open(target)
+    # Repli : webbrowser lance gio / gvfs-open / un navigateur avec NOTRE environnement. On le
+    # nettoie le temps de l'appel (open() rend la main tout de suite, les enfants sont déjà créés).
+    saved = dict(os.environ)
+    try:
+        os.environ.clear()
+        os.environ.update(external_env())
+        return webbrowser.open(target)
+    finally:
+        os.environ.clear()
+        os.environ.update(saved)
