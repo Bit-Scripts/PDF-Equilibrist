@@ -185,7 +185,8 @@ def test_build_sudo_install_command_reads_password_on_stdin(tmp_path, monkeypatc
     monkeypatch.setattr(update.shutil, "which", lambda name: "/usr/bin/" + name)
     new = tmp_path / "new.AppImage"
     cmd = update.build_sudo_install_command(new, "ef" * 32)
-    assert cmd[:6] == ["/usr/bin/sudo", "-S", "-k", "-p", "", "--"]       # mot de passe sur l'entrée, jamais en argument
+    # le mot de passe arrive sur l'entrée de sudo, jamais en argument
+    assert cmd[:6] == ["/usr/bin/sudo", "-S", "-k", "-p", "", "--"]
     assert cmd[6:9] == ["/usr/bin/bash", "-c", script.read_text(encoding="utf-8")]
     assert cmd[9:] == ["install.sh", "--system", "--file", str(new), "--sha256", "ef" * 32]
 

@@ -462,7 +462,7 @@ class UpdateDialog(QDialog):
             "Dans un terminal : {0}{1}"
         ).format(hint, self._new_appimage))
 
-    def _start_install(self, command: list[str], scope: str, method: str, password: str = ""):
+    def _start_install(self, command: list[str], scope: str, method: str, stdin_text: str | None = None):
         self._install_scope = scope
         self._install_method = method
         self._install_output = ""
@@ -482,11 +482,11 @@ class UpdateDialog(QDialog):
         self._proc.errorOccurred.connect(self._on_install_error)
         if method == "sudo":
             # le mot de passe part sur l'entrée de sudo (-S) dès le démarrage, puis l'entrée est fermée
-            self._proc.started.connect(lambda: self._send_password(password))
+            self._proc.started.connect(lambda: self._send_to_stdin(stdin_text or ""))
         self._proc.start(command[0], command[1:])
 
-    def _send_password(self, password: str):
-        self._proc.write((password + "\n").encode("utf-8"))
+    def _send_to_stdin(self, text: str):
+        self._proc.write((text + "\n").encode("utf-8"))
         self._proc.closeWriteChannel()
 
     def _on_install_output(self):
