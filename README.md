@@ -27,41 +27,41 @@
 **PyQt6** and **PyMuPDF**. It runs entirely locally — no cloud, no telemetry, no account
 required — and lets you read, edit, convert, annotate and protect your PDF documents.
 
-![PDF-Equilibrist](assets/images/PDF-Equilibrist.png)
+![PDF-Equilibrist](assets/images/en/PDF-Equilibrist.png)
 
 ## Features
 
 ### Display
 Zoom, rotation, multi-tab and multi-page navigation.
 
-![Display](assets/images/feature-afficher.png)
+![Display](assets/images/en/feature-afficher.png)
 
 ### Edit
 Text editing, watermarks, signatures and stamps.
 
-![Edit](assets/images/feature-modifier.png)
+![Edit](assets/images/en/feature-modifier.png)
 
 ### Annotate
 Highlight, strikethrough, underline, text boxes.
 
-![Annotate](assets/images/feature-annoter.png)
+![Annotate](assets/images/en/feature-annoter.png)
 
 ### Pages
 Insert, split, merge, reverse, extract. Multi-select pages in the thumbnail
 panel (Ctrl/Shift-click) to reorder, rotate, duplicate, delete, extract or
 print several pages at once from the right-click menu.
 
-![Pages](assets/images/feature-page.png)
+![Pages](assets/images/en/feature-page.png)
 
 ### Convert
 Word, Excel, PowerPoint, images, Office → PDF, image → PDF, local OCR, batch processing.
 
-![Convert](assets/images/feature-convertir.png)
+![Convert](assets/images/en/feature-convertir.png)
 
 ### Protect
 AES-256 encryption and decryption.
 
-![Protect](assets/images/feature-proteger.png)
+![Protect](assets/images/en/feature-proteger.png)
 
 ## Security & privacy
 
