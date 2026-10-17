@@ -5,12 +5,13 @@ from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QHBoxLayout, QPushButton,
     QProgressBar, QFrame, QLineEdit, QApplication,
 )
-from PyQt6.QtCore import QThread, pyqtSignal, Qt
+from PyQt6.QtCore import QThread, QTimer, pyqtSignal, Qt
 from PyQt6.QtGui import QPixmap
 
 from pdf_equilibrist import __version__
 from pdf_equilibrist import network
 from pdf_equilibrist import update as updater
+from pdf_equilibrist.utils import open_external
 
 _GREEN  = "#6BBF4E"
 _GRAY   = "#888888"
@@ -47,6 +48,26 @@ class _StatsThread(QThread):
         try:
             stats = updater.get_download_stats(self.repo, __version__)
             self.finished_ok.emit(stats)
+        except Exception as e:
+            self.finished_err.emit(str(e))
+
+
+class _DownloadThread(QThread):
+    """Télécharge hors du fil de l'interface (un installeur / une AppImage pèse plusieurs centaines de Mo)."""
+    progress = pyqtSignal(int, int)
+    finished_ok = pyqtSignal()
+    finished_err = pyqtSignal(str)
+
+    def __init__(self, asset: dict, target):
+        super().__init__()
+        self.asset = asset
+        self.target = target
+
+    def run(self):
+        try:
+            updater.download_release_asset(
+                self.asset, self.target, progress=lambda done, total: self.progress.emit(done, total))
+            self.finished_ok.emit()
         except Exception as e:
             self.finished_err.emit(str(e))
 
@@ -103,6 +124,7 @@ class UpdateDialog(QDialog):
 
         # ── Vérification de version ───────────────────────────────────────────
         self._lbl = QLabel(self.tr("Vérification des nouvelles versions…"))
+        self._lbl.setWordWrap(True)
         layout.addWidget(self._lbl)
 
         self._progress = QProgressBar()
@@ -159,6 +181,21 @@ class UpdateDialog(QDialog):
         layout.addWidget(self._linux_cmd_widget)
         self._btn_copy_cmd.clicked.connect(self._copy_linux_command)
 
+        # ── Adresse à copier à la main (affichée seulement si aucun navigateur ne s'ouvre) ──
+        self._url_edit = QLineEdit()
+        self._url_edit.setReadOnly(True)
+        self._btn_copy_url = QPushButton(self.tr("Copier"))
+        url_row = QHBoxLayout()
+        url_row.addWidget(QLabel(self.tr("Adresse :")))
+        url_row.addWidget(self._url_edit)
+        url_row.addWidget(self._btn_copy_url)
+        self._url_widget = QFrame()
+        self._url_widget.setLayout(url_row)
+        self._url_widget.setVisible(False)
+        layout.addWidget(self._url_widget)
+        self._btn_copy_url.clicked.connect(
+            lambda: QApplication.clipboard().setText(self._url_edit.text()))
+
         # ── Boutons ───────────────────────────────────────────────────────────
         btn_row = QHBoxLayout()
         btn_row.addStretch()
@@ -171,6 +208,16 @@ class UpdateDialog(QDialog):
         btn_row.addWidget(self._btn_download)
         btn_row.addWidget(self._btn_close)
         layout.addLayout(btn_row)
+
+        # Lien (AppImage seulement) : récupérer le script qui l'installe dans le menu et le PATH
+        self._script_link = QLabel(
+            f"<a href='#script' style='color:{_GREEN};'>"
+            + self.tr("Télécharger le script d'installation (install.sh)") + "</a>")
+        self._script_link.setTextFormat(Qt.TextFormat.RichText)
+        self._script_link.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self._script_link.setVisible(False)
+        self._script_link.linkActivated.connect(lambda _href: self._download_script())
+        layout.addWidget(self._script_link)
 
         self._btn_close.clicked.connect(self.accept)
         self._btn_open_page.clicked.connect(self._open_release_page)
@@ -218,6 +265,11 @@ class UpdateDialog(QDialog):
             self._linux_cmd_widget.setVisible(True)
             self._btn_download.setEnabled(False)
             self._btn_download.setVisible(False)
+        elif updater.is_appimage():
+            # AppImage : la release contient la nouvelle AppImage, à télécharger.
+            self._btn_download.setText(self.tr("Télécharger la nouvelle AppImage"))
+            self._btn_download.setEnabled(bool(updater.find_appimage_asset(release)))
+            self._script_link.setVisible(bool(updater.find_install_script_asset(release)))
         elif os.name != "nt":
             # Linux non reconnu (pas encore de PPA/COPR, ou distro inconnue) :
             # ni exe Windows ni commande fiable à proposer, on masque juste
@@ -243,46 +295,114 @@ class UpdateDialog(QDialog):
         self._lbl_current.setText("—")
         self._lbl_total.setText("—")
 
+    def _open_url(self, url: str):
+        """Ouvre l'URL ; sans navigateur utilisable (WSL, serveur…), l'affiche et la copie dans le presse-papiers."""
+        if open_external(url):
+            return
+        QApplication.clipboard().setText(url)
+        self._url_edit.setText(url)
+        self._url_edit.setCursorPosition(0)
+        self._url_widget.setVisible(True)
+        self._lbl.setText(self.tr("Aucun navigateur détecté : adresse copiée dans le presse-papiers."))
+
     def _open_github(self):
-        import webbrowser
-        webbrowser.open(_GITHUB_URL)
+        self._open_url(_GITHUB_URL)
 
     def _open_release_page(self):
         if not self._release:
             return
         url = updater.get_release_page_url(self._release)
         if url:
-            import webbrowser
-            webbrowser.open(url)
+            self._open_url(url)
+
+    def _quit_for_installer(self):
+        self.accept()
+        QApplication.closeAllWindows()
+        QApplication.quit()
+
+    def _start_download(self, asset: dict, target, on_done):
+        """Lance le téléchargement en arrière-plan, avec barre de progression."""
+        self._btn_download.setEnabled(False)
+        self._lbl.setText(self.tr("Téléchargement en cours…"))
+        self._progress.setRange(0, 0)
+        self._dl_thread = _DownloadThread(asset, target)
+        self._dl_thread.progress.connect(self._on_download_progress)
+        self._dl_thread.finished_ok.connect(lambda: self._on_download_done(target, on_done))
+        self._dl_thread.finished_err.connect(self._on_download_error)
+        self._dl_thread.start()
+
+    def _on_download_progress(self, done: int, total: int):
+        mb = done / 1_048_576
+        if total:
+            self._progress.setRange(0, total)
+            self._progress.setValue(done)
+            self._lbl.setText(self.tr("Téléchargement : {0:.0f} / {1:.0f} Mo").format(mb, total / 1_048_576))
+        else:
+            self._lbl.setText(self.tr("Téléchargement : {0:.0f} Mo").format(mb))
+
+    def _on_download_error(self, msg: str):
+        self._progress.setRange(0, 1)
+        self._btn_download.setEnabled(True)
+        self._lbl.setText(self.tr("Échec du téléchargement : {0}").format(msg))
+
+    def _on_download_done(self, target, on_done):
+        self._progress.setRange(0, 1)
+        self._progress.setValue(1)
+        on_done(target)
+
+    def _download_appimage(self):
+        asset = updater.find_appimage_asset(self._release)
+        if not asset:
+            return
+        self._start_download(asset, updater.appimage_download_target(self._release), self._appimage_ready)
+
+    def _download_script(self):
+        asset = updater.find_install_script_asset(self._release) if self._release else None
+        if asset:
+            self._start_download(asset, updater.install_script_target(self._release), self._script_ready)
+
+    def _script_ready(self, target):
+        try:
+            target.chmod(0o755)
+        except OSError:
+            pass
+        self._btn_download.setEnabled(True)
+        self._lbl.setText(self.tr(
+            "Script d'installation téléchargé :\n{0}\nLancez : bash install.sh   (ou sudo bash install.sh --system)"
+        ).format(target))
+
+    def _appimage_ready(self, target):
+        try:
+            target.chmod(0o755)
+        except OSError:
+            pass
+        self._btn_download.setEnabled(True)
+        self._lbl.setText(self.tr(
+            "Nouvelle AppImage téléchargée :\n{0}\nFermez l'application puis lancez ce fichier "
+            "(ou : bash install.sh --file <fichier>)."
+        ).format(target))
 
     def _download_and_run(self):
         if not self._release:
             return
+        if updater.is_appimage():
+            self._download_appimage()
+            return
         asset = updater.find_installer_asset(self._release)
         if not asset:
             return
-        target = updater.get_download_target(asset)
+        self._start_download(asset, updater.get_download_target(asset), self._installer_ready)
+
+    def _installer_ready(self, target):
+        self._lbl.setText(self.tr("Téléchargé : {0}").format(target))
         try:
-            self._lbl.setText(self.tr("Téléchargement en cours…"))
-            self._progress.setRange(0, 0)
-            updater.download_release_asset(asset, target)
-            self._lbl.setText(self.tr("Téléchargé : {0}").format(target))
-            try:
-                if os.name == "nt":
-                    # Fichier qu'on vient nous-même de télécharger dans le temp
-                    os.startfile(str(target))  # nosec B606
-                else:
-                    import shutil
-                    import subprocess  # nosec B404
-                    xdg_open = shutil.which("xdg-open")
-                    if xdg_open:
-                        subprocess.Popen([xdg_open, str(target)])  # nosec B603
-                    else:
-                        raise FileNotFoundError("xdg-open introuvable")
-            except Exception:
-                import webbrowser
-                webbrowser.open(target.parent.as_uri())
-        except Exception as e:
-            self._lbl.setText(self.tr("Échec du téléchargement : {0}").format(e))
-        finally:
-            self._progress.setRange(0, 1)
+            if os.name == "nt":
+                # Fichier qu'on vient nous-même de télécharger dans le temp
+                os.startfile(str(target))  # nosec B606
+                # L'installeur refuse de continuer tant que l'application tourne
+                # (fichiers verrouillés) : on se ferme pour lui laisser la place.
+                QTimer.singleShot(1500, self._quit_for_installer)
+            else:
+                open_external(str(target))
+        except Exception:
+            open_external(target.parent.as_uri())

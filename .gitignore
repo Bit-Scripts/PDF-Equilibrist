@@ -20,6 +20,7 @@ PDF Equilibrist.zip
 # PyInstaller
 *.spec
 !packaging/copr/pdf-equilibrist.spec
+!packaging/appimage/PDF-Equilibrist-linux.spec
 
 # Logs and temp files
 *.log
@@ -50,6 +51,9 @@ packaging/copr/*.src.rpm
 *.pyc
 *.pyo
 *.pyd
+
+# Dossier de preuves forensiques (antériorité) — jamais poussé
+forensic/
 
 # Réglages locaux de Claude Code (chemins, permissions) — ne pas versionner
 .claude/settings.local.json

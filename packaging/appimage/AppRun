@@ -1,0 +1,7 @@
+#!/bin/sh
+# Point d'entrée de l'AppImage : lance le binaire PyInstaller embarqué.
+HERE="$(dirname "$(readlink -f "$0")")"
+export APPDIR="${APPDIR:-$HERE}"
+# Ne pas hériter des modules Qt de l'hôte : ils ne correspondent pas aux bibliothèques embarquées
+unset QT_PLUGIN_PATH QT_QPA_PLATFORM_PLUGIN_PATH
+exec "$HERE/usr/lib/pdf-equilibrist/PDF-Equilibrist" "$@"

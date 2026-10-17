@@ -112,8 +112,9 @@ def main():
     try:
         import pyi_splash
         pyi_splash.close()
-    except ModuleNotFoundError:
-        pass   # normal en mode dev — pyi_splash n'existe que dans l'exe
+    except (ModuleNotFoundError, KeyError):
+        # absent en mode dev ; sans splash natif (AppImage) PyInstaller lève KeyError('_PYI_SPLASH_IPC')
+        pass
 
     splash.close()
     splash.deleteLater()

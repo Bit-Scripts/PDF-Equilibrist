@@ -1,0 +1,207 @@
+name: Linux AppImage
+
+# Canal « autres distributions » : un seul fichier .AppImage, joint à la release GitHub.
+#  - tag v*          : construit, teste, puis JOINT l'AppImage à la release du tag (celle que crée
+#                      release.yml ; ce workflow attend qu'elle existe).
+#  - workflow_dispatch avec `tag` (ex. v0.1.25) : même chose pour une release existante (rattrapage) ;
+#                      le code construit est celui de la branche choisie dans « Run workflow ».
+#  - workflow_dispatch sans `tag`, ou PR touchant packaging/appimage/ : construit et teste seulement,
+#                      artefact de run de 14 jours, rien n'est publié.
+#
+# Construit sur Ubuntu 22.04 (glibc 2.35) : un binaire construit sur un système ancien tourne sur
+# les récents, pas l'inverse. L'AppImage est ensuite lancée dans plusieurs distributions vierges.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag de la release à laquelle joindre l''AppImage (ex. v0.1.25) ; vide = essai sans publication'
+        required: false
+        default: ''
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packaging/appimage/**'
+      - '.github/workflows/linux-appimage.yml'
+      - 'src/pdf_equilibrist/update.py'
+
+permissions:
+  contents: read
+
+env:
+  APPIMAGETOOL_VERSION: '1.9.1'
+  # SHA-256 du binaire de la release officielle AppImage/appimagetool 1.9.1 (épinglé : on n'exécute
+  # jamais un binaire téléchargé sans l'avoir vérifié)
+  APPIMAGETOOL_SHA256: 'ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0'
+
+jobs:
+  # Comme tous les workflows de publication : rien n'est construit ni publié si les contrôles échouent.
+  checks:
+    if: github.event_name == 'push'
+    name: Contrôles (lint, Bandit, tests)
+    uses: ./.github/workflows/checks.yml
+
+  build:
+    name: Build AppImage (Ubuntu 22.04)
+    needs: checks
+    # `checks` est ignoré hors tag (PR, dispatch) : on construit alors quand même
+    if: ${{ !cancelled() && (needs.checks.result == 'success' || needs.checks.result == 'skipped') }}
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.version.outputs.TAG }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          tag=""
+          if [ "$REF_TYPE" = "tag" ]; then tag="$REF_NAME"; elif [ -n "$INPUT_TAG" ]; then tag="$INPUT_TAG"; fi
+          if [ -n "$tag" ]; then
+            case "$tag" in v[0-9]*.[0-9]*.[0-9]*) ;; *) echo "Tag inattendu : $tag" >&2; exit 1;; esac
+            echo "TAG=$tag" >> "$GITHUB_OUTPUT"
+            # Même injection que release.yml : l'application affiche (et compare) la version du tag
+            sed -i "s/^__version__ = \".*\"/__version__ = \"${tag#v}\"/" src/pdf_equilibrist/__init__.py
+            grep '^__version__' src/pdf_equilibrist/__init__.py
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install system libraries (Qt6/xcb, offscreen)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libxcb-cursor0 libegl1 libgl1 libxkbcommon0 libdbus-1-3 libfontconfig1 libglib2.0-0 binutils
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+
+      - name: Download appimagetool (pinned and verified)
+        run: |
+          curl -fsSL -o appimagetool \
+            "https://github.com/AppImage/appimagetool/releases/download/${APPIMAGETOOL_VERSION}/appimagetool-x86_64.AppImage"
+          echo "${APPIMAGETOOL_SHA256}  appimagetool" | sha256sum -c -
+          chmod +x appimagetool
+
+      - name: Build the AppDir and the AppImage
+        env:
+          PYTHON: python
+        run: |
+          APPIMAGETOOL="$PWD/appimagetool" bash packaging/appimage/build_appimage.sh
+          ls -la build/appimage/*.AppImage
+
+      # Environnement minimal et HOME vide : ce que verrait un utilisateur sur une machine vierge.
+      - name: OCR selftest on the AppImage (offline, empty home)
+        run: |
+          H="$(mktemp -d)"
+          env -i HOME="$H" PATH=/usr/bin:/bin APPIMAGE_EXTRACT_AND_RUN=1 \
+            build/appimage/PDF-Equilibrist-x86_64.AppImage --ocr-selftest "$H/report.txt" || { cat "$H/report.txt"; exit 1; }
+          cat "$H/report.txt"
+          # Informatif : en local (Ubuntu 24.04) un dossier ~/.cache apparaît pendant le selftest ; on veut
+          # savoir quel composant l'écrit (aucun fichier utilisateur ne doit contenir de document).
+          echo "Fichiers créés dans HOME hors rapport :"
+          find "$H" -mindepth 1 ! -name report.txt | head -20 || true
+
+      - name: GUI starts offscreen and stays up
+        run: |
+          H="$(mktemp -d)"
+          set +e
+          env -i HOME="$H" PATH=/usr/bin:/bin APPIMAGE_EXTRACT_AND_RUN=1 QT_QPA_PLATFORM=offscreen \
+            timeout 15 build/appimage/PDF-Equilibrist-x86_64.AppImage > "$H/run.log" 2>&1
+          rc=$?
+          cat "$H/run.log" | tail -20
+          # 124 = toujours en cours d'exécution au bout de 15 s = démarrage réussi
+          test "$rc" = 124
+
+      - name: Summary
+        run: |
+          {
+            echo "### AppImage (prototype)"
+            echo "- Taille : $(du -h build/appimage/PDF-Equilibrist-x86_64.AppImage | cut -f1)"
+            echo "- sha256 : \`$(sha256sum build/appimage/PDF-Equilibrist-x86_64.AppImage | cut -d' ' -f1)\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: PDF-Equilibrist-x86_64.AppImage
+          path: build/appimage/PDF-Equilibrist-x86_64.AppImage
+          retention-days: 14
+
+  # La même AppImage, lancée dans des distributions vierges (sans Python ni aucune dépendance de l'appli)
+  distros:
+    name: Run on ${{ matrix.image }}
+    needs: build
+    # `checks` (ancêtre) est ignoré hors tag : sans cette condition, GitHub ignorerait aussi ce job
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ['debian:12', 'ubuntu:24.04', 'fedora:44', 'archlinux:latest', 'opensuse/tumbleweed']
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - name: Download the AppImage
+        uses: actions/download-artifact@v4
+        with:
+          name: PDF-Equilibrist-x86_64.AppImage
+
+      - name: OCR selftest (no Python, no network used, fresh distribution)
+        run: |
+          chmod +x PDF-Equilibrist-x86_64.AppImage
+          . /etc/os-release; echo "== $PRETTY_NAME"; command -v python3 || echo "(pas de python3 : normal)"
+          export HOME="$(mktemp -d)" APPIMAGE_EXTRACT_AND_RUN=1
+          ./PDF-Equilibrist-x86_64.AppImage --ocr-selftest "$HOME/report.txt" || { cat "$HOME/report.txt" 2>/dev/null; exit 1; }
+          cat "$HOME/report.txt"
+
+  # Joint l'AppImage à la release GitHub (créée par release.yml sur le même tag).
+  publish:
+    name: Attach to the GitHub release
+    needs: [build, distros]
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.distros.result == 'success' && needs.build.outputs.tag != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ needs.build.outputs.tag }}
+    steps:
+      - name: Checkout (install script)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: packaging/appimage/install.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Download the AppImage
+        uses: actions/download-artifact@v4
+        with:
+          name: PDF-Equilibrist-x86_64.AppImage
+
+      # release.yml (Windows) crée la release bien après la fin de ce workflow : on attend (max 60 min)
+      - name: Wait for the release
+        run: |
+          for i in $(seq 1 60); do
+            if gh release view "$TAG" >/dev/null 2>&1; then echo "Release $TAG trouvée"; exit 0; fi
+            echo "Release $TAG pas encore créée (essai $i/60)…"; sleep 60
+          done
+          echo "Release $TAG introuvable : le workflow Release a-t-il échoué ?" >&2; exit 1
+
+      - name: Upload (replaces any previous AppImage)
+        run: |
+          sha256sum PDF-Equilibrist-x86_64.AppImage | tee PDF-Equilibrist-x86_64.AppImage.sha256
+          gh release upload "$TAG" PDF-Equilibrist-x86_64.AppImage PDF-Equilibrist-x86_64.AppImage.sha256 packaging/appimage/install.sh --clobber

@@ -152,6 +152,9 @@ jobs:
             - **Arch Linux et dérivées** : `yay -S pdf-equilibrist` ([AUR](https://aur.archlinux.org/packages/pdf-equilibrist))
             - **Ubuntu et dérivées** : `sudo add-apt-repository ppa:paulwoisard/pdf-equilibrist && sudo apt update && sudo apt install pdf-equilibrist` ([PPA](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist))
             - **Fedora et dérivées** : `sudo dnf copr enable paullux/PDF-Equilibrist && sudo dnf install pdf-equilibrist` ([COPR](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/))
+            - **Autres distributions Linux** (Debian, openSUSE, Mint…) : AppImage, un seul fichier, ajoutée quelques minutes après l'installeur.
+              Installation guidée (menu, association aux PDF, sans root) : `curl -fsSLO https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/install.sh && bash install.sh`
+              ou téléchargez `PDF-Equilibrist-x86_64.AppImage` ci-dessous, `chmod +x` puis lancez-la (`.sha256` fourni).
           append_body: true
           generate_release_notes: true
           draft: false

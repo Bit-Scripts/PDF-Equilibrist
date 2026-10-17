@@ -13,7 +13,7 @@ the content of a document, and both can be blocked (see below).
 
 | Service | Endpoint | When | What is sent |
 |---|---|---|---|
-| GitHub | `api.github.com` | At startup, if "Check for updates at startup" is enabled (default on Windows only), and when you open *Help › Check for Updates* or *Help › About PDF-Equilibrist* | Nothing: the version comparison happens on your computer. Clicking *Download and install* (Windows) downloads the installer from GitHub. |
+| GitHub | `api.github.com` | At startup, if "Check for updates at startup" is enabled (default on Windows only), and when you open *Help › Check for Updates* or *Help › About PDF-Equilibrist* | Nothing: the version comparison happens on your computer. Clicking *Download and install* (Windows) downloads the installer from GitHub; on an AppImage, *Download the new AppImage* and the install-script link download the file from the GitHub release. |
 | OSV.dev | `api.osv.dev` | Only when you run *Help › Check CVE Vulnerabilities* | The names and versions of the libraries used by the application |
 
 Like any Internet request, these connections expose your IP address to the
@@ -54,7 +54,7 @@ jamais le contenu d'un document, et les deux peuvent être bloqués (voir plus b
 
 | Service | Point d'accès | Quand | Ce qui est envoyé |
 |---|---|---|---|
-| GitHub | `api.github.com` | Au démarrage si « Vérifier les mises à jour au démarrage » est coché (par défaut sous Windows uniquement), et à l'ouverture de *Aide › Vérifier les mises à jour* ou *Aide › À propos de PDF-Equilibrist* | Rien : la comparaison de version se fait sur votre ordinateur. Le bouton *Télécharger et installer* (Windows) télécharge l'installeur depuis GitHub. |
+| GitHub | `api.github.com` | Au démarrage si « Vérifier les mises à jour au démarrage » est coché (par défaut sous Windows uniquement), et à l'ouverture de *Aide › Vérifier les mises à jour* ou *Aide › À propos de PDF-Equilibrist* | Rien : la comparaison de version se fait sur votre ordinateur. Le bouton *Télécharger et installer* (Windows) télécharge l'installeur depuis GitHub ; sous AppImage, *Télécharger la nouvelle AppImage* et le lien du script d'installation téléchargent le fichier depuis la release GitHub. |
 | OSV.dev | `api.osv.dev` | Uniquement quand vous lancez *Aide › Vérifier les vulnérabilités CVE* | Les noms et versions des bibliothèques utilisées par l'application |
 
 Comme toute requête Internet, ces connexions exposent votre adresse IP au service

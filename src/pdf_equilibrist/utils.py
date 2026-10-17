@@ -77,3 +77,55 @@ def resource_path(relative: str) -> Path:
 
     # Mode dev : remonter src/pdf_equilibrist/utils.py → projet root
     return Path(__file__).resolve().parent.parent.parent / relative
+
+
+def external_env() -> dict[str, str]:
+    """
+    Environnement à donner aux programmes externes (xdg-open, gio…).
+
+    Un exécutable PyInstaller (AppImage comprise) place ses propres bibliothèques en tête de
+    ``LD_LIBRARY_PATH`` : un programme système qui les charge (ex. ``gio`` avec la glib embarquée)
+    plante avec « undefined symbol ». On restitue la valeur d'origine, que le lanceur PyInstaller
+    garde dans ``LD_LIBRARY_PATH_ORIG``.
+    """
+    import os
+
+    env = dict(os.environ)
+    if "LD_LIBRARY_PATH_ORIG" in env:
+        env["LD_LIBRARY_PATH"] = env.pop("LD_LIBRARY_PATH_ORIG")
+    elif getattr(sys, "frozen", False):
+        env.pop("LD_LIBRARY_PATH", None)
+    return env
+
+
+def open_external(target: str) -> bool:
+    """Ouvre une URL ou un fichier avec l'application par défaut du système (sans polluer son environnement)."""
+    import os
+    import shutil
+    import subprocess  # nosec B404
+    import webbrowser
+
+    if sys.platform.startswith("linux"):
+        xdg_open = shutil.which("xdg-open")
+        if xdg_open:
+            try:
+                subprocess.Popen(  # nosec B603
+                    [xdg_open, target], env=external_env(), start_new_session=True,
+                    stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                )
+                return True
+            except OSError:
+                pass
+    elif sys.platform == "win32" and not target.startswith(("http://", "https://")):
+        os.startfile(target)  # nosec B606
+        return True
+    # Repli : webbrowser lance gio / gvfs-open / un navigateur avec NOTRE environnement. On le
+    # nettoie le temps de l'appel (open() rend la main tout de suite, les enfants sont déjà créés).
+    saved = dict(os.environ)
+    try:
+        os.environ.clear()
+        os.environ.update(external_env())
+        return webbrowser.open(target)
+    finally:
+        os.environ.clear()
+        os.environ.update(saved)
