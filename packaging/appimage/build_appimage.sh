@@ -61,15 +61,19 @@ echo "== 3/4  Bibliothèques xcb pour Qt6 (libxcb-cursor n'est pas installée pa
 INTERNAL="$APPDIR/usr/lib/pdf-equilibrist/_internal"
 # (pas de `exit` dans awk : avec pipefail, ldconfig recevrait SIGPIPE et set -e arrêterait le script)
 cursor="$(ldconfig -p | awk '/libxcb-cursor\.so\.0 /{p=$NF} END{print p}')"
-if [ -n "$cursor" ]; then
-  # la bibliothèque + ses dépendances libxcb-* (hors libxcb.so.1 : fournie par tout système X11)
-  for lib in "$cursor" $(ldd "$cursor" | awk '/libxcb-/{print $3}'); do
-    cp -nL "$lib" "$INTERNAL/" 2>/dev/null || true
-  done
-  echo "   embarquée : $(ls "$INTERNAL" | grep -c '^libxcb-' || true) bibliothèque(s) libxcb-*"
-else
-  echo "   AVERTISSEMENT : libxcb-cursor.so.0 introuvable sur la machine de build (apt install libxcb-cursor0)"
+xkbx11="$(ldconfig -p | awk '/libxkbcommon-x11\.so\.0 /{p=$NF} END{print p}')"
+qxcb="$(find "$INTERNAL" -name libqxcb.so | head -1)"
+if [ -z "$cursor" ] || [ -z "$xkbx11" ]; then
+  echo "   ERREUR : libxcb-cursor.so.0 ou libxkbcommon-x11.so.0 introuvable sur la machine de build" >&2
+  echo "            (apt install libxcb-cursor0 libxkbcommon-x11-0) : l'AppImage ne démarrerait pas sur un système minimal" >&2
+  exit 1
 fi
+# les bibliothèques + leurs dépendances xcb-* / xkbcommon* (hors libxcb.so.1 et libX11 : fournies par tout système X11).
+# Sans cela Qt échoue sur un système minimal : « Could not load the Qt platform plugin "xcb" ».
+for lib in "$cursor" "$xkbx11" $(ldd "$cursor" "$xkbx11" ${qxcb:+"$qxcb"} | awk '/libxcb-|libxkbcommon/{print $3}' | sort -u); do
+  cp -nL "$lib" "$INTERNAL/" 2>/dev/null || true
+done
+echo "   embarquées : $(ls "$INTERNAL" | grep -Ec '^(libxcb-|libxkbcommon)' || true) bibliothèque(s) xcb-*/xkbcommon*"
 
 du -sh "$APPDIR" | awk '{print "   AppDir : " $1}'
 
