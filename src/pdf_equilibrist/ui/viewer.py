@@ -49,13 +49,13 @@ Le ``FloatingItem`` est un enfant direct du widget de page (pas du viewer),
 ce qui lui permet d'utiliser les coordonnées locales de la page.
 """
 from __future__ import annotations
-import webbrowser
 from pathlib import Path
 from PyQt6.QtWidgets import QScrollArea, QLabel, QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt, pyqtSignal, QPoint, QRect
 from PyQt6.QtGui import QPixmap, QPainter, QColor, QFont, QPen
 import pymupdf
 from pdf_equilibrist.core.document import Document
+from pdf_equilibrist.utils import open_external
 
 
 class _PageLabel(QLabel):
@@ -282,7 +282,7 @@ class _PageLabel(QLabel):
             QMessageBox.StandardButton.No,
         )
         if reply == QMessageBox.StandardButton.Yes:
-            webbrowser.open(uri)
+            open_external(uri)
 
     @staticmethod
     def _open_with_system(path: str):

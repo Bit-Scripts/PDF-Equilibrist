@@ -11,6 +11,7 @@ from PyQt6.QtGui import QPixmap
 from pdf_equilibrist import __version__
 from pdf_equilibrist import network
 from pdf_equilibrist import update as updater
+from pdf_equilibrist.utils import open_external
 
 _GREEN  = "#6BBF4E"
 _GRAY   = "#888888"
@@ -248,16 +249,14 @@ class UpdateDialog(QDialog):
         self._lbl_total.setText("—")
 
     def _open_github(self):
-        import webbrowser
-        webbrowser.open(_GITHUB_URL)
+        open_external(_GITHUB_URL)
 
     def _open_release_page(self):
         if not self._release:
             return
         url = updater.get_release_page_url(self._release)
         if url:
-            import webbrowser
-            webbrowser.open(url)
+            open_external(url)
 
     def _quit_for_installer(self):
         self.accept()
@@ -314,8 +313,7 @@ class UpdateDialog(QDialog):
                     else:
                         raise FileNotFoundError("xdg-open introuvable")
             except Exception:
-                import webbrowser
-                webbrowser.open(target.parent.as_uri())
+                open_external(target.parent.as_uri())
         except Exception as e:
             self._lbl.setText(self.tr("Échec du téléchargement : {0}").format(e))
         finally:

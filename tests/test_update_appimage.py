@@ -67,3 +67,12 @@ def test_download_checks_sha256(tmp_path, monkeypatch):
     with pytest.raises(ValueError):
         update.download_release_asset(asset, Path(tmp_path / "bad"))
     assert not (tmp_path / "bad").exists()
+
+
+def test_external_env_restores_original_library_path(monkeypatch):
+    from pdf_equilibrist.utils import external_env
+
+    monkeypatch.setenv("LD_LIBRARY_PATH", "/tmp/_MEI123")
+    monkeypatch.setenv("LD_LIBRARY_PATH_ORIG", "/usr/lib/custom")
+    assert external_env()["LD_LIBRARY_PATH"] == "/usr/lib/custom"
+    assert "LD_LIBRARY_PATH_ORIG" not in external_env()
