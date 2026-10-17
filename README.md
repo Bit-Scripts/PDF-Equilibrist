@@ -7,9 +7,10 @@
 [![AUR](https://img.shields.io/aur/version/pdf-equilibrist)](https://aur.archlinux.org/packages/pdf-equilibrist)
 
 [![Total downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.total&label=total%20downloads&color=6BBF4E&cacheSeconds=3600&v=2)](https://pdf-equilibrist.org/en/#diffusion)
-[![Windows downloads](https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=Windows%20downloads&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
+[![Windows downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.github.total&label=Windows%20downloads&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600&v=2)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
 [![Ubuntu downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.launchpad.total&label=Ubuntu%20downloads&logo=ubuntu&logoColor=white&color=E95420&cacheSeconds=3600&v=2)](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist)
 [![Fedora downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.copr.total&label=Fedora%20downloads&logo=fedora&logoColor=white&color=51A2DA&cacheSeconds=3600&v=2)](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
+[![AppImage downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.appimage.total&label=AppImage%20downloads&logo=linux&logoColor=white&color=8E6BBF&cacheSeconds=3600&v=2)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest)
 [![Arch downloads: not tracked](https://img.shields.io/badge/Arch%20downloads-not%20tracked-lightgrey?logo=archlinux&logoColor=white "The AUR does not publish any download counter")](https://pdf-equilibrist.org/en/#diffusion-arch)
 
 [![CI](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg)](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml)
@@ -115,6 +116,17 @@ sudo dnf install pdf-equilibrist
 
 → [COPR page](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
 
+🐧 **Any other Linux distribution** (AppImage — Debian, openSUSE, Mint…): one file, no repository.
+
+```bash
+curl -fsSLO https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/install.sh
+bash install.sh                  # no root: installs into ~/.local (menu entry, PDF association)
+# sudo bash install.sh --system  # all users: /usr/local
+# bash install.sh --uninstall    # remove
+```
+
+The script downloads the latest release and checks its SHA-256. You can also download [`PDF-Equilibrist-x86_64.AppImage`](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/PDF-Equilibrist-x86_64.AppImage) yourself, `chmod +x` it and run it. Without FUSE (`libfuse2`), start it with `--appimage-extract-and-run`. *Help › About* offers to download newer versions.
+
 ### Installing from source (developers)
 
 1. Create a compatible Python environment (`>=3.12`).
@@ -156,7 +168,7 @@ For many common uses — editing, annotation, conversion, protection — yes. It
 
 **Which operating systems are supported?**
 
-Windows (.exe installer), Arch Linux (AUR), Ubuntu (PPA) and Fedora (COPR).
+Windows (.exe installer), Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) and any other 64-bit Linux distribution (AppImage).
 
 **Are administrator rights required to install it?**
 

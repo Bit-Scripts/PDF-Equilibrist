@@ -61,5 +61,8 @@ git push origin v0.1.25      # ← déclenche TOUT : release publique + AUR + PP
       sans réseau côté builder : vérifier launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist). Surveiller le
       quota du PPA (wheelhouse ≈ 250 Mo par version).
 - [ ] `Linux COPR publish` : build COPR réussi pour les chroots Fedora
+- [ ] `Linux AppImage` : build + 5 distributions vertes, puis la release contient `PDF-Equilibrist-x86_64.AppImage`,
+      son `.sha256` et `install.sh` (le job `publish` attend la release Windows, jusqu'à 60 min). Rattrapage :
+      Run workflow avec `tag` = `vX.Y.Z`.
 - [ ] Site : `softwareVersion` mis à jour, liens de téléchargement valides
 - [ ] Si un canal échoue : corriger puis bump du dernier chiffre (le PPA refuse de réutiliser une version avec un contenu différent)

@@ -7,9 +7,10 @@
 [![AUR](https://img.shields.io/aur/version/pdf-equilibrist)](https://aur.archlinux.org/packages/pdf-equilibrist)
 
 [![Téléchargements (total)](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.total&label=t%C3%A9l%C3%A9chargements%20%28total%29&color=6BBF4E&cacheSeconds=3600&v=2)](https://pdf-equilibrist.org/#diffusion)
-[![Téléchargements Windows](https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=t%C3%A9l%C3%A9chargements%20Windows&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
+[![Téléchargements Windows](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.github.total&label=t%C3%A9l%C3%A9chargements%20Windows&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600&v=2)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases)
 [![Téléchargements Ubuntu](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.launchpad.total&label=t%C3%A9l%C3%A9chargements%20Ubuntu&logo=ubuntu&logoColor=white&color=E95420&cacheSeconds=3600&v=2)](https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist)
 [![Téléchargements Fedora](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.copr.total&label=t%C3%A9l%C3%A9chargements%20Fedora&logo=fedora&logoColor=white&color=51A2DA&cacheSeconds=3600&v=2)](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
+[![Téléchargements AppImage](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.appimage.total&label=t%C3%A9l%C3%A9chargements%20AppImage&logo=linux&logoColor=white&color=8E6BBF&cacheSeconds=3600&v=2)](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest)
 [![Téléchargements Arch : non mesuré](https://img.shields.io/badge/t%C3%A9l%C3%A9chargements%20Arch-non%20mesur%C3%A9-lightgrey?logo=archlinux&logoColor=white "L'AUR ne publie aucun compteur de téléchargements")](https://pdf-equilibrist.org/#diffusion-arch)
 
 [![CI](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml/badge.svg)](https://github.com/Bit-Scripts/PDF-Equilibrist/actions/workflows/ci.yml)
@@ -118,6 +119,17 @@ sudo dnf install pdf-equilibrist
 
 → [Page COPR](https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/)
 
+🐧 **Toute autre distribution Linux** (AppImage — Debian, openSUSE, Mint…) : un seul fichier, sans dépôt.
+
+```bash
+curl -fsSLO https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/install.sh
+bash install.sh                  # sans root : installe dans ~/.local (menu, association aux PDF)
+# sudo bash install.sh --system  # tous les utilisateurs : /usr/local
+# bash install.sh --uninstall    # désinstaller
+```
+
+Le script télécharge la dernière release et vérifie son SHA-256. Vous pouvez aussi télécharger [`PDF-Equilibrist-x86_64.AppImage`](https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/PDF-Equilibrist-x86_64.AppImage) vous-même, `chmod +x` puis le lancer. Sans FUSE (`libfuse2`), lancez-le avec `--appimage-extract-and-run`. *Aide › À propos* propose de télécharger les nouvelles versions.
+
 ### Installation depuis les sources (développeurs)
 
 1. Créez un environnement Python compatible (`>=3.12`).
@@ -159,7 +171,7 @@ Pour de nombreux usages courants — édition, annotation, conversion, protectio
 
 **Quels systèmes d'exploitation sont supportés ?**
 
-Windows (installeur .exe), Arch Linux (AUR), Ubuntu (PPA) et Fedora (COPR).
+Windows (installeur .exe), Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) et toute autre distribution Linux 64 bits (AppImage).
 
 **Faut-il des droits administrateur pour l'installer ?**
 
