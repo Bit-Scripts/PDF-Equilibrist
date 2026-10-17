@@ -89,6 +89,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt pyinstaller
 
+      # Le .qm versionné peut être en retard sur le .ts : on le recompile ici, sinon l'AppImage afficherait en
+      # français les textes ajoutés depuis. Pas de repli silencieux : sans lrelease, le build échoue.
+      - name: Compile translations (.ts to .qm)
+        run: |
+          pip install pyside6-essentials --quiet
+          LRELEASE="$(find "$(python -c 'import PySide6, os; print(os.path.dirname(PySide6.__file__))')" -name lrelease -type f | head -n1)"
+          test -n "$LRELEASE" || { echo "lrelease introuvable dans pyside6-essentials" >&2; exit 1; }
+          for ts in translations/*.ts; do "$LRELEASE" "$ts" -qm "${ts%.ts}.qm"; done
+          ls -la translations/*.qm
+
       - name: Download appimagetool (pinned and verified)
         run: |
           curl -fsSL -o appimagetool \
@@ -125,6 +135,28 @@ jobs:
           cat "$H/run.log" | tail -20
           # 124 = toujours en cours d'exécution au bout de 15 s = démarrage réussi
           test "$rc" = 124
+
+      # Le script embarqué, tel que la mise à jour intégrée le lance : installation utilisateur dans un HOME vide,
+      # avec la somme imposée ; une mauvaise somme doit être refusée.
+      - name: Bundled install script (user install, checksum enforced)
+        run: |
+          H="$(mktemp -d)"
+          IMG="$PWD/build/appimage/PDF-Equilibrist-x86_64.AppImage"
+          ( cd "$H" && APPIMAGE_EXTRACT_AND_RUN=1 "$IMG" --appimage-extract >/dev/null )
+          SCRIPT="$H/squashfs-root/usr/share/pdf-equilibrist/install.sh"
+          test -x "$SCRIPT"
+          SUM="$(sha256sum "$IMG" | cut -d' ' -f1)"
+          if env -i HOME="$H" PATH=/usr/bin:/bin bash "$SCRIPT" --file "$IMG" --sha256 "$(printf '%064d' 0)"; then
+            echo "une mauvaise somme aurait dû être refusée" >&2; exit 1
+          fi
+          env -i HOME="$H" PATH=/usr/bin:/bin APPIMAGE_EXTRACT_AND_RUN=1 bash "$SCRIPT" --file "$IMG" --sha256 "$SUM"
+          test -x "$H/.local/share/pdf-equilibrist/PDF-Equilibrist.AppImage"
+          test -L "$H/.local/bin/pdf-equilibrist"
+          test -f "$H/.local/share/applications/pdf-equilibrist.desktop"
+          test -f "$H/.local/share/icons/hicolor/256x256/apps/pdf-equilibrist.png"
+          desktop-file-validate "$H/.local/share/applications/pdf-equilibrist.desktop"
+          env -i HOME="$H" PATH=/usr/bin:/bin bash "$SCRIPT" --uninstall
+          test ! -e "$H/.local/share/pdf-equilibrist"
 
       - name: Summary
         run: |

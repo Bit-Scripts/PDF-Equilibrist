@@ -90,3 +90,108 @@ def test_install_script_asset_and_target(tmp_path, monkeypatch):
     f.write_bytes(b"x")
     monkeypatch.setenv("APPIMAGE", str(f))
     assert update.install_script_target(rel) == tmp_path / "install.sh"
+
+
+# ── Installation depuis l'application (AppImage) ─────────────────────────────
+
+def _fake_appimage(tmp_path, monkeypatch, subdir):
+    folder = tmp_path / subdir
+    folder.mkdir(parents=True)
+    appimage = folder / update.INSTALLED_NAME
+    appimage.write_bytes(b"x")
+    monkeypatch.setenv("APPIMAGE", str(appimage))
+    return appimage
+
+
+def test_install_scope_user_system_none(tmp_path, monkeypatch):
+    monkeypatch.setattr(update.Path, "home", classmethod(lambda cls: tmp_path / "home"))
+    monkeypatch.setattr(update, "SYSTEM_PREFIX", tmp_path / "usr_local")
+    _fake_appimage(tmp_path, monkeypatch, "home/.local/share/pdf-equilibrist")
+    assert update.install_scope() == "user"
+    _fake_appimage(tmp_path, monkeypatch, "usr_local/share/pdf-equilibrist")
+    assert update.install_scope() == "system"
+    _fake_appimage(tmp_path, monkeypatch, "Downloads")
+    assert update.install_scope() == "none"
+    monkeypatch.delenv("APPIMAGE")
+    assert update.install_scope() == "none"
+
+
+def test_installed_appimage_path(tmp_path, monkeypatch):
+    monkeypatch.setattr(update.Path, "home", classmethod(lambda cls: tmp_path / "home"))
+    monkeypatch.setattr(update, "SYSTEM_PREFIX", tmp_path / "usr_local")
+    assert update.installed_appimage_path("user") == (
+        tmp_path / "home" / ".local" / "share" / "pdf-equilibrist" / "PDF-Equilibrist.AppImage")
+    assert update.installed_appimage_path("system") == (
+        tmp_path / "usr_local" / "share" / "pdf-equilibrist" / "PDF-Equilibrist.AppImage")
+
+
+def _bundle_script(tmp_path, monkeypatch):
+    script = tmp_path / "appdir" / "usr" / "share" / "pdf-equilibrist" / "install.sh"
+    script.parent.mkdir(parents=True)
+    script.write_text("#!/usr/bin/env bash\necho hi\n", encoding="utf-8")
+    monkeypatch.setenv("APPDIR", str(tmp_path / "appdir"))
+    return script
+
+
+def test_build_install_command_user(tmp_path, monkeypatch):
+    script = _bundle_script(tmp_path, monkeypatch)
+    monkeypatch.setattr(update.shutil, "which", lambda name: "/usr/bin/" + name)
+    new = tmp_path / "new.AppImage"
+    cmd = update.build_install_command(new, "user", "ab" * 32)
+    assert cmd == ["/usr/bin/bash", str(script), "--file", str(new), "--sha256", "ab" * 32]
+
+
+def test_build_install_command_system_uses_pkexec_and_inline_script(tmp_path, monkeypatch):
+    script = _bundle_script(tmp_path, monkeypatch)
+    monkeypatch.setattr(update.shutil, "which", lambda name: "/usr/bin/" + name)
+    new = tmp_path / "new.AppImage"
+    cmd = update.build_install_command(new, "system", "cd" * 32)
+    assert cmd[:3] == ["/usr/bin/pkexec", "/usr/bin/bash", "-c"]
+    assert cmd[3] == script.read_text(encoding="utf-8")        # le script voyage en texte, pas en chemin
+    assert cmd[4:] == ["install.sh", "--system", "--file", str(new), "--sha256", "cd" * 32]
+
+
+def test_build_install_command_unavailable(tmp_path, monkeypatch):
+    new = tmp_path / "new.AppImage"
+    monkeypatch.delenv("APPDIR", raising=False)
+    assert update.build_install_command(new, "user", "00") is None        # pas de script embarqué
+    _bundle_script(tmp_path, monkeypatch)
+    monkeypatch.setattr(update.shutil, "which", lambda name: None if name == "pkexec" else "/usr/bin/" + name)
+    assert update.build_install_command(new, "system", "00") is None      # pas de pkexec
+    assert update.build_install_command(new, "user", "00") is not None
+
+
+def test_expected_sha256_prefers_github_digest(tmp_path):
+    f = tmp_path / "f"
+    f.write_bytes(b"payload")
+    assert update.expected_sha256({"digest": "sha256:" + "AB" * 32}, f) == "ab" * 32
+    assert update.expected_sha256({}, f) == update.file_sha256(f)
+    assert update.expected_sha256({"digest": "sha256:zz"}, f) == update.file_sha256(f)
+
+
+def test_relaunch_env_drops_appimage_variables(monkeypatch):
+    for name in ("APPIMAGE", "APPDIR", "ARGV0", "OWD"):
+        monkeypatch.setenv(name, "x")
+    monkeypatch.setenv("LD_LIBRARY_PATH", "/tmp/_MEI1")
+    monkeypatch.setenv("LD_LIBRARY_PATH_ORIG", "/usr/lib/x")
+    env = update.relaunch_env()
+    assert not {"APPIMAGE", "APPDIR", "ARGV0", "OWD"} & set(env)
+    assert env["LD_LIBRARY_PATH"] == "/usr/lib/x"
+    assert env["PYINSTALLER_RESET_ENVIRONMENT"] == "1"
+
+
+def test_build_sudo_install_command_reads_password_on_stdin(tmp_path, monkeypatch):
+    script = _bundle_script(tmp_path, monkeypatch)
+    monkeypatch.setattr(update.shutil, "which", lambda name: "/usr/bin/" + name)
+    new = tmp_path / "new.AppImage"
+    cmd = update.build_sudo_install_command(new, "ef" * 32)
+    # le mot de passe arrive sur l'entrée de sudo, jamais en argument
+    assert cmd[:6] == ["/usr/bin/sudo", "-S", "-k", "-p", "", "--"]
+    assert cmd[6:9] == ["/usr/bin/bash", "-c", script.read_text(encoding="utf-8")]
+    assert cmd[9:] == ["install.sh", "--system", "--file", str(new), "--sha256", "ef" * 32]
+
+
+def test_build_sudo_install_command_unavailable(tmp_path, monkeypatch):
+    _bundle_script(tmp_path, monkeypatch)
+    monkeypatch.setattr(update.shutil, "which", lambda name: None if name == "sudo" else "/usr/bin/" + name)
+    assert update.build_sudo_install_command(tmp_path / "new.AppImage", "00") is None

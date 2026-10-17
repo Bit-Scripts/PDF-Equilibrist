@@ -39,8 +39,11 @@ Avec `APPIMAGETOOL=/chemin/appimagetool`, le script produit aussi
 - **glibc** : construire sur le système le plus ancien à couvrir (CI : Ubuntu 22.04 = glibc 2.35).
 - **Impression (CUPS), polices d'emoji, Wayland** : dépendent du système hôte, non testés en vrai.
 - **Mises à jour** : `update.py` détecte l'AppImage via `APPIMAGE`, cherche l'asset `*x86_64.AppImage` de la
-  dernière release et le télécharge à côté de l'actuelle sous un nom versionné (SHA-256 vérifié si GitHub le
-  fournit). L'utilisateur la relance lui-même. Pas de zsync (delta) pour l'instant.
+  dernière release et la télécharge (SHA-256 vérifié si GitHub le fournit), puis propose de l'installer avec le
+  `install.sh` embarqué (`usr/share/pdf-equilibrist/install.sh`) : pour l'utilisateur seul, ou pour tous via
+  `pkexec` (script passé en texte, somme revérifiée en root sur une copie, icône existante conservée), puis de
+  relancer. Sans `pkexec`, repli sur `sudo -S` avec une demande de mot de passe dans l'application (mot de passe
+  sur l'entrée de sudo, jamais en argument). Pas de zsync (delta) pour l'instant.
 - **Version** : le workflow injecte la version du tag dans `__version__`, comme `release.yml`.
 - **Publication** : un tag `v*` construit l'AppImage puis la joint à la release (`gh release upload`, après avoir
   attendu que `release.yml` l'ait créée). Rattrapage d'une release existante : Actions › « Linux AppImage » ›

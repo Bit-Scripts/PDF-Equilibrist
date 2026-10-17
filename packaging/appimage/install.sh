@@ -6,6 +6,7 @@
 #   sudo install.sh --system    pour tous les utilisateurs      → /usr/local
 #   install.sh --uninstall      retire l'installation (ajouter --system si faite avec sudo)
 #   install.sh --file CHEMIN    utilise cette AppImage au lieu de la télécharger
+#   install.sh --sha256 HEX     avec --file : refuse l'installation si la somme SHA-256 ne correspond pas
 #
 # Sans --file : prend l'AppImage posée à côté du script, sinon télécharge la dernière release GitHub
 # (api.github.com / github.com uniquement) et vérifie sa somme SHA-256 avant d'installer.
@@ -13,7 +14,7 @@ set -euo pipefail
 
 REPO="Bit-Scripts/PDF-Equilibrist"
 ASSET="PDF-Equilibrist-x86_64.AppImage"
-MODE=user ; ACTION=install ; FILE=""
+MODE=user ; ACTION=install ; FILE="" ; SHA256=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -21,6 +22,7 @@ while [ $# -gt 0 ]; do
     --user) MODE=user ;;
     --uninstall) ACTION=uninstall ;;
     --file) FILE="${2:?--file demande un chemin}" ; shift ;;
+    --sha256) SHA256="${2:?--sha256 demande une somme}" ; shift ;;
     -h|--help) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//' ; exit 0 ;;
     *) echo "Option inconnue : $1 (voir --help)" >&2 ; exit 2 ;;
   esac
@@ -83,13 +85,36 @@ if [ -z "$FILE" ]; then
 fi
 [ -f "$FILE" ] || { echo "Fichier introuvable : $FILE" >&2 ; exit 1; }
 
+# Somme imposée (mise à jour intégrée) : en root, on copie d'abord le fichier dans un dossier réservé à root
+# puis on vérifie la COPIE, pour qu'un fichier remplacé entre-temps par un autre processus ne soit jamais installé.
+if [ -n "$SHA256" ]; then
+  if [ "$(id -u)" -eq 0 ]; then
+    cp -L -- "$FILE" "$WORK/checked.AppImage"
+    FILE="$WORK/checked.AppImage"
+  fi
+  actual="$(sha256sum -- "$FILE" | cut -d' ' -f1)"
+  [ "$actual" = "$SHA256" ] || { echo "Somme SHA-256 incorrecte : installation refusée." >&2 ; exit 1; }
+  echo "SHA-256 vérifiée."
+fi
+
 mkdir -p "$APPDIR" "$PREFIX/bin" "$(dirname "$DESKTOP")" "$(dirname "$ICON")"
 install -m755 "$FILE" "$TARGET"
 ln -sf "$TARGET" "$BIN"
 
-# Icône : extraite de l'AppImage elle-même (--appimage-extract ne demande pas FUSE)
-( cd "$WORK" && "$TARGET" --appimage-extract pdf-equilibrist.png >/dev/null 2>&1 \
-    && install -m644 squashfs-root/pdf-equilibrist.png "$ICON" ) || echo "Icône non extraite (le lanceur utilisera l'icône par défaut)."
+# Icône. Quand le script est embarqué dans l'AppImage, l'icône est à côté de lui : rien n'est exécuté.
+# Sinon elle est extraite de l'AppImage (--appimage-extract, sans FUSE) — mais jamais en root :
+# on n'exécute pas avec des droits élevés un fichier qui vient d'être téléchargé.
+SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BUNDLED_ICON="$SELF/../icons/hicolor/256x256/apps/pdf-equilibrist.png"
+if [ -f "$BUNDLED_ICON" ] && [ "$(id -u)" -ne 0 ]; then
+  install -m644 "$BUNDLED_ICON" "$ICON"
+elif [ "$(id -u)" -eq 0 ]; then
+  # root : on ne lit ni n'exécute rien qui vienne d'un utilisateur ; une icône déjà installée est conservée
+  [ -f "$ICON" ] || echo "Icône non installée (installation système : icône par défaut)."
+else
+  ( cd "$WORK" && "$TARGET" --appimage-extract pdf-equilibrist.png >/dev/null 2>&1 \
+      && install -m644 squashfs-root/pdf-equilibrist.png "$ICON" ) || echo "Icône non installée (icône par défaut)."
+fi
 
 cat > "$DESKTOP" <<DESK
 [Desktop Entry]
