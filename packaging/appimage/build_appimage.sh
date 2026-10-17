@@ -37,6 +37,19 @@ install -m644 "$ROOT/packaging/ppa/debian/pdf-equilibrist-256.png" \
   "$APPDIR/usr/share/icons/hicolor/256x256/apps/pdf-equilibrist.png"
 ln -sf pdf-equilibrist.png "$APPDIR/.DirIcon"
 
+# AppStream metainfo (AppImageHub, logiciels de gestion d'applications) : version et date injectées
+APP_VERSION="$("$PYTHON" -c 'import re,sys; print(re.search(r"__version__ = \"(.*?)\"", open(sys.argv[1], encoding="utf-8").read()).group(1))' "$ROOT/src/pdf_equilibrist/__init__.py")"
+mkdir -p "$APPDIR/usr/share/metainfo"
+sed -e "s/@VERSION@/${APP_VERSION}/" -e "s/@DATE@/$(date -u +%Y-%m-%d)/" \
+  "$HERE/org.pdf_equilibrist.pdf_equilibrist.metainfo.xml" \
+  > "$APPDIR/usr/share/metainfo/org.pdf_equilibrist.pdf_equilibrist.metainfo.xml"
+if command -v appstreamcli >/dev/null 2>&1; then
+  appstreamcli validate --no-net "$APPDIR/usr/share/metainfo/org.pdf_equilibrist.pdf_equilibrist.metainfo.xml"
+fi
+if command -v desktop-file-validate >/dev/null 2>&1; then
+  desktop-file-validate "$APPDIR/pdf-equilibrist.desktop"
+fi
+
 echo "== 3/4  Bibliothèques xcb pour Qt6 (libxcb-cursor n'est pas installée par défaut sur toutes les distributions)"
 INTERNAL="$APPDIR/usr/lib/pdf-equilibrist/_internal"
 # (pas de `exit` dans awk : avec pipefail, ldconfig recevrait SIGPIPE et set -e arrêterait le script)
