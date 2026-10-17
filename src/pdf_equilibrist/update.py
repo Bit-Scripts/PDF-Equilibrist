@@ -184,7 +184,11 @@ def appimage_download_target(release: dict) -> Path:
     return folder / filename
 
 
-def download_release_asset(asset: dict, target_path: Path, timeout: int = 120) -> Path:
+def download_release_asset(asset: dict, target_path: Path, timeout: int = 120, progress=None) -> Path:
+    """
+    Télécharge l'asset vers ``target_path`` (fichier ``.part`` puis renommage : jamais de fichier
+    tronqué sous le nom final). ``progress(octets_lus, total_ou_0)`` est appelé à chaque bloc.
+    """
     url = asset.get("browser_download_url")
     if not url:
         raise ValueError("L'asset ne contient pas d'URL de téléchargement valide.")
@@ -201,13 +205,29 @@ def download_release_asset(asset: dict, target_path: Path, timeout: int = 120) -
         },
     )
     target_path.parent.mkdir(parents=True, exist_ok=True)
-    with network.urlopen(request, timeout=timeout) as response:
-        data = response.read()
-    # GitHub publie l'empreinte de chaque asset (« sha256:… ») : si elle est là, on la vérifie.
-    digest = str(asset.get("digest") or "")
-    if digest.startswith("sha256:") and hashlib.sha256(data).hexdigest() != digest[7:].lower():
-        raise ValueError("Empreinte SHA-256 du fichier téléchargé incorrecte.")
-    target_path.write_bytes(data)
+    part = target_path.with_name(target_path.name + ".part")
+    sha = hashlib.sha256()
+    done = 0
+    try:
+        with network.urlopen(request, timeout=timeout) as response, open(part, "wb") as out:
+            headers = getattr(response, "headers", None)
+            total = int(headers.get("Content-Length") or 0) if headers is not None else 0
+            while True:
+                chunk = response.read(1024 * 1024)
+                if not chunk:
+                    break
+                out.write(chunk)
+                sha.update(chunk)
+                done += len(chunk)
+                if progress:
+                    progress(done, total)
+        # GitHub publie l'empreinte de chaque asset (« sha256:… ») : si elle est là, on la vérifie.
+        digest = str(asset.get("digest") or "")
+        if digest.startswith("sha256:") and sha.hexdigest() != digest[7:].lower():
+            raise ValueError("Empreinte SHA-256 du fichier téléchargé incorrecte.")
+        os.replace(part, target_path)
+    finally:
+        part.unlink(missing_ok=True)
     return target_path
 
 
