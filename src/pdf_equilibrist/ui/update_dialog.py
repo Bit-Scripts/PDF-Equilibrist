@@ -181,6 +181,21 @@ class UpdateDialog(QDialog):
         layout.addWidget(self._linux_cmd_widget)
         self._btn_copy_cmd.clicked.connect(self._copy_linux_command)
 
+        # ── Adresse à copier à la main (affichée seulement si aucun navigateur ne s'ouvre) ──
+        self._url_edit = QLineEdit()
+        self._url_edit.setReadOnly(True)
+        self._btn_copy_url = QPushButton(self.tr("Copier"))
+        url_row = QHBoxLayout()
+        url_row.addWidget(QLabel(self.tr("Adresse :")))
+        url_row.addWidget(self._url_edit)
+        url_row.addWidget(self._btn_copy_url)
+        self._url_widget = QFrame()
+        self._url_widget.setLayout(url_row)
+        self._url_widget.setVisible(False)
+        layout.addWidget(self._url_widget)
+        self._btn_copy_url.clicked.connect(
+            lambda: QApplication.clipboard().setText(self._url_edit.text()))
+
         # ── Boutons ───────────────────────────────────────────────────────────
         btn_row = QHBoxLayout()
         btn_row.addStretch()
@@ -285,7 +300,10 @@ class UpdateDialog(QDialog):
         if open_external(url):
             return
         QApplication.clipboard().setText(url)
-        self._lbl.setText(self.tr("Aucun navigateur détecté. Adresse copiée dans le presse-papiers :\n{0}").format(url))
+        self._url_edit.setText(url)
+        self._url_edit.setCursorPosition(0)
+        self._url_widget.setVisible(True)
+        self._lbl.setText(self.tr("Aucun navigateur détecté : adresse copiée dans le presse-papiers."))
 
     def _open_github(self):
         self._open_url(_GITHUB_URL)
