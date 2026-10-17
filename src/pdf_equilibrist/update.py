@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import sys
 import tempfile
 import urllib.error
@@ -49,6 +50,102 @@ def appimage_path() -> Path | None:
 
 def is_appimage() -> bool:
     return appimage_path() is not None
+
+
+INSTALL_SUBDIR = Path("share") / "pdf-equilibrist"
+INSTALLED_NAME = "PDF-Equilibrist.AppImage"
+SYSTEM_PREFIX = Path("/usr/local")
+
+
+def install_prefix(scope: str) -> Path:
+    """Préfixe d'installation du script ``install.sh`` : ``~/.local`` (user) ou ``/usr/local`` (system)."""
+    return SYSTEM_PREFIX if scope == "system" else Path.home() / ".local"
+
+
+def installed_appimage_path(scope: str) -> Path:
+    """Où ``install.sh`` pose l'AppImage pour ce périmètre."""
+    return install_prefix(scope) / INSTALL_SUBDIR / INSTALLED_NAME
+
+
+def install_scope(current: Path | None = None) -> str:
+    """
+    Comment l'AppImage en cours d'exécution est installée : ``"user"`` (sous ``~/.local``),
+    ``"system"`` (sous ``/usr/local``) ou ``"none"`` (lancée depuis n'importe quel dossier).
+    """
+    current = current or appimage_path()
+    if current is None:
+        return "none"
+    try:
+        resolved = current.resolve()
+    except OSError:
+        return "none"
+    for scope in ("user", "system"):
+        if install_prefix(scope) / INSTALL_SUBDIR in resolved.parents:
+            return scope
+    return "none"
+
+
+def bundled_install_script() -> Path | None:
+    """``install.sh`` embarqué dans l'AppImage en cours d'exécution (AppRun exporte ``APPDIR``)."""
+    appdir = os.environ.get("APPDIR")
+    if not appdir:
+        return None
+    script = Path(appdir) / "usr" / "share" / "pdf-equilibrist" / "install.sh"
+    return script if script.is_file() else None
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def expected_sha256(asset: dict, downloaded: Path) -> str:
+    """Somme à imposer à l'installation : celle de GitHub (vérifiée au téléchargement), sinon celle du fichier."""
+    digest = str(asset.get("digest") or "")
+    if digest.startswith("sha256:") and re.fullmatch(r"[0-9a-fA-F]{64}", digest[7:]):
+        return digest[7:].lower()
+    return file_sha256(downloaded)
+
+
+def build_install_command(new_file: Path, scope: str, sha256: str) -> list[str] | None:
+    """
+    Commande qui installe ``new_file`` avec le ``install.sh`` embarqué.
+
+    ``scope="user"`` : ``bash install.sh --file …`` (aucun droit particulier).
+    ``scope="system"`` : même chose en root via ``pkexec`` — la fenêtre d'authentification est celle du système,
+    l'application ne voit jamais le mot de passe. Le script est passé *en texte* (``bash -c``) : le fichier est
+    dans un montage FUSE que root ne peut pas lire, et on évite qu'un autre processus le remplace pendant que
+    l'utilisateur s'authentifie. Retourne ``None`` si le script ou ``pkexec`` manque.
+    """
+    script = bundled_install_script()
+    bash = shutil.which("bash")
+    if script is None or bash is None:
+        return None
+    args = ["--file", str(new_file), "--sha256", sha256]
+    if scope != "system":
+        return [bash, str(script), *args]
+    pkexec = shutil.which("pkexec")
+    if pkexec is None:
+        return None
+    try:
+        text = script.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    return [pkexec, bash, "-c", text, "install.sh", "--system", *args]
+
+
+def relaunch_env() -> dict[str, str]:
+    """Environnement pour relancer l'application : celui du système, sans les variables de l'AppImage en cours."""
+    from pdf_equilibrist.utils import external_env
+
+    env = external_env()
+    for name in ("APPIMAGE", "APPDIR", "ARGV0", "OWD"):
+        env.pop(name, None)
+    env["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
+    return env
 
 
 _LINUX_UPDATE_COMMANDS = {

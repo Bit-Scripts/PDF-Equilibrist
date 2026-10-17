@@ -37,6 +37,11 @@ install -m644 "$ROOT/packaging/ppa/debian/pdf-equilibrist-256.png" \
   "$APPDIR/usr/share/icons/hicolor/256x256/apps/pdf-equilibrist.png"
 ln -sf pdf-equilibrist.png "$APPDIR/.DirIcon"
 
+# Script d'installation embarqué : la mise à jour intégrée le lance depuis l'AppImage en cours d'exécution
+# (rien à télécharger ; l'icône est prise dans usr/share/icons, donc sans exécuter de fichier téléchargé).
+mkdir -p "$APPDIR/usr/share/pdf-equilibrist"
+install -m755 "$HERE/install.sh" "$APPDIR/usr/share/pdf-equilibrist/install.sh"
+
 # AppStream metainfo (AppImageHub, logiciels de gestion d'applications) : version et date injectées
 APP_VERSION="$("$PYTHON" -c 'import re,sys; print(re.search(r"__version__ = \"(.*?)\"", open(sys.argv[1], encoding="utf-8").read()).group(1))' "$ROOT/src/pdf_equilibrist/__init__.py")"
 mkdir -p "$APPDIR/usr/share/metainfo"

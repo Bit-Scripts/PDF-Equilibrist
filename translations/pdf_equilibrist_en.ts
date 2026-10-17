@@ -1856,6 +1856,167 @@ rypt</translation>
         <source>Échec du téléchargement : {0}</source>
         <translation>Download failed: {0}</translation>
     </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="307" />
+        <source>Aucun navigateur détecté : adresse copiée dans le presse-papiers.</source>
+        <translation>No browser detected: the address was copied to the clipboard.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="397" />
+        <source>Installer la nouvelle version</source>
+        <translation>Install the new version</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="398" />
+        <source>La nouvelle version est téléchargée. L'installer maintenant ?</source>
+        <translation>The new version is downloaded. Install it now?</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="409" />
+        <source>Installer pour qui ?</source>
+        <translation>Install for whom?</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="420" />
+        <source>Pour moi uniquement</source>
+        <translation>Just for me</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="421" />
+        <source>Pour tous les utilisateurs</source>
+        <translation>For all users</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="422" />
+        <source>Annuler</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="442" />
+        <source>Installation en cours…</source>
+        <translation>Installing…</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="190" />
+        <source>Adresse :</source>
+        <translation>Address:</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="411" />
+        <source>Cette version est installée pour tous les utilisateurs de l'ordinateur. Mettre à jour :
+
+• pour vous seulement : une copie dans votre dossier personnel, sans mot de passe ;
+• pour tous : le système vous demandera l'autorisation d'un administrateur.</source>
+        <translation>This version is installed for all users of the computer. Update it:
+
+• for you only: a copy in your home folder, no password needed;
+• for everyone: the system will ask for an administrator's authorisation.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="416" />
+        <source>Cette copie n'est pas installée. L'installer :
+
+• pour vous seulement : dans votre dossier personnel, sans mot de passe ;
+• pour tous les utilisateurs : le système vous demandera l'autorisation d'un administrateur.</source>
+        <translation>This copy is not installed. Install it:
+
+• for you only: in your home folder, no password needed;
+• for all users: the system will ask for an administrator's authorisation.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="461" />
+        <source>Impossible de lancer l'installation.</source>
+        <translation>Could not start the installation.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="471" />
+        <source>Installation terminée</source>
+        <translation>Installation finished</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="472" />
+        <source>La nouvelle version est installée. Relancer l'application maintenant ?</source>
+        <translation>The new version is installed. Restart the application now?</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="478" />
+        <source>Autorisation refusée ou annulée : rien n'a été installé.</source>
+        <translation>Authorisation refused or cancelled: nothing was installed.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="216" />
+        <source>Télécharger le script d'installation (install.sh)</source>
+        <translation>Download the install script (install.sh)</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="271" />
+        <source>Télécharger la nouvelle AppImage</source>
+        <translation>Download the new AppImage</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="372" />
+        <source>Script d'installation téléchargé :
+{0}
+Lancez : bash install.sh   (ou sudo bash install.sh --system)</source>
+        <translation>Install script downloaded:
+{0}
+Run: bash install.sh   (or sudo bash install.sh --system)</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="395" />
+        <source>Nouvelle version téléchargée et vérifiée :
+{0}</source>
+        <translation>New version downloaded and verified:
+{0}</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="482" />
+        <source>L'installation a échoué (code {0}).
+{1}</source>
+        <translation>The installation failed (code {0}).
+{1}</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="341" />
+        <source>Téléchargement : {0:.0f} / {1:.0f} Mo</source>
+        <translation>Downloading: {0:.0f} / {1:.0f} MB</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="343" />
+        <source>Téléchargement : {0:.0f} Mo</source>
+        <translation>Downloading: {0:.0f} MB</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="385" />
+        <source>Nouvelle AppImage téléchargée :
+{0}
+Fermez l'application puis lancez ce fichier (ou : bash install.sh --file &lt;fichier&gt;).</source>
+        <translation>New AppImage downloaded:
+{0}
+Close the application, then run this file (or: bash install.sh --file &lt;file&gt;).</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="433" />
+        <source>Installation automatique indisponible sur ce système (pkexec ou le script est introuvable).
+Dans un terminal : {0}{1}</source>
+        <translation>Automatic installation is not available on this system (pkexec or the script is missing).
+In a terminal: {0}{1}</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="469" />
+        <source>Installée : {0}</source>
+        <translation>Installed: {0}</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="393" />
+        <source>Impossible de lire le fichier téléchargé : {0}</source>
+        <translation>Could not read the downloaded file: {0}</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="491" />
+        <source>Impossible de relancer l'application : {0}</source>
+        <translation>Could not restart the application: {0}</translation>
+    </message>
 </context><context>
     <name>_PageLabel</name>
     <message>
