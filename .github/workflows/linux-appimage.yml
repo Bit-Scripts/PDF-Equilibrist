@@ -145,6 +145,8 @@ jobs:
   distros:
     name: Run on ${{ matrix.image }}
     needs: build
+    # `checks` (ancêtre) est ignoré hors tag : sans cette condition, GitHub ignorerait aussi ce job
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -170,7 +172,7 @@ jobs:
   publish:
     name: Attach to the GitHub release
     needs: [build, distros]
-    if: ${{ needs.build.outputs.tag != '' }}
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.distros.result == 'success' && needs.build.outputs.tag != '' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
