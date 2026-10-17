@@ -1,5 +1,5 @@
 Name:           pdf-equilibrist
-Version:        0.1.25
+Version:        0.1.26
 Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
@@ -197,6 +197,16 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Sat Oct 17 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.26-1
+- New upstream release: an AppImage for every other Linux distribution, and
+  updates that install themselves. A single-file AppImage (with its SHA-256
+  and an install script) is published for Debian, openSUSE, Mint and others;
+  when running as an AppImage, Help > About downloads the new version,
+  installs it for the current user or for all users (administrator
+  authorisation requested) and offers to restart it. On Windows the
+  application now closes by itself once the installer has started. The update
+  download no longer freezes the window and shows its progress.
+
 * Sun Oct 11 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.25-1
 - New upstream release: local OCR that works offline on every channel.
   OCR is now RapidOCR + ONNX Runtime with the recognition models shipped

@@ -1,3 +1,43 @@
+pdf-equilibrist (0.1.26-1~noble1) noble; urgency=medium
+
+  * New upstream release: an AppImage for every other Linux distribution, and
+    updates that install themselves.
+    - New single-file AppImage for Debian, openSUSE, Mint and other
+      distributions, published with its SHA-256 and an install script
+      (per-user without root, or system-wide).
+    - When running as an AppImage, Help > About now downloads the new
+      version, installs it (for the current user, or for all users after an
+      administrator authorisation) and offers to restart it.
+    - On Windows, the application now closes by itself once the installer of
+      the new version has started, so the installer is no longer blocked by
+      a running copy.
+    - The update download no longer freezes the window and shows its
+      progress; links that cannot be opened (no web browser) are shown with a
+      Copy button.
+    - New English translations for the update dialog.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sat, 17 Oct 2026 12:00:00 +0000
+
+pdf-equilibrist (0.1.26-1~resolute1) resolute; urgency=medium
+
+  * New upstream release: an AppImage for every other Linux distribution, and
+    updates that install themselves.
+    - New single-file AppImage for Debian, openSUSE, Mint and other
+      distributions, published with its SHA-256 and an install script
+      (per-user without root, or system-wide).
+    - When running as an AppImage, Help > About now downloads the new
+      version, installs it (for the current user, or for all users after an
+      administrator authorisation) and offers to restart it.
+    - On Windows, the application now closes by itself once the installer of
+      the new version has started, so the installer is no longer blocked by
+      a running copy.
+    - The update download no longer freezes the window and shows its
+      progress; links that cannot be opened (no web browser) are shown with a
+      Copy button.
+    - New English translations for the update dialog.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sat, 17 Oct 2026 12:00:00 +0000
+
 pdf-equilibrist (0.1.25-1~noble1) noble; urgency=medium
 
   * New upstream release: local OCR that works offline on every channel.
