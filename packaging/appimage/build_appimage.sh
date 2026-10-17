@@ -74,6 +74,16 @@ for lib in "$cursor" "$xkbx11" $(ldd "$cursor" "$xkbx11" ${qxcb:+"$qxcb"} | awk 
   cp -nL "$lib" "$INTERNAL/" 2>/dev/null || true
 done
 echo "   embarquées : $(ls "$INTERNAL" | grep -Ec '^(libxcb-|libxkbcommon)' || true) bibliothèque(s) xcb-*/xkbcommon*"
+# Garde-fou : toute dépendance xcb/xkbcommon du plugin Qt doit être résolue (ici ou dans le bundle), sinon l'AppImage
+# ne démarre pas sur un système minimal (cas vécu : libxcb-icccm.so.4 absente sur le testeur d'AppImageHub).
+if [ -n "$qxcb" ]; then
+  missing="$(LD_LIBRARY_PATH="$INTERNAL:$(dirname "$qxcb")" ldd "$qxcb" | awk '/not found/ && /libxcb|libxkb|libX11/{print $1}')"
+  if [ -n "$missing" ]; then
+    echo "   ERREUR : dépendances de libqxcb.so introuvables :" $missing >&2
+    echo "            installer les paquets libxcb-*0 correspondants sur la machine de build" >&2
+    exit 1
+  fi
+fi
 
 du -sh "$APPDIR" | awk '{print "   AppDir : " $1}'
 
