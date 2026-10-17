@@ -85,6 +85,9 @@ SetCompressor   lzma
 LangString MSG_APP_RUNNING ${LANG_FRENCH}  "${APP_NAME} est en cours d'exécution.$\r$\n$\r$\nVeuillez fermer l'application avant de continuer."
 LangString MSG_APP_RUNNING ${LANG_ENGLISH} "${APP_NAME} is currently running.$\r$\n$\r$\nPlease close the application before continuing."
 
+LangString MSG_APP_RUNNING_ASK ${LANG_FRENCH}  "${APP_NAME} est en cours d'exécution.$\r$\n$\r$\nOui : fermer l'application maintenant (les modifications non enregistrées seront perdues).$\r$\nNon : je la ferme moi-même, puis réessayer.$\r$\nAnnuler : abandonner."
+LangString MSG_APP_RUNNING_ASK ${LANG_ENGLISH} "${APP_NAME} is currently running.$\r$\n$\r$\nYes: close the application now (unsaved changes will be lost).$\r$\nNo: I will close it myself, then retry.$\r$\nCancel: abort."
+
 LangString WELCOME_TITLE ${LANG_FRENCH}  "Bienvenue dans l'installation de ${APP_NAME}"
 LangString WELCOME_TITLE ${LANG_ENGLISH} "Welcome to the ${APP_NAME} Setup Wizard"
 
@@ -113,16 +116,31 @@ LangString SEC_DESKTOP_NAME ${LANG_ENGLISH} "Desktop shortcut"
 ; Vérifie que l'application n'est pas en cours d'exécution avant d'installer
 ; ou de désinstaller (fichiers verrouillés sinon). Détection par titre de
 ; fenêtre (fiable : main_window.py fixe ce titre une fois pour toutes, il ne
-; change jamais même quand un document est ouvert). Pas de fermeture forcée
-; pour ne pas risquer de perdre un travail non sauvegardé.
+; change jamais même quand un document est ouvert). Jamais de fermeture sans
+; accord : l'utilisateur choisit entre fermer l'application (message WM_CLOSE,
+; la fermeture normale de la fenêtre) ou la fermer lui-même. Fonctionne quelle
+; que soit la version de l'application en cours, y compris les plus anciennes.
 !macro CHECK_APP_RUNNING
     check_app_running:
         FindWindow $0 "" "PDF Equilibrist"
         ${If} $0 <> 0
-            MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION \
-                "$(MSG_APP_RUNNING)" \
-                IDRETRY check_app_running
+            MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION \
+                "$(MSG_APP_RUNNING_ASK)" \
+                IDYES close_app IDNO check_app_running
             Abort
+        close_app:
+            SendMessage $0 0x0010 0 0
+            StrCpy $1 0
+        wait_app_closed:
+            Sleep 500
+            IntOp $1 $1 + 1
+            FindWindow $0 "" "PDF Equilibrist"
+            ${If} $0 <> 0
+            ${AndIf} $1 < 20
+                Goto wait_app_closed
+            ${EndIf}
+            ; encore ouverte après 10 s (ou fermée) : on revérifie, la question se reposera au besoin
+            Goto check_app_running
         ${EndIf}
 !macroend
 
