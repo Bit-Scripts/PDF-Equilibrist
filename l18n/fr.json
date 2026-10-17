@@ -29,7 +29,7 @@
   "nav.docs": "Documentation",
 
   "hero.tagline1": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Il fonctionne entièrement en local — pas de cloud, pas de télémétrie, pas de compte requis.",
-  "hero.tagline2": "PDF‑Equilibrist est disponible pour Windows, Arch Linux (AUR), Ubuntu (PPA) et Fedora (COPR).",
+  "hero.tagline2": "PDF‑Equilibrist est disponible pour Windows, Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) et toute autre distribution Linux (AppImage).",
 
   "cta.download.windows": "Télécharger (Windows)",
   "cta.install.arch.btn": "Installation ArchLinux",
@@ -89,7 +89,7 @@
   "faq.q3": "PDF‑Equilibrist remplace-t-il Adobe Acrobat ?",
   "faq.a3": "Pour de nombreux usages courants — édition, annotation, conversion, protection — oui. Il ne nécessite ni abonnement ni compte.",
   "faq.q4": "Quels systèmes d'exploitation sont supportés ?",
-  "faq.a4": "Windows (installeur .exe), Arch Linux (AUR), Ubuntu (PPA) et Fedora (COPR).",
+  "faq.a4": "Windows (installeur .exe), Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) et toute autre distribution Linux 64 bits (AppImage).",
   "faq.q5": "Faut-il des droits administrateur pour l'installer ?",
   "faq.a5": "Non. L'installeur Windows s'installe dans le profil utilisateur sans élévation UAC.",
   "faq.q6": "Le code source est-il auditable ?",
@@ -156,5 +156,12 @@
   "stats.copr": "depuis le dépôt Fedora (COPR)",
   "stats.copr.enablements": "activations du dépôt Fedora (dnf copr enable)",
   "stats.arch": "Arch Linux (AUR) n'a pas de compteur : l'AUR ne diffuse qu'une recette de construction, le paquet est compilé sur la machine de l'utilisateur depuis l'archive des sources GitHub, que GitHub ne comptabilise pas.",
-  "stats.updated": "Relevé du"
+  "stats.updated": "Relevé du",
+  "cta.install.appimage.btn": "Installation autre Linux",
+  "cta.install.appimage.link": "Télécharger l'AppImage",
+  "install.appimage.lead": "🐧 Sur toute autre distribution Linux 64 bits (Debian, openSUSE, Mint…), en un seul fichier AppImage :",
+  "install.appimage.note": "Le script installe dans ~/.local sans root (--system pour tous les utilisateurs, --uninstall pour retirer), ajoute le lanceur de menu et l'association aux PDF, et vérifie le SHA-256 du téléchargement. Vous pouvez aussi télécharger PDF-Equilibrist-x86_64.AppImage sur la page de la release, la rendre exécutable et la lancer. Sans FUSE (libfuse2), lancez-la avec --appimage-extract-and-run.",
+  "badge.dl.appimage": "t%C3%A9l%C3%A9chargements%20AppImage",
+  "badge.dl.appimage.alt": "Téléchargements AppImage",
+  "stats.appimage": "depuis les releases GitHub (AppImage, autres distributions Linux)"
 }

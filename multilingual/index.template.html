@@ -42,7 +42,8 @@
   "installUrl": [
     "https://aur.archlinux.org/packages/pdf-equilibrist",
     "https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist",
-    "https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"
+    "https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/",
+    "https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"
   ],
   "description": "{{jsonld.description}}",
   "applicationCategory": "UtilityApplication",
@@ -151,9 +152,10 @@
        un nouveau relevé si une erreur y est restée en cache. -->
   <div class="badges">
     <a href="#diffusion"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.total&label={{badge.dl.total}}&color=6BBF4E&cacheSeconds=3600&v=2" alt="{{badge.dl.total.alt}}"></a>
-    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label={{badge.dl.windows}}&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600" alt="{{badge.dl.windows.alt}}"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.github.total&label={{badge.dl.windows}}&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600&v=2" alt="{{badge.dl.windows.alt}}"></a>
     <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.launchpad.total&label={{badge.dl.ubuntu}}&logo=ubuntu&logoColor=white&color=E95420&cacheSeconds=3600&v=2" alt="{{badge.dl.ubuntu.alt}}"></a>
     <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.copr.total&label={{badge.dl.fedora}}&logo=fedora&logoColor=white&color=51A2DA&cacheSeconds=3600&v=2" alt="{{badge.dl.fedora.alt}}"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.appimage.total&label={{badge.dl.appimage}}&logo=linux&logoColor=white&color=8E6BBF&cacheSeconds=3600&v=2" alt="{{badge.dl.appimage.alt}}"></a>
     <a href="#diffusion-arch" title="{{badge.dl.arch.title}}"><img src="https://img.shields.io/badge/{{badge.dl.arch}}-{{badge.dl.arch.msg}}-lightgrey?logo=archlinux&logoColor=white" alt="{{badge.dl.arch.alt}}"></a>
   </div>
   <div class="badges">
@@ -190,6 +192,14 @@ sudo apt install pdf-equilibrist</code></pre>
         <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
 sudo dnf install pdf-equilibrist</code></pre>
         <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/">{{cta.install.fedora.link}}</a>
+      </div>
+    </div>
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="appimage-toggle" aria-expanded="false" aria-controls="appimage-drawer">{{cta.install.appimage.btn}}</button>
+      <div class="arch-drawer" id="appimage-drawer">
+        <pre><code>curl -fsSLO https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/install.sh
+bash install.sh</code></pre>
+        <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">{{cta.install.appimage.link}}</a>
       </div>
     </div>
     <div class="cta-item">
@@ -298,6 +308,10 @@ sudo apt install pdf-equilibrist</code></pre>
     <p class="lead">{{install.fedora.lead}}</p>
     <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
 sudo dnf install pdf-equilibrist</code></pre>
+    <p class="lead">{{install.appimage.lead}}</p>
+    <pre><code>curl -fsSLO https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/install.sh
+bash install.sh</code></pre>
+    <p style="color:var(--text-dim)">{{install.appimage.note}}</p>
     <h3 style="font-size:1.1rem;color:var(--text)">{{install.dev.title}}</h3>
     <p style="color:var(--text-dim)">{{install.dev.step1}}</p>
     <pre><code>python -m pip install -r requirements.txt</code></pre>
@@ -313,6 +327,7 @@ sudo dnf install pdf-equilibrist</code></pre>
     <ul class="stats-list">
       <li><strong data-stat="total">&mdash;</strong><span>{{stats.total}}</span></li>
       <li><strong data-stat="github">&mdash;</strong><span>{{stats.github}}</span></li>
+      <li><strong data-stat="appimage">&mdash;</strong><span>{{stats.appimage}}</span></li>
       <li><strong data-stat="launchpad">&mdash;</strong><span>{{stats.launchpad}}</span></li>
       <li><strong data-stat="copr">&mdash;</strong><span>{{stats.copr}}</span></li>
       <li><strong data-stat="copr.enablements">&mdash;</strong><span>{{stats.copr.enablements}}</span></li>
@@ -355,6 +370,7 @@ sudo dnf install pdf-equilibrist</code></pre>
     { toggle: document.getElementById('arch-toggle'), drawer: document.getElementById('arch-drawer') },
     { toggle: document.getElementById('ubuntu-toggle'), drawer: document.getElementById('ubuntu-drawer') },
     { toggle: document.getElementById('fedora-toggle'), drawer: document.getElementById('fedora-drawer') },
+    { toggle: document.getElementById('appimage-toggle'), drawer: document.getElementById('appimage-drawer') },
   ];
 
   drawers.forEach(({ toggle, drawer }) => {

@@ -42,7 +42,8 @@
   "installUrl": [
     "https://aur.archlinux.org/packages/pdf-equilibrist",
     "https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist",
-    "https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"
+    "https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/",
+    "https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"
   ],
   "description": "Open-source PDF editor running entirely locally for Windows and Linux.",
   "applicationCategory": "UtilityApplication",
@@ -84,7 +85,7 @@
     {
       "@type": "Question",
       "name": "Which operating systems are supported?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Windows (.exe installer), Arch Linux (AUR), Ubuntu (PPA) and Fedora (COPR)." }
+      "acceptedAnswer": { "@type": "Answer", "text": "Windows (.exe installer), Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) and any other 64-bit Linux distribution (AppImage)." }
     },
     {
       "@type": "Question",
@@ -136,7 +137,7 @@
   <img class="logo" src="../assets/logo/PDF-Equilibrist-logo.png" alt="PDF-Equilibrist logo — free PDF editing software">
   <h1>PDF-Equilibrist</h1>
   <p class="tagline">Free, open-source desktop PDF editor built in Python with PyQt6 and PyMuPDF. Runs entirely locally — no cloud, no telemetry, no account required.</p>
-  <p class="tagline">PDF‑Equilibrist is available for Windows, Arch Linux (AUR), Ubuntu (PPA) and Fedora (COPR).</p>
+  <p class="tagline">PDF‑Equilibrist is available for Windows, Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) and any other Linux distribution (AppImage).</p>
   <p class="app-notice" hidden></p>
 
   <div class="badges">
@@ -151,9 +152,10 @@
        un nouveau relevé si une erreur y est restée en cache. -->
   <div class="badges">
     <a href="#diffusion"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.total&label=total%20downloads&color=6BBF4E&cacheSeconds=3600&v=2" alt="Total downloads"></a>
-    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=Windows%20downloads&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600" alt="Windows downloads"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.github.total&label=Windows%20downloads&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600&v=2" alt="Windows downloads"></a>
     <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.launchpad.total&label=Ubuntu%20downloads&logo=ubuntu&logoColor=white&color=E95420&cacheSeconds=3600&v=2" alt="Ubuntu downloads"></a>
     <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.copr.total&label=Fedora%20downloads&logo=fedora&logoColor=white&color=51A2DA&cacheSeconds=3600&v=2" alt="Fedora downloads"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.appimage.total&label=AppImage%20downloads&logo=linux&logoColor=white&color=8E6BBF&cacheSeconds=3600&v=2" alt="AppImage downloads"></a>
     <a href="#diffusion-arch" title="The AUR does not publish any download counter"><img src="https://img.shields.io/badge/Arch%20downloads-not%20tracked-lightgrey?logo=archlinux&logoColor=white" alt="Arch downloads: not tracked"></a>
   </div>
   <div class="badges">
@@ -190,6 +192,14 @@ sudo apt install pdf-equilibrist</code></pre>
         <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
 sudo dnf install pdf-equilibrist</code></pre>
         <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/">View project on COPR</a>
+      </div>
+    </div>
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="appimage-toggle" aria-expanded="false" aria-controls="appimage-drawer">Install on other Linux</button>
+      <div class="arch-drawer" id="appimage-drawer">
+        <pre><code>curl -fsSLO https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/install.sh
+bash install.sh</code></pre>
+        <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Download the AppImage</a>
       </div>
     </div>
     <div class="cta-item">
@@ -298,6 +308,10 @@ sudo apt install pdf-equilibrist</code></pre>
     <p class="lead">🐧 On Fedora and derivatives, available via COPR:</p>
     <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
 sudo dnf install pdf-equilibrist</code></pre>
+    <p class="lead">🐧 On any other 64-bit Linux distribution (Debian, openSUSE, Mint…), as a single AppImage file:</p>
+    <pre><code>curl -fsSLO https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/install.sh
+bash install.sh</code></pre>
+    <p style="color:var(--text-dim)">The script installs into ~/.local without root (use --system for all users, --uninstall to remove), adds the menu entry and the PDF association, and checks the SHA-256 of the download. You can also download PDF-Equilibrist-x86_64.AppImage from the release page, make it executable and run it. Without FUSE (libfuse2), start it with --appimage-extract-and-run.</p>
     <h3 style="font-size:1.1rem;color:var(--text)">Install from source (developers)</h3>
     <p style="color:var(--text-dim)">1. Create a compatible Python environment (>=3.12).<br>2. Install dependencies:</p>
     <pre><code>python -m pip install -r requirements.txt</code></pre>
@@ -313,6 +327,7 @@ sudo dnf install pdf-equilibrist</code></pre>
     <ul class="stats-list">
       <li><strong data-stat="total">&mdash;</strong><span>downloads, all channels combined</span></li>
       <li><strong data-stat="github">&mdash;</strong><span>from GitHub releases (Windows installer)</span></li>
+      <li><strong data-stat="appimage">&mdash;</strong><span>from GitHub releases (AppImage, other Linux distributions)</span></li>
       <li><strong data-stat="launchpad">&mdash;</strong><span>from the Ubuntu PPA (Noble and Resolute)</span></li>
       <li><strong data-stat="copr">&mdash;</strong><span>from the Fedora repository (COPR)</span></li>
       <li><strong data-stat="copr.enablements">&mdash;</strong><span>Fedora repository enablements (dnf copr enable)</span></li>
@@ -332,7 +347,7 @@ sudo dnf install pdf-equilibrist</code></pre>
     <h3>Does PDF‑Equilibrist replace Adobe Acrobat?</h3>
     <p>For many common uses — editing, annotation, conversion, protection — yes. It requires no subscription or account.</p>
     <h3>Which operating systems are supported?</h3>
-    <p>Windows (.exe installer), Arch Linux (AUR), Ubuntu (PPA) and Fedora (COPR).</p>
+    <p>Windows (.exe installer), Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) and any other 64-bit Linux distribution (AppImage).</p>
     <h3>Are administrator rights required to install it?</h3>
     <p>No. The Windows installer installs in the user profile without UAC elevation.</p>
     <h3>Is the source code auditable?</h3>
@@ -355,6 +370,7 @@ sudo dnf install pdf-equilibrist</code></pre>
     { toggle: document.getElementById('arch-toggle'), drawer: document.getElementById('arch-drawer') },
     { toggle: document.getElementById('ubuntu-toggle'), drawer: document.getElementById('ubuntu-drawer') },
     { toggle: document.getElementById('fedora-toggle'), drawer: document.getElementById('fedora-drawer') },
+    { toggle: document.getElementById('appimage-toggle'), drawer: document.getElementById('appimage-drawer') },
   ];
 
   drawers.forEach(({ toggle, drawer }) => {

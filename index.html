@@ -42,7 +42,8 @@
   "installUrl": [
     "https://aur.archlinux.org/packages/pdf-equilibrist",
     "https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist",
-    "https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"
+    "https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/",
+    "https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"
   ],
   "description": "Éditeur PDF open-source fonctionnant entièrement en local pour Windows et Linux.",
   "applicationCategory": "UtilityApplication",
@@ -84,7 +85,7 @@
     {
       "@type": "Question",
       "name": "Quels systèmes d'exploitation sont supportés ?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Windows (installeur .exe), Arch Linux (AUR), Ubuntu (PPA) et Fedora (COPR)." }
+      "acceptedAnswer": { "@type": "Answer", "text": "Windows (installeur .exe), Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) et toute autre distribution Linux 64 bits (AppImage)." }
     },
     {
       "@type": "Question",
@@ -136,7 +137,7 @@
   <img class="logo" src="assets/logo/PDF-Equilibrist-logo.png" alt="PDF-Equilibrist logo — logiciel d'édition PDF gratuit">
   <h1>PDF-Equilibrist</h1>
   <p class="tagline">Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Il fonctionne entièrement en local — pas de cloud, pas de télémétrie, pas de compte requis.</p>
-  <p class="tagline">PDF‑Equilibrist est disponible pour Windows, Arch Linux (AUR), Ubuntu (PPA) et Fedora (COPR).</p>
+  <p class="tagline">PDF‑Equilibrist est disponible pour Windows, Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) et toute autre distribution Linux (AppImage).</p>
   <p class="app-notice" hidden></p>
 
   <div class="badges">
@@ -151,9 +152,10 @@
        un nouveau relevé si une erreur y est restée en cache. -->
   <div class="badges">
     <a href="#diffusion"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.total&label=t%C3%A9l%C3%A9chargements%20(total)&color=6BBF4E&cacheSeconds=3600&v=2" alt="Téléchargements (total)"></a>
-    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/github/downloads/Bit-Scripts/PDF-Equilibrist/total?label=t%C3%A9l%C3%A9chargements%20Windows&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600" alt="Téléchargements Windows"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.github.total&label=t%C3%A9l%C3%A9chargements%20Windows&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGg3LjV2Ny41SDB6TTguNSAwSDE2djcuNUg4LjV6TTAgOC41aDcuNVYxNkgwek04LjUgOC41SDE2VjE2SDguNXoiLz48L3N2Zz4=&cacheSeconds=3600&v=2" alt="Téléchargements Windows"></a>
     <a href="https://launchpad.net/~paulwoisard/+archive/ubuntu/pdf-equilibrist"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.launchpad.total&label=t%C3%A9l%C3%A9chargements%20Ubuntu&logo=ubuntu&logoColor=white&color=E95420&cacheSeconds=3600&v=2" alt="Téléchargements Ubuntu"></a>
     <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.copr.total&label=t%C3%A9l%C3%A9chargements%20Fedora&logo=fedora&logoColor=white&color=51A2DA&cacheSeconds=3600&v=2" alt="Téléchargements Fedora"></a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdf-equilibrist.org%2Fstats.json&query=%24.channels.appimage.total&label=t%C3%A9l%C3%A9chargements%20AppImage&logo=linux&logoColor=white&color=8E6BBF&cacheSeconds=3600&v=2" alt="Téléchargements AppImage"></a>
     <a href="#diffusion-arch" title="L'AUR ne publie aucun compteur de téléchargements"><img src="https://img.shields.io/badge/t%C3%A9l%C3%A9chargements%20Arch-non%20mesur%C3%A9-lightgrey?logo=archlinux&logoColor=white" alt="Téléchargements Arch : non mesuré"></a>
   </div>
   <div class="badges">
@@ -190,6 +192,14 @@ sudo apt install pdf-equilibrist</code></pre>
         <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
 sudo dnf install pdf-equilibrist</code></pre>
         <a href="https://copr.fedorainfracloud.org/coprs/paullux/PDF-Equilibrist/">Voir le projet sur COPR</a>
+      </div>
+    </div>
+    <div class="cta-item">
+      <button class="btn btn-primary" type="button" id="appimage-toggle" aria-expanded="false" aria-controls="appimage-drawer">Installation autre Linux</button>
+      <div class="arch-drawer" id="appimage-drawer">
+        <pre><code>curl -fsSLO https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/install.sh
+bash install.sh</code></pre>
+        <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest">Télécharger l'AppImage</a>
       </div>
     </div>
     <div class="cta-item">
@@ -298,6 +308,10 @@ sudo apt install pdf-equilibrist</code></pre>
     <p class="lead">🐧 Sur Fedora et dérivées, disponible via COPR :</p>
     <pre><code>sudo dnf copr enable paullux/PDF-Equilibrist
 sudo dnf install pdf-equilibrist</code></pre>
+    <p class="lead">🐧 Sur toute autre distribution Linux 64 bits (Debian, openSUSE, Mint…), en un seul fichier AppImage :</p>
+    <pre><code>curl -fsSLO https://github.com/Bit-Scripts/PDF-Equilibrist/releases/latest/download/install.sh
+bash install.sh</code></pre>
+    <p style="color:var(--text-dim)">Le script installe dans ~/.local sans root (--system pour tous les utilisateurs, --uninstall pour retirer), ajoute le lanceur de menu et l'association aux PDF, et vérifie le SHA-256 du téléchargement. Vous pouvez aussi télécharger PDF-Equilibrist-x86_64.AppImage sur la page de la release, la rendre exécutable et la lancer. Sans FUSE (libfuse2), lancez-la avec --appimage-extract-and-run.</p>
     <h3 style="font-size:1.1rem;color:var(--text)">Installation depuis les sources (développeurs)</h3>
     <p style="color:var(--text-dim)">1. Créez un environnement Python compatible (>=3.12).<br>2. Installez les dépendances :</p>
     <pre><code>python -m pip install -r requirements.txt</code></pre>
@@ -313,6 +327,7 @@ sudo dnf install pdf-equilibrist</code></pre>
     <ul class="stats-list">
       <li><strong data-stat="total">&mdash;</strong><span>téléchargements, tous canaux confondus</span></li>
       <li><strong data-stat="github">&mdash;</strong><span>depuis les versions GitHub (installeur Windows)</span></li>
+      <li><strong data-stat="appimage">&mdash;</strong><span>depuis les releases GitHub (AppImage, autres distributions Linux)</span></li>
       <li><strong data-stat="launchpad">&mdash;</strong><span>depuis le PPA Ubuntu (Noble et Resolute)</span></li>
       <li><strong data-stat="copr">&mdash;</strong><span>depuis le dépôt Fedora (COPR)</span></li>
       <li><strong data-stat="copr.enablements">&mdash;</strong><span>activations du dépôt Fedora (dnf copr enable)</span></li>
@@ -332,7 +347,7 @@ sudo dnf install pdf-equilibrist</code></pre>
     <h3>PDF‑Equilibrist remplace-t-il Adobe Acrobat ?</h3>
     <p>Pour de nombreux usages courants — édition, annotation, conversion, protection — oui. Il ne nécessite ni abonnement ni compte.</p>
     <h3>Quels systèmes d'exploitation sont supportés ?</h3>
-    <p>Windows (installeur .exe), Arch Linux (AUR), Ubuntu (PPA) et Fedora (COPR).</p>
+    <p>Windows (installeur .exe), Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) et toute autre distribution Linux 64 bits (AppImage).</p>
     <h3>Faut-il des droits administrateur pour l'installer ?</h3>
     <p>Non. L'installeur Windows s'installe dans le profil utilisateur sans élévation UAC.</p>
     <h3>Le code source est-il auditable ?</h3>
@@ -355,6 +370,7 @@ sudo dnf install pdf-equilibrist</code></pre>
     { toggle: document.getElementById('arch-toggle'), drawer: document.getElementById('arch-drawer') },
     { toggle: document.getElementById('ubuntu-toggle'), drawer: document.getElementById('ubuntu-drawer') },
     { toggle: document.getElementById('fedora-toggle'), drawer: document.getElementById('fedora-drawer') },
+    { toggle: document.getElementById('appimage-toggle'), drawer: document.getElementById('appimage-drawer') },
   ];
 
   drawers.forEach(({ toggle, drawer }) => {

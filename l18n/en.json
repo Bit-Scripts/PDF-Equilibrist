@@ -29,7 +29,7 @@
   "nav.docs": "Documentation",
 
   "hero.tagline1": "Free, open-source desktop PDF editor built in Python with PyQt6 and PyMuPDF. Runs entirely locally — no cloud, no telemetry, no account required.",
-  "hero.tagline2": "PDF‑Equilibrist is available for Windows, Arch Linux (AUR), Ubuntu (PPA) and Fedora (COPR).",
+  "hero.tagline2": "PDF‑Equilibrist is available for Windows, Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) and any other Linux distribution (AppImage).",
 
   "cta.download.windows": "Download (Windows)",
   "cta.install.arch.btn": "Install on ArchLinux",
@@ -89,7 +89,7 @@
   "faq.q3": "Does PDF‑Equilibrist replace Adobe Acrobat?",
   "faq.a3": "For many common uses — editing, annotation, conversion, protection — yes. It requires no subscription or account.",
   "faq.q4": "Which operating systems are supported?",
-  "faq.a4": "Windows (.exe installer), Arch Linux (AUR), Ubuntu (PPA) and Fedora (COPR).",
+  "faq.a4": "Windows (.exe installer), Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) and any other 64-bit Linux distribution (AppImage).",
   "faq.q5": "Are administrator rights required to install it?",
   "faq.a5": "No. The Windows installer installs in the user profile without UAC elevation.",
   "faq.q6": "Is the source code auditable?",
@@ -156,5 +156,12 @@
   "stats.copr": "from the Fedora repository (COPR)",
   "stats.copr.enablements": "Fedora repository enablements (dnf copr enable)",
   "stats.arch": "Arch Linux (AUR) has no counter: the AUR only distributes a build recipe, and the package is compiled on the user's machine from the GitHub source archive, which GitHub does not count.",
-  "stats.updated": "As of"
+  "stats.updated": "As of",
+  "cta.install.appimage.btn": "Install on other Linux",
+  "cta.install.appimage.link": "Download the AppImage",
+  "install.appimage.lead": "🐧 On any other 64-bit Linux distribution (Debian, openSUSE, Mint…), as a single AppImage file:",
+  "install.appimage.note": "The script installs into ~/.local without root (use --system for all users, --uninstall to remove), adds the menu entry and the PDF association, and checks the SHA-256 of the download. You can also download PDF-Equilibrist-x86_64.AppImage from the release page, make it executable and run it. Without FUSE (libfuse2), start it with --appimage-extract-and-run.",
+  "badge.dl.appimage": "AppImage%20downloads",
+  "badge.dl.appimage.alt": "AppImage downloads",
+  "stats.appimage": "from GitHub releases (AppImage, other Linux distributions)"
 }

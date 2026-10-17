@@ -7,7 +7,8 @@ chargement, ce qui évite de reconstruire le site à chaque relevé.
 
 Sources, toutes publiques et en lecture seule :
 
-    GitHub      API releases, somme des `download_count` des assets
+    GitHub      API releases : `download_count` des assets `.exe` (Windows) et
+                `.AppImage` (autres Linux), comptés à part
     Launchpad   API du PPA : getPublishedBinaries puis getDownloadCount
     COPR        page HTML — pas d'API pour ces compteurs
     AUR         RPC v5 : ni téléchargements ni installations, mais votes
@@ -52,7 +53,14 @@ def get_json(url: str, headers: dict | None = None):
     return json.loads(get(url, headers))
 
 
-def github() -> dict:
+_RELEASES: list[dict] | None = None
+
+
+def _releases() -> list[dict]:
+    """Releases GitHub, lues une seule fois pour les canaux `github` et `appimage`."""
+    global _RELEASES
+    if _RELEASES is not None:
+        return _RELEASES
     # Sans jeton, l'API GitHub plafonne à 60 requêtes/heure par IP — et les
     # runners Actions partagent leurs IP. Le workflow fournit GITHUB_TOKEN.
     token = os.environ.get("GITHUB_TOKEN")
@@ -69,12 +77,41 @@ def github() -> dict:
         page += 1
     if not releases:
         raise ValueError("aucune release publiée")
+    _RELEASES = releases
+    return releases
+
+
+def _asset_total(releases: list[dict], suffix: str) -> int:
+    """Somme des téléchargements des assets dont le nom finit par `suffix` (ni .sha256, ni install.sh)."""
+    return sum(
+        a["download_count"]
+        for r in releases
+        for a in r["assets"]
+        if a["name"].lower().endswith(suffix)
+    )
+
+
+def github() -> dict:
+    """Installeur Windows : assets `.exe` seulement (les releases portent aussi l'AppImage, sa somme et le script)."""
+    releases = _releases()
     latest = next((r for r in releases if not r["prerelease"]), releases[0])
     return {
-        "total": sum(a["download_count"] for r in releases for a in r["assets"]),
+        "total": _asset_total(releases, ".exe"),
         "releases": len(releases),
         "latest": latest["tag_name"],
         "latest_date": latest["published_at"][:10],
+    }
+
+
+def appimage() -> dict:
+    """AppImage (autres distributions Linux), depuis la v0.1.25."""
+    releases = _releases()
+    with_appimage = [r for r in releases if any(a["name"].lower().endswith(".appimage") for a in r["assets"])]
+    latest = with_appimage[0] if with_appimage else None
+    return {
+        "total": _asset_total(releases, ".appimage"),
+        "releases": len(with_appimage),
+        "latest": latest["tag_name"] if latest else None,
     }
 
 
@@ -142,7 +179,7 @@ def aur() -> dict:
     }
 
 
-SOURCES = (("github", github), ("launchpad", launchpad), ("copr", copr), ("aur", aur))
+SOURCES = (("github", github), ("appimage", appimage), ("launchpad", launchpad), ("copr", copr), ("aur", aur))
 
 
 def read_previous() -> dict:
