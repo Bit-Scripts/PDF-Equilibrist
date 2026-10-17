@@ -1,8 +1,7 @@
-# AppImage — PDF-Equilibrist (PROTOTYPE)
+# AppImage — PDF-Equilibrist
 
 Canal « autres distributions » (Debian, openSUSE, Mint…) : **un seul fichier à télécharger**, sans
-dépôt à configurer. **Prototype** : rien n'est publié (pas de déclenchement sur tag, rien n'est joint à
-la release). Le résultat est un artefact de run GitHub Actions, à tester à la main.
+dépôt à configurer. Publié sur chaque tag `v*` : l'AppImage est jointe à la release GitHub.
 
 ## Fichiers
 
@@ -39,8 +38,11 @@ Avec `APPIMAGETOOL=/chemin/appimagetool`, le script produit aussi
 - **FUSE** : sans `libfuse2`, lancer avec `--appimage-extract-and-run` ou extraire l'image.
 - **glibc** : construire sur le système le plus ancien à couvrir (CI : Ubuntu 22.04 = glibc 2.35).
 - **Impression (CUPS), polices d'emoji, Wayland** : dépendent du système hôte, non testés en vrai.
-- **Mises à jour** : l'AppImage ne passe par aucun gestionnaire de paquets ; l'application ne sait pas encore
-  la détecter (`update.py` ne connaît que `.exe` et les gestionnaires de paquets). À faire avant publication :
-  détecter `APPIMAGE`, pointer vers la page de release, éventuellement zsync.
-- **Version** : le prototype n'injecte pas la version du tag (`__version__`), comme le fait `release.yml`.
+- **Mises à jour** : `update.py` détecte l'AppImage via `APPIMAGE`, cherche l'asset `*x86_64.AppImage` de la
+  dernière release et le télécharge à côté de l'actuelle sous un nom versionné (SHA-256 vérifié si GitHub le
+  fournit). L'utilisateur la relance lui-même. Pas de zsync (delta) pour l'instant.
+- **Version** : le workflow injecte la version du tag dans `__version__`, comme `release.yml`.
+- **Publication** : un tag `v*` construit l'AppImage puis la joint à la release (`gh release upload`, après avoir
+  attendu que `release.yml` l'ait créée). Rattrapage d'une release existante : Actions › « Linux AppImage » ›
+  Run workflow, champ `tag` = `v0.1.25` (le code construit est celui de la branche choisie).
 - **Sécurité** : les bibliothèques embarquées ne sont corrigées que par une nouvelle release.

@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QHBoxLayout, QPushButton,
     QProgressBar, QFrame, QLineEdit, QApplication,
 )
-from PyQt6.QtCore import QThread, pyqtSignal, Qt
+from PyQt6.QtCore import QThread, QTimer, pyqtSignal, Qt
 from PyQt6.QtGui import QPixmap
 
 from pdf_equilibrist import __version__
@@ -218,6 +218,10 @@ class UpdateDialog(QDialog):
             self._linux_cmd_widget.setVisible(True)
             self._btn_download.setEnabled(False)
             self._btn_download.setVisible(False)
+        elif updater.is_appimage():
+            # AppImage : la release contient la nouvelle AppImage, à télécharger.
+            self._btn_download.setText(self.tr("Télécharger la nouvelle AppImage"))
+            self._btn_download.setEnabled(bool(updater.find_appimage_asset(release)))
         elif os.name != "nt":
             # Linux non reconnu (pas encore de PPA/COPR, ou distro inconnue) :
             # ni exe Windows ni commande fiable à proposer, on masque juste
@@ -255,8 +259,35 @@ class UpdateDialog(QDialog):
             import webbrowser
             webbrowser.open(url)
 
+    def _quit_for_installer(self):
+        self.accept()
+        QApplication.closeAllWindows()
+        QApplication.quit()
+
+    def _download_appimage(self):
+        asset = updater.find_appimage_asset(self._release)
+        if not asset:
+            return
+        target = updater.appimage_download_target(self._release)
+        try:
+            self._lbl.setText(self.tr("Téléchargement en cours…"))
+            self._progress.setRange(0, 0)
+            QApplication.processEvents()
+            updater.download_release_asset(asset, target)
+            target.chmod(0o755)
+            self._lbl.setText(self.tr(
+                "Nouvelle AppImage téléchargée : {0}\nFermez l'application puis lancez ce fichier."
+            ).format(target))
+        except Exception as e:
+            self._lbl.setText(self.tr("Échec du téléchargement : {0}").format(e))
+        finally:
+            self._progress.setRange(0, 1)
+
     def _download_and_run(self):
         if not self._release:
+            return
+        if updater.is_appimage():
+            self._download_appimage()
             return
         asset = updater.find_installer_asset(self._release)
         if not asset:
@@ -271,6 +302,9 @@ class UpdateDialog(QDialog):
                 if os.name == "nt":
                     # Fichier qu'on vient nous-même de télécharger dans le temp
                     os.startfile(str(target))  # nosec B606
+                    # L'installeur refuse de continuer tant que l'application tourne
+                    # (fichiers verrouillés) : on se ferme pour lui laisser la place.
+                    QTimer.singleShot(1500, self._quit_for_installer)
                 else:
                     import shutil
                     import subprocess  # nosec B404

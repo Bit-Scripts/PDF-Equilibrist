@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -31,6 +32,25 @@ def is_flatpak() -> bool:
     return os.path.exists("/.flatpak-info") or "FLATPAK_ID" in os.environ
 
 
+def appimage_path() -> Path | None:
+    """
+    Chemin du fichier ``.AppImage`` en cours d'exécution, ou ``None``.
+
+    Le lanceur AppImage exporte ``APPIMAGE`` (chemin absolu du fichier d'origine).
+    On exige un fichier réel : une variable héritée d'un autre processus ne doit
+    pas faire croire à un AppImage.
+    """
+    value = os.environ.get("APPIMAGE")
+    if not value:
+        return None
+    path = Path(value)
+    return path if path.is_file() else None
+
+
+def is_appimage() -> bool:
+    return appimage_path() is not None
+
+
 _LINUX_UPDATE_COMMANDS = {
     "arch": "yay -Syu",
     "ubuntu": "sudo apt update && sudo apt install --only-upgrade pdf-equilibrist",
@@ -50,7 +70,9 @@ def linux_update_command() -> str | None:
     à jour se fait via le gestionnaire de paquets ; ``None`` signale à l'appelant
     de masquer toute action de mise à jour plutôt que d'en proposer une fausse.
     """
-    if sys.platform == "win32" or is_flatpak():
+    if sys.platform == "win32" or is_flatpak() or is_appimage():
+        # AppImage : posée sur n'importe quelle distribution, le gestionnaire de
+        # paquets ne la met pas à jour (voir find_appimage_asset).
         return None
     try:
         os_release = Path("/etc/os-release").read_text(encoding="utf-8")
@@ -139,6 +161,29 @@ def find_installer_asset(release: dict) -> dict | None:
     return None
 
 
+def find_appimage_asset(release: dict) -> dict | None:
+    for asset in release.get("assets", []) or []:
+        name = asset.get("name", "").lower()
+        if name.endswith(".appimage") and "x86_64" in name:
+            return asset
+    return None
+
+
+def appimage_download_target(release: dict) -> Path:
+    """
+    Où poser la nouvelle AppImage : à côté de l'actuelle (même dossier), sous un nom
+    versionné pour ne jamais écraser celle qui tourne ; ``~/Downloads`` si le dossier
+    n'est pas modifiable.
+    """
+    tag = re.sub(r"[^0-9A-Za-z.\-]", "", release.get("tag_name") or "") or "update"
+    filename = f"PDF-Equilibrist-{tag}-x86_64.AppImage"
+    current = appimage_path()
+    folder = current.parent if current else Path.home() / "Downloads"
+    if not os.access(folder, os.W_OK):
+        folder = Path.home() / "Downloads"
+    return folder / filename
+
+
 def download_release_asset(asset: dict, target_path: Path, timeout: int = 120) -> Path:
     url = asset.get("browser_download_url")
     if not url:
@@ -158,6 +203,10 @@ def download_release_asset(asset: dict, target_path: Path, timeout: int = 120) -
     target_path.parent.mkdir(parents=True, exist_ok=True)
     with network.urlopen(request, timeout=timeout) as response:
         data = response.read()
+    # GitHub publie l'empreinte de chaque asset (« sha256:… ») : si elle est là, on la vérifie.
+    digest = str(asset.get("digest") or "")
+    if digest.startswith("sha256:") and hashlib.sha256(data).hexdigest() != digest[7:].lower():
+        raise ValueError("Empreinte SHA-256 du fichier téléchargé incorrecte.")
     target_path.write_bytes(data)
     return target_path
 
