@@ -1996,13 +1996,6 @@ Fermez l'application puis lancez ce fichier (ou : bash install.sh --file &lt;fic
 Close the application, then run this file (or: bash install.sh --file &lt;file&gt;).</translation>
     </message>
     <message>
-        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="433" />
-        <source>Installation automatique indisponible sur ce système (pkexec ou le script est introuvable).
-Dans un terminal : {0}{1}</source>
-        <translation>Automatic installation is not available on this system (pkexec or the script is missing).
-In a terminal: {0}{1}</translation>
-    </message>
-    <message>
         <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="469" />
         <source>Installée : {0}</source>
         <translation>Installed: {0}</translation>
@@ -2016,6 +2009,33 @@ In a terminal: {0}{1}</translation>
         <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="491" />
         <source>Impossible de relancer l'application : {0}</source>
         <translation>Could not restart the application: {0}</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="447" />
+        <source>Mot de passe administrateur</source>
+        <translation>Administrator password</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="448" />
+        <source>Aucune fenêtre d'autorisation du système n'est disponible. Pour installer pour tous les utilisateurs, saisissez votre mot de passe : il est transmis uniquement à sudo, jamais enregistré ni affiché.</source>
+        <translation>No system authorisation window is available. To install for all users, enter your password: it is sent only to sudo, never stored or displayed.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="454" />
+        <source>Installation annulée : rien n'a été installé.</source>
+        <translation>Installation cancelled: nothing was installed.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="525" />
+        <source>Mot de passe incorrect : rien n'a été installé.</source>
+        <translation>Wrong password: nothing was installed.</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\update_dialog.py" line="460" />
+        <source>Installation automatique indisponible sur ce système (pkexec, sudo ou le script est introuvable).
+Dans un terminal : {0}{1}</source>
+        <translation>Automatic installation is not available on this system (pkexec, sudo or the script is missing).
+In a terminal: {0}{1}</translation>
     </message>
 </context><context>
     <name>_PageLabel</name>

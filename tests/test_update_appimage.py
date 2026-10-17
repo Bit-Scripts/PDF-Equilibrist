@@ -178,3 +178,19 @@ def test_relaunch_env_drops_appimage_variables(monkeypatch):
     assert not {"APPIMAGE", "APPDIR", "ARGV0", "OWD"} & set(env)
     assert env["LD_LIBRARY_PATH"] == "/usr/lib/x"
     assert env["PYINSTALLER_RESET_ENVIRONMENT"] == "1"
+
+
+def test_build_sudo_install_command_reads_password_on_stdin(tmp_path, monkeypatch):
+    script = _bundle_script(tmp_path, monkeypatch)
+    monkeypatch.setattr(update.shutil, "which", lambda name: "/usr/bin/" + name)
+    new = tmp_path / "new.AppImage"
+    cmd = update.build_sudo_install_command(new, "ef" * 32)
+    assert cmd[:6] == ["/usr/bin/sudo", "-S", "-k", "-p", "", "--"]       # mot de passe sur l'entrée, jamais en argument
+    assert cmd[6:9] == ["/usr/bin/bash", "-c", script.read_text(encoding="utf-8")]
+    assert cmd[9:] == ["install.sh", "--system", "--file", str(new), "--sha256", "ef" * 32]
+
+
+def test_build_sudo_install_command_unavailable(tmp_path, monkeypatch):
+    _bundle_script(tmp_path, monkeypatch)
+    monkeypatch.setattr(update.shutil, "which", lambda name: None if name == "sudo" else "/usr/bin/" + name)
+    assert update.build_sudo_install_command(tmp_path / "new.AppImage", "00") is None

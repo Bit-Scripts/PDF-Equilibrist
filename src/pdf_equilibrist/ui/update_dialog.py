@@ -4,7 +4,7 @@ import os
 import subprocess  # nosec B404
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QHBoxLayout, QPushButton,
-    QProgressBar, QFrame, QLineEdit, QApplication, QMessageBox,
+    QProgressBar, QFrame, QLineEdit, QApplication, QMessageBox, QInputDialog,
 )
 from PyQt6.QtCore import QProcess, QProcessEnvironment, QThread, QTimer, pyqtSignal, Qt
 from PyQt6.QtGui import QPixmap
@@ -428,14 +428,43 @@ class UpdateDialog(QDialog):
 
     def _run_install(self, scope: str):
         command = updater.build_install_command(self._new_appimage, scope, self._new_sha)
-        if command is None:
-            hint = ("sudo bash install.sh --system --file " if scope == "system" else "bash install.sh --file ")
-            self._lbl.setText(self.tr(
-                "Installation automatique indisponible sur ce système (pkexec ou le script est introuvable).\n"
-                "Dans un terminal : {0}{1}"
-            ).format(hint, self._new_appimage))
+        method = "user" if scope != "system" else "pkexec"
+        if command is None and scope == "system":
+            # Pas de pkexec (WSL, bureau minimal, serveur…) : repli sur sudo avec notre propre demande de mot de passe
+            self._run_install_sudo()
             return
+        if command is None:
+            self._show_manual_install_hint(scope)
+            return
+        self._start_install(command, scope, method)
+
+    def _run_install_sudo(self):
+        command = updater.build_sudo_install_command(self._new_appimage, self._new_sha)
+        if command is None:
+            self._show_manual_install_hint("system")
+            return
+        password, accepted = QInputDialog.getText(
+            self, self.tr("Mot de passe administrateur"),
+            self.tr("Aucune fenêtre d'autorisation du système n'est disponible. Pour installer pour tous les "
+                    "utilisateurs, saisissez votre mot de passe : il est transmis uniquement à sudo, jamais "
+                    "enregistré ni affiché."),
+            QLineEdit.EchoMode.Password,
+        )
+        if not accepted or not password:
+            self._lbl.setText(self.tr("Installation annulée : rien n'a été installé."))
+            return
+        self._start_install(command, "system", "sudo", password)
+
+    def _show_manual_install_hint(self, scope: str):
+        hint = "sudo bash install.sh --system --file " if scope == "system" else "bash install.sh --file "
+        self._lbl.setText(self.tr(
+            "Installation automatique indisponible sur ce système (pkexec, sudo ou le script est introuvable).\n"
+            "Dans un terminal : {0}{1}"
+        ).format(hint, self._new_appimage))
+
+    def _start_install(self, command: list[str], scope: str, method: str, password: str = ""):
         self._install_scope = scope
+        self._install_method = method
         self._install_output = ""
         self._btn_download.setEnabled(False)
         self._progress.setRange(0, 0)
@@ -443,13 +472,22 @@ class UpdateDialog(QDialog):
         env = QProcessEnvironment()
         for key, value in external_env().items():
             env.insert(key, value)
+        if method == "sudo":
+            env.insert("LC_ALL", "C")   # messages de sudo en anglais, pour reconnaître « mot de passe incorrect »
         self._proc = QProcess(self)
         self._proc.setProcessEnvironment(env)
         self._proc.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
         self._proc.readyReadStandardOutput.connect(self._on_install_output)
         self._proc.finished.connect(self._on_install_finished)
         self._proc.errorOccurred.connect(self._on_install_error)
+        if method == "sudo":
+            # le mot de passe part sur l'entrée de sudo (-S) dès le démarrage, puis l'entrée est fermée
+            self._proc.started.connect(lambda: self._send_password(password))
         self._proc.start(command[0], command[1:])
+
+    def _send_password(self, password: str):
+        self._proc.write((password + "\n").encode("utf-8"))
+        self._proc.closeWriteChannel()
 
     def _on_install_output(self):
         self._install_output += bytes(self._proc.readAllStandardOutput()).decode("utf-8", "replace")
@@ -474,8 +512,17 @@ class UpdateDialog(QDialog):
             if answer == QMessageBox.StandardButton.Yes:
                 self._relaunch(installed)
             return
-        if self._install_scope == "system" and exit_code in (126, 127):
-            self._lbl.setText(self.tr("Autorisation refusée ou annulée : rien n'a été installé."))
+        output = self._install_output.lower()
+        if self._install_method == "pkexec" and exit_code in (126, 127):
+            if "no authentication agent" in output:
+                # pkexec existe mais aucun agent graphique n'est lancé : on demande le mot de passe nous-mêmes
+                self._run_install_sudo()
+            else:
+                self._lbl.setText(self.tr("Autorisation refusée ou annulée : rien n'a été installé."))
+            return
+        if self._install_method == "sudo" and any(
+                text in output for text in ("incorrect password", "no password was provided", "try again")):
+            self._lbl.setText(self.tr("Mot de passe incorrect : rien n'a été installé."))
             return
         lines = [line for line in self._install_output.splitlines() if line.strip()]
         detail = "\n".join(lines[-3:])

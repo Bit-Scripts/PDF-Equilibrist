@@ -42,7 +42,8 @@ Avec `APPIMAGETOOL=/chemin/appimagetool`, le script produit aussi
   dernière release et la télécharge (SHA-256 vérifié si GitHub le fournit), puis propose de l'installer avec le
   `install.sh` embarqué (`usr/share/pdf-equilibrist/install.sh`) : pour l'utilisateur seul, ou pour tous via
   `pkexec` (script passé en texte, somme revérifiée en root sur une copie, icône existante conservée), puis de
-  relancer. Pas de zsync (delta) pour l'instant.
+  relancer. Sans `pkexec`, repli sur `sudo -S` avec une demande de mot de passe dans l'application (mot de passe
+  sur l'entrée de sudo, jamais en argument). Pas de zsync (delta) pour l'instant.
 - **Version** : le workflow injecte la version du tag dans `__version__`, comme `release.yml`.
 - **Publication** : un tag `v*` construit l'AppImage puis la joint à la release (`gh release upload`, après avoir
   attendu que `release.yml` l'ait créée). Rattrapage d'une release existante : Actions › « Linux AppImage » ›

@@ -137,6 +137,25 @@ def build_install_command(new_file: Path, scope: str, sha256: str) -> list[str] 
     return [pkexec, bash, "-c", text, "install.sh", "--system", *args]
 
 
+def build_sudo_install_command(new_file: Path, sha256: str) -> list[str] | None:
+    """
+    Repli quand ``pkexec`` est absent (WSL, bureau minimal, serveur…) : ``sudo -S`` lit le mot de passe sur son entrée,
+    que l'application lui envoie après l'avoir demandé dans sa propre fenêtre. ``-k`` ignore tout mot de passe en
+    cache, ``-p ''`` supprime l'invite. Même script en texte et même somme imposée que pour ``pkexec``.
+    """
+    script = bundled_install_script()
+    bash = shutil.which("bash")
+    sudo = shutil.which("sudo")
+    if script is None or bash is None or sudo is None:
+        return None
+    try:
+        text = script.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    return [sudo, "-S", "-k", "-p", "", "--", bash, "-c", text, "install.sh", "--system",
+            "--file", str(new_file), "--sha256", sha256]
+
+
 def relaunch_env() -> dict[str, str]:
     """Environnement pour relancer l'application : celui du système, sans les variables de l'AppImage en cours."""
     from pdf_equilibrist.utils import external_env
