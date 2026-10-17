@@ -8,3 +8,5 @@ packaging/ppa/debian/copyright text eol=lf
 packaging/ppa/debian/source/format text eol=lf
 packaging/copr/pdf-equilibrist.spec text eol=lf
 packaging/copr/pdf-equilibrist.sh text eol=lf
+*.sh text eol=lf
+packaging/appimage/AppRun text eol=lf

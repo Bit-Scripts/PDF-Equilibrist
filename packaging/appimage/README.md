@@ -46,3 +46,18 @@ Avec `APPIMAGETOOL=/chemin/appimagetool`, le script produit aussi
   attendu que `release.yml` l'ait créée). Rattrapage d'une release existante : Actions › « Linux AppImage » ›
   Run workflow, champ `tag` = `v0.1.25` (le code construit est celui de la branche choisie).
 - **Sécurité** : les bibliothèques embarquées ne sont corrigées que par une nouvelle release.
+
+## Installation (script `install.sh`)
+
+Joint à chaque release avec l'AppImage. Il crée le lanceur de menu, l'icône, la commande
+`pdf-equilibrist` et l'association aux PDF.
+
+```bash
+bash install.sh                  # sans root → ~/.local
+sudo bash install.sh --system    # tous les utilisateurs → /usr/local
+bash install.sh --uninstall      # (ajouter --system si installé avec sudo)
+bash install.sh --file ./PDF-Equilibrist-x86_64.AppImage   # AppImage déjà téléchargée
+```
+
+Sans `--file`, il utilise l'AppImage posée à côté de lui, sinon télécharge la dernière release et vérifie
+son SHA-256. Pour mettre à jour : le relancer.

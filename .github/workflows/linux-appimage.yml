@@ -179,6 +179,12 @@ jobs:
       GH_REPO: ${{ github.repository }}
       TAG: ${{ needs.build.outputs.tag }}
     steps:
+      - name: Checkout (install script)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: packaging/appimage/install.sh
+          sparse-checkout-cone-mode: false
+
       - name: Download the AppImage
         uses: actions/download-artifact@v4
         with:
@@ -196,4 +202,4 @@ jobs:
       - name: Upload (replaces any previous AppImage)
         run: |
           sha256sum PDF-Equilibrist-x86_64.AppImage | tee PDF-Equilibrist-x86_64.AppImage.sha256
-          gh release upload "$TAG" PDF-Equilibrist-x86_64.AppImage PDF-Equilibrist-x86_64.AppImage.sha256 --clobber
+          gh release upload "$TAG" PDF-Equilibrist-x86_64.AppImage PDF-Equilibrist-x86_64.AppImage.sha256 packaging/appimage/install.sh --clobber
