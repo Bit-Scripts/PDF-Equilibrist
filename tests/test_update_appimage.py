@@ -80,3 +80,13 @@ def test_external_env_restores_original_library_path(monkeypatch):
     monkeypatch.setenv("LD_LIBRARY_PATH_ORIG", "/usr/lib/custom")
     assert external_env()["LD_LIBRARY_PATH"] == "/usr/lib/custom"
     assert "LD_LIBRARY_PATH_ORIG" not in external_env()
+
+
+def test_install_script_asset_and_target(tmp_path, monkeypatch):
+    rel = _release("PDF-Equilibrist-x86_64.AppImage", "install.sh")
+    assert update.find_install_script_asset(rel)["name"] == "install.sh"
+    assert update.find_install_script_asset(_release("PDF-Equilibrist-x86_64.AppImage")) is None
+    f = tmp_path / "PDF-Equilibrist-x86_64.AppImage"
+    f.write_bytes(b"x")
+    monkeypatch.setenv("APPIMAGE", str(f))
+    assert update.install_script_target(rel) == tmp_path / "install.sh"

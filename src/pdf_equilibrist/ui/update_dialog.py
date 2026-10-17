@@ -194,6 +194,16 @@ class UpdateDialog(QDialog):
         btn_row.addWidget(self._btn_close)
         layout.addLayout(btn_row)
 
+        # Lien (AppImage seulement) : récupérer le script qui l'installe dans le menu et le PATH
+        self._script_link = QLabel(
+            f"<a href='#script' style='color:{_GREEN};'>"
+            + self.tr("Télécharger le script d'installation (install.sh)") + "</a>")
+        self._script_link.setTextFormat(Qt.TextFormat.RichText)
+        self._script_link.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self._script_link.setVisible(False)
+        self._script_link.linkActivated.connect(lambda _href: self._download_script())
+        layout.addWidget(self._script_link)
+
         self._btn_close.clicked.connect(self.accept)
         self._btn_open_page.clicked.connect(self._open_release_page)
         self._btn_download.clicked.connect(self._download_and_run)
@@ -244,6 +254,7 @@ class UpdateDialog(QDialog):
             # AppImage : la release contient la nouvelle AppImage, à télécharger.
             self._btn_download.setText(self.tr("Télécharger la nouvelle AppImage"))
             self._btn_download.setEnabled(bool(updater.find_appimage_asset(release)))
+            self._script_link.setVisible(bool(updater.find_install_script_asset(release)))
         elif os.name != "nt":
             # Linux non reconnu (pas encore de PPA/COPR, ou distro inconnue) :
             # ni exe Windows ni commande fiable à proposer, on masque juste
@@ -326,6 +337,21 @@ class UpdateDialog(QDialog):
         if not asset:
             return
         self._start_download(asset, updater.appimage_download_target(self._release), self._appimage_ready)
+
+    def _download_script(self):
+        asset = updater.find_install_script_asset(self._release) if self._release else None
+        if asset:
+            self._start_download(asset, updater.install_script_target(self._release), self._script_ready)
+
+    def _script_ready(self, target):
+        try:
+            target.chmod(0o755)
+        except OSError:
+            pass
+        self._btn_download.setEnabled(True)
+        self._lbl.setText(self.tr(
+            "Script d'installation téléchargé :\n{0}\nLancez : bash install.sh   (ou sudo bash install.sh --system)"
+        ).format(target))
 
     def _appimage_ready(self, target):
         try:

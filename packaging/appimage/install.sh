@@ -59,8 +59,11 @@ trap 'rm -rf "$WORK"' EXIT
 
 if [ -z "$FILE" ]; then
   HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  if [ -f "$HERE/$ASSET" ]; then
-    FILE="$HERE/$ASSET"
+  # AppImage posée à côté (nom de la release ou nom versionné de la mise à jour intégrée) : la plus récente
+  LOCAL="$(ls -t "$HERE"/PDF-Equilibrist*x86_64.AppImage 2>/dev/null | head -n1 || true)"
+  if [ -n "$LOCAL" ]; then
+    FILE="$LOCAL"
+    echo "AppImage trouvée à côté du script : $FILE"
   else
     command -v curl >/dev/null 2>&1 || { echo "curl est requis pour télécharger (ou utilisez --file)." >&2 ; exit 1; }
     BASE="https://github.com/$REPO/releases/latest/download"

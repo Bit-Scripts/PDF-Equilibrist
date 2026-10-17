@@ -169,6 +169,18 @@ def find_appimage_asset(release: dict) -> dict | None:
     return None
 
 
+def find_install_script_asset(release: dict) -> dict | None:
+    for asset in release.get("assets", []) or []:
+        if asset.get("name") == "install.sh":
+            return asset
+    return None
+
+
+def install_script_target(release: dict) -> Path:
+    """``install.sh`` est posé dans le même dossier que la nouvelle AppImage."""
+    return appimage_download_target(release).parent / "install.sh"
+
+
 def appimage_download_target(release: dict) -> Path:
     """
     Où poser la nouvelle AppImage : à côté de l'actuelle (même dossier), sous un nom
