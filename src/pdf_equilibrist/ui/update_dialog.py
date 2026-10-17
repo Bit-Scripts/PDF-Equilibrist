@@ -269,15 +269,22 @@ class UpdateDialog(QDialog):
         self._lbl_current.setText("—")
         self._lbl_total.setText("—")
 
+    def _open_url(self, url: str):
+        """Ouvre l'URL ; sans navigateur utilisable (WSL, serveur…), l'affiche et la copie dans le presse-papiers."""
+        if open_external(url):
+            return
+        QApplication.clipboard().setText(url)
+        self._lbl.setText(self.tr("Aucun navigateur détecté. Adresse copiée dans le presse-papiers :\n{0}").format(url))
+
     def _open_github(self):
-        open_external(_GITHUB_URL)
+        self._open_url(_GITHUB_URL)
 
     def _open_release_page(self):
         if not self._release:
             return
         url = updater.get_release_page_url(self._release)
         if url:
-            open_external(url)
+            self._open_url(url)
 
     def _quit_for_installer(self):
         self.accept()
