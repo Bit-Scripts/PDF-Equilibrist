@@ -52,5 +52,8 @@ packaging/copr/*.src.rpm
 *.pyo
 *.pyd
 
+# Dossier de preuves forensiques (antériorité) — jamais poussé
+forensic/
+
 # Réglages locaux de Claude Code (chemins, permissions) — ne pas versionner
 .claude/settings.local.json

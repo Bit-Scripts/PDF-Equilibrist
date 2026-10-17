@@ -12,7 +12,11 @@ def _release(*names: str, tag: str = "v0.1.26") -> dict:
 
 
 def test_find_appimage_asset_ignores_exe_and_checksum():
-    rel = _release("PDF-Equilibrist-Setup.exe", "PDF-Equilibrist-x86_64.AppImage.sha256", "PDF-Equilibrist-x86_64.AppImage")
+    rel = _release(
+        "PDF-Equilibrist-Setup.exe",
+        "PDF-Equilibrist-x86_64.AppImage.sha256",
+        "PDF-Equilibrist-x86_64.AppImage",
+    )
     assert update.find_appimage_asset(rel)["name"] == "PDF-Equilibrist-x86_64.AppImage"
     assert update.find_installer_asset(rel)["name"] == "PDF-Equilibrist-Setup.exe"
     assert update.find_appimage_asset(_release("PDF-Equilibrist-Setup.exe")) is None
