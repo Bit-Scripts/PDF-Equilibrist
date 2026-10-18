@@ -1,5 +1,5 @@
 Name:           pdf-equilibrist
-Version:        0.2.0
+Version:        0.2.1
 Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
@@ -197,6 +197,15 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Sun Oct 18 2026 Paul Woisard <paulwoisard@gmail.com> - 0.2.1-1
+- New upstream release: no more lost work, and a quick access toolbar.
+  Closing the window, a tab or a document with unsaved changes now asks what
+  to do (Save, Don't save, Cancel); Cancel stops everything, including
+  restarts after an update, and an asterisk marks modified tabs. If saving
+  fails the document stays open. New quick access toolbar (Undo, Redo, Open,
+  Save, Save as) for the active tab; Redo is new. Save as now keeps working
+  on the new file. On Windows the installer asks to close the application.
+
 * Sun Oct 18 2026 Paul Woisard <paulwoisard@gmail.com> - 0.2.0-1
 - New upstream release: a light theme, and a THEME switch in the title bar.
   A new light colour scheme is chosen with the THEME switch next to the

@@ -1,3 +1,39 @@
+pdf-equilibrist (0.2.1-1~noble1) noble; urgency=medium
+
+  * New upstream release: no more lost work, and a quick access toolbar.
+    - Closing the window, a tab or a document with unsaved changes now asks
+      what to do (Save, Don't save, Cancel), document by document; Cancel
+      stops everything, including restarts after an update. An asterisk
+      before the file name marks the modified tabs in the tab bar. If saving
+      fails, the document stays open and a message explains why.
+    - New quick access toolbar next to the application name: Undo, Redo,
+      Open, Save and Save as, acting on the active tab. Redo is new.
+    - Save as now keeps working on the new file (tab title, status bar and
+      the following saves).
+    - On Windows, the installer asks to close the application itself instead
+      of the application quitting on its own.
+    - New English translations.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 18 Oct 2026 18:00:00 +0000
+
+pdf-equilibrist (0.2.1-1~resolute1) resolute; urgency=medium
+
+  * New upstream release: no more lost work, and a quick access toolbar.
+    - Closing the window, a tab or a document with unsaved changes now asks
+      what to do (Save, Don't save, Cancel), document by document; Cancel
+      stops everything, including restarts after an update. An asterisk
+      before the file name marks the modified tabs in the tab bar. If saving
+      fails, the document stays open and a message explains why.
+    - New quick access toolbar next to the application name: Undo, Redo,
+      Open, Save and Save as, acting on the active tab. Redo is new.
+    - Save as now keeps working on the new file (tab title, status bar and
+      the following saves).
+    - On Windows, the installer asks to close the application itself instead
+      of the application quitting on its own.
+    - New English translations.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 18 Oct 2026 18:00:00 +0000
+
 pdf-equilibrist (0.2.0-1~noble1) noble; urgency=medium
 
   * New upstream release: a light theme, and a THEME switch in the title bar.

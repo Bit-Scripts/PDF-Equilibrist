@@ -5,7 +5,7 @@
 > et la mise à jour du site (`update-site-version.yml`). Un tag ne se « retire » pas proprement :
 > **ne le créer qu'une fois toute la checklist cochée.**
 
-## 1. Préparation (avant le tag) — fait pour 0.2.0
+## 1. Préparation (avant le tag) — fait pour 0.2.1
 
 - [x] `packaging/ppa/debian/changelog` : entrées `X.Y.Z-1~noble1` **et** `X.Y.Z-1~resolute1` en tête
       (le workflow PPA échoue explicitement si la version ne correspond pas au tag)
@@ -49,8 +49,8 @@ OCR → PDF cherchable, OCR → Word, OCR → Excel. Mesure synthétique de réf
 
 ```bash
 git switch main && git pull
-git tag -a v0.2.0 -m "PDF-Equilibrist 0.2.0"
-git push origin v0.2.0       # ← déclenche TOUT : release publique + AUR + PPA + COPR + site
+git tag -a v0.2.1 -m "PDF-Equilibrist 0.2.1"
+git push origin v0.2.1       # ← déclenche TOUT : release publique + AUR + PPA + COPR + site
 ```
 
 ## 5. Après le tag — à surveiller
