@@ -1,5 +1,5 @@
 -r requirements.txt
 pytest
-flake8
-bandit
+flake8==7.3.0
+bandit==1.9.4
 actionlint-py
