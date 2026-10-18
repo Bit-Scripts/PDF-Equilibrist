@@ -413,8 +413,13 @@ class TitleBar(QWidget):
     # ── Drag et double-clic ───────────────────────────────────────────────────
 
     def eventFilter(self, obj, event):
-        """Compte les clics sur le logo (7 de suite = easter-egg) sans bloquer le déplacement."""
-        if obj is self._logo and event.type() == QEvent.Type.MouseButtonPress:
+        """Compte les clics sur le logo (7 de suite = easter-egg).
+
+        Un 2ᵉ clic rapide arrive en ``MouseButtonDblClick`` et un clic non traité remonte à la
+        barre (déplacement / agrandir-restaurer) : on absorbe donc les deux sur le logo.
+        """
+        if obj is self._logo and event.type() in (QEvent.Type.MouseButtonPress,
+                                                  QEvent.Type.MouseButtonDblClick):
             from pdf_equilibrist.ui import easter_egg
             now = time.monotonic()
             if (now - self._logo_last_click) * 1000 > easter_egg.CLICK_WINDOW_MS:
@@ -424,6 +429,7 @@ class TitleBar(QWidget):
             if self._logo_clicks >= easter_egg.CLICKS_NEEDED:
                 self._logo_clicks = 0
                 easter_egg.trigger(self.window())
+            return True
         return False
 
     def mousePressEvent(self, event):
