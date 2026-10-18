@@ -51,8 +51,9 @@ from PyQt6.QtWidgets import (
     QWidget, QHBoxLayout, QLabel, QPushButton, QTabBar,
     QFrame,
 )
-from PyQt6.QtGui import QPixmap, QIcon
-from PyQt6.QtCore import Qt, pyqtSignal, QSize
+from PyQt6.QtGui import QPixmap, QIcon, QPainter, QColor, QFont, QPen
+from PyQt6.QtCore import Qt, pyqtSignal, QSize, QRectF
+from pdf_equilibrist import theme
 
 ACCENT = "#6BBF4E"
 
@@ -65,6 +66,19 @@ QPushButton {
 }
 QPushButton:hover  { background: #2E2E2E; border-radius: 6px; }
 QPushButton:pressed { background: #222222; border-radius: 6px; }
+"""
+
+# Bouton langue : même capsule que le switch THEME (même hauteur, même bordure)
+_CAPSULE = """
+QPushButton {
+    background: #2D2D2D;
+    border: 1px solid #3A3A3A;
+    border-radius: 15px;
+    padding: 0 8px;
+    color: #F0F0F0;
+}
+QPushButton:hover { border-color: #6BBF4E; }
+QPushButton:pressed { background: #2A2A2A; }
 """
 
 # Style du bouton Fermer — fond hover rouge (convention Windows)
@@ -106,6 +120,49 @@ QTabBar::close-button {
     subcontrol-position: right;
 }
 """
+
+
+class ThemeSwitch(QPushButton):
+    """Capsule « THEME » à pastille : à droite = sombre, à gauche = clair."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedSize(88, 30)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._light = theme.theme_name() == theme.LIGHT
+
+    @property
+    def is_light(self) -> bool:
+        return self._light
+
+    def set_light(self, light: bool) -> None:
+        self._light = light
+        self.update()
+
+    def paintEvent(self, _event):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
+        hover = self.underMouse()
+        p.setPen(QPen(QColor(theme.ACCENT) if hover else theme.qcolor("#3A3A3A"), 1))
+        p.setBrush(theme.qcolor("#2D2D2D"))
+        p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
+        # Pastille : vert du logo (vert foncé sur fond clair, plus lisible)
+        knob = QColor(theme.ACCENT_TEXT_LIGHT if self._light else theme.ACCENT)
+        d = r.height() - 6
+        x = r.left() + 3 if self._light else r.right() - 3 - d
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(knob)
+        p.drawEllipse(QRectF(x, r.top() + 3, d, d))
+        # Libellé : identique en français et en anglais, donc pas de traduction
+        font = QFont("Segoe UI")
+        font.setPixelSize(11)
+        font.setLetterSpacing(QFont.SpacingType.PercentageSpacing, 108)
+        p.setFont(font)
+        p.setPen(theme.qcolor("#F0F0F0"))
+        text = QRectF(r.left() + (d + 6 if self._light else 0), r.top(),
+                      r.width() - (d + 6), r.height())
+        p.drawText(text, Qt.AlignmentFlag.AlignCenter, "THEME")
 
 
 class TitleBar(QWidget):
@@ -206,11 +263,17 @@ class TitleBar(QWidget):
         # Espace extensible = zone de drag (reçoit mousePressEvent)
         layout.addStretch(1)
 
+        # ── Switch thème (à gauche du bouton langue) ─────────────────────────
+        self._btn_theme = ThemeSwitch()
+        self._btn_theme.setToolTip(self.tr("Thème clair / sombre"))
+        self._btn_theme.clicked.connect(self._toggle_theme)
+        layout.addWidget(self._btn_theme)
+
         # ── Bouton langue ─────────────────────────────────────────────────────
         from pdf_equilibrist.i18n import current_lang as _cur_lang
         self._btn_lang = QPushButton(f"🌐{_cur_lang().upper()}")
-        self._btn_lang.setFixedSize(52, 30)
-        self._btn_lang.setStyleSheet(_CTRL_BASE)
+        self._btn_lang.setFixedSize(60, 30)
+        self._btn_lang.setStyleSheet(_CAPSULE)
         self._btn_lang.setToolTip(self.tr("Langue / Language"))
         self._btn_lang.clicked.connect(self._show_lang_menu)
         layout.addWidget(self._btn_lang)
@@ -362,6 +425,36 @@ class TitleBar(QWidget):
         if event.button() == Qt.MouseButton.LeftButton:
             self.maximize_requested.emit()
 
+    # ── Thème ─────────────────────────────────────────────────────────────────
+
+    def _toggle_theme(self):
+        sw = self._btn_theme
+        new = theme.DARK if sw.is_light else theme.LIGHT
+        theme.set_theme(new)
+        sw.set_light(new == theme.LIGHT)   # la pastille montre le choix, même avant redémarrage
+        self._ask_restart(self.tr("Thème modifié"),
+                          self.tr("Le changement de thème sera appliqué au prochain démarrage."))
+
+    def _ask_restart(self, title: str, text: str):
+        from PyQt6.QtWidgets import QMessageBox, QApplication
+        from PyQt6.QtCore import QProcess
+        import sys
+
+        msg = QMessageBox(self)
+        msg.setWindowTitle(title)
+        msg.setText(text)
+        msg.setIcon(QMessageBox.Icon.Information)
+        btn_now = msg.addButton(
+            self.tr("Redémarrer maintenant"),
+            QMessageBox.ButtonRole.AcceptRole,
+        )
+        msg.addButton(self.tr("Plus tard"), QMessageBox.ButtonRole.RejectRole)
+        msg.exec()
+
+        if msg.clickedButton() is btn_now:
+            QProcess.startDetached(sys.executable, sys.argv)
+            QApplication.quit()
+
     # ── Langue ────────────────────────────────────────────────────────────────
 
     def _show_lang_menu(self):
@@ -389,24 +482,5 @@ class TitleBar(QWidget):
             return
         set_lang(lang)
 
-        from PyQt6.QtWidgets import QMessageBox
-        from PyQt6.QtCore import QProcess
-        import sys
-
-        msg = QMessageBox(self)
-        msg.setWindowTitle(self.tr("Langue modifiée"))
-        msg.setText(self.tr(
-            "Le changement de langue sera appliqué au prochain démarrage."
-        ))
-        msg.setIcon(QMessageBox.Icon.Information)
-        btn_now = msg.addButton(
-            self.tr("Redémarrer maintenant"),
-            QMessageBox.ButtonRole.AcceptRole,
-        )
-        msg.addButton(self.tr("Plus tard"), QMessageBox.ButtonRole.RejectRole)
-        msg.exec()
-
-        if msg.clickedButton() is btn_now:
-            QProcess.startDetached(sys.executable, sys.argv)
-            from PyQt6.QtWidgets import QApplication
-            QApplication.quit()
+        self._ask_restart(self.tr("Langue modifiée"),
+                          self.tr("Le changement de langue sera appliqué au prochain démarrage."))

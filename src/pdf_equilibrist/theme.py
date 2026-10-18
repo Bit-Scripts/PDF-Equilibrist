@@ -47,7 +47,18 @@ _ACCENT_AS_TEXT = re.compile(r"(?<![\w-])color:\s*" + re.escape(ACCENT), re.I)
 
 
 def theme_name() -> str:
+    """Thème actif : choix enregistré (switch THEME), sinon ``PDFEQ_THEME`` (aperçu), sinon sombre."""
+    from PyQt6.QtCore import QSettings
+    saved = str(QSettings("Bit-Scripts", "PDF-Equilibrist").value("theme", ""))
+    if saved in (LIGHT, DARK):
+        return saved
     return LIGHT if os.environ.get("PDFEQ_THEME", "").lower() == LIGHT else DARK
+
+
+def set_theme(name: str) -> None:
+    """Enregistre le choix de l'utilisateur (appliqué au prochain démarrage)."""
+    from PyQt6.QtCore import QSettings
+    QSettings("Bit-Scripts", "PDF-Equilibrist").setValue("theme", LIGHT if name == LIGHT else DARK)
 
 
 def _swap(match: re.Match) -> str:
