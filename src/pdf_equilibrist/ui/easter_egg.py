@@ -14,8 +14,8 @@ DURATION_MS = 4000
 FRAME_MS = 45
 CELL = 16                 # taille d'une colonne / d'un caractère (px)
 GLYPHS = "01ABCDEF<>/|=+*"   # ASCII seulement : aucune police spéciale requise
-
 # random sert uniquement à l'effet visuel (B311 : aucun usage cryptographique)
+
 
 class MatrixRain(QWidget):
     """Calque transparent aux clics, posé sur une fenêtre, qui se détruit tout seul."""
