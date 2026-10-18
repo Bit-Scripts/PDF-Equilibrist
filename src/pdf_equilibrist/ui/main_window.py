@@ -227,6 +227,13 @@ class MainWindow(QWidget):
 
         # ── Menu bar ─────────────────────────────────────────────────────────
         self._menu_bar = self._build_menu_bar()
+        # Barre d'accès rapide de la barre de titre : miroir des actions du menu
+        qa = self._title_bar.quick_access
+        qa.bind("undo", self._act_undo)
+        qa.bind("redo", self._act_redo)
+        qa.bind("open", self._act_open)
+        qa.bind("save", self._act_save)
+        qa.bind("save_as", self._act_save_as)
 
         # ── Status bar ───────────────────────────────────────────────────────
         self._status_file = QLabel(self.tr("Aucun document ouvert"))
@@ -339,6 +346,11 @@ class MainWindow(QWidget):
         if self._current_doc.undo():
             self.viewer.clear_search()
 
+    def _redo(self):
+        """Rétablit la dernière modification annulée (Ctrl+Y)."""
+        if self._current_doc.redo():
+            self.viewer.clear_search()
+
     def _build_menu_bar(self) -> QWidget:
         from PyQt6.QtWidgets import QMenuBar
         mb = QMenuBar()
@@ -353,10 +365,10 @@ class MainWindow(QWidget):
 
         fichier = mb.addMenu(self.tr("Fichier"))
 
-        act_open = QAction(self.tr("Ouvrir…"), self)
-        act_open.setShortcut(QKeySequence.StandardKey.Open)
-        act_open.triggered.connect(self._open_file_dialog)
-        fichier.addAction(act_open)
+        self._act_open = QAction(self.tr("Ouvrir…"), self)
+        self._act_open.setShortcut(QKeySequence.StandardKey.Open)
+        self._act_open.triggered.connect(self._open_file_dialog)
+        fichier.addAction(self._act_open)
 
         # Sous-menu "Ouvrir récemment" — peuplé dynamiquement
         self._recent_menu = fichier.addMenu(self.tr("Ouvrir récemment"))
@@ -398,6 +410,12 @@ class MainWindow(QWidget):
         self._act_undo.triggered.connect(self._undo)
         self._act_undo.setEnabled(False)
         edition.addAction(self._act_undo)
+
+        self._act_redo = QAction(self.tr("Rétablir"), self)
+        self._act_redo.setShortcuts([QKeySequence("Ctrl+Y"), QKeySequence("Ctrl+Shift+Z")])
+        self._act_redo.triggered.connect(self._redo)
+        self._act_redo.setEnabled(False)
+        edition.addAction(self._act_redo)
 
         act_search = QAction(self.tr("Rechercher…"), self)
         act_search.setShortcut(QKeySequence.StandardKey.Find)
@@ -561,6 +579,7 @@ class MainWindow(QWidget):
             act.setEnabled(enabled)
         if not enabled:
             self._act_undo.setEnabled(False)
+            self._act_redo.setEnabled(False)
 
     # ── Gestion multi-documents ───────────────────────────────────────────────
 
@@ -721,6 +740,7 @@ class MainWindow(QWidget):
                 self.tr("{0} page").format(n) if n <= 1 else self.tr("{0} pages").format(n))
             self._set_ribbon_enabled(True)
             self._act_undo.setEnabled(doc.can_undo)
+            self._act_redo.setEnabled(doc.can_redo)
         else:
             self._update_status()
 
@@ -749,10 +769,11 @@ class MainWindow(QWidget):
         return False
 
     def _save_doc(self, doc: Document, path: Path | None = None) -> bool:
-        """Enregistre ``doc`` (en place, ou sous ``path``). En cas d'échec : le document reste
-        ouvert et modifié, et l'utilisateur est prévenu. ``True`` si l'écriture a réussi."""
+        """Enregistre ``doc`` (en place, ou sous ``path``, qui devient alors son fichier). En cas
+        d'échec : le document reste ouvert et modifié, et l'utilisateur est prévenu.
+        ``True`` si l'écriture a réussi."""
         try:
-            doc.save(path)
+            doc.save(path, rebind=path is not None)
         except Exception as e:
             show_error(self, self.tr("Enregistrement impossible"),
                        self.tr("« {0} » n'a pas pu être enregistré :\n{1}\n\n"
@@ -771,7 +792,13 @@ class MainWindow(QWidget):
             str(doc.path), self.tr("PDF (*.pdf)"))
         if not path:
             return False
-        return self._save_doc(doc, Path(ensure_suffix(path, ".pdf")))
+        if not self._save_doc(doc, Path(ensure_suffix(path, ".pdf"))):
+            return False
+        # Le document pointe maintenant sur le nouveau fichier : onglet, barre d'état, récents
+        self._on_doc_changed()
+        self._add_recent(str(doc.path))
+        self._status_file.setText(self.tr("Enregistré : {0}").format(doc.path.name))
+        return True
 
     # ── Modifications non enregistrées ────────────────────────────────────────
 
