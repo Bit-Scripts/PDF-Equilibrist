@@ -1,3 +1,31 @@
+pdf-equilibrist (0.2.0-1~noble1) noble; urgency=medium
+
+  * New upstream release: a light theme, and a THEME switch in the title bar.
+    - New light colour scheme, chosen with the new THEME switch next to the
+      language button; the choice is remembered and applied after a restart.
+      The dark theme stays the default.
+    - The splash screen follows the chosen theme.
+    - Page thumbnails keep each page's own proportions (landscape pages are
+      no longer squeezed into the portrait format) and are framed one by one.
+    - Dependency update: cryptography 50.0.2 (CVE-2026-69247).
+    - New English translations for the theme switch.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 18 Oct 2026 12:00:00 +0000
+
+pdf-equilibrist (0.2.0-1~resolute1) resolute; urgency=medium
+
+  * New upstream release: a light theme, and a THEME switch in the title bar.
+    - New light colour scheme, chosen with the new THEME switch next to the
+      language button; the choice is remembered and applied after a restart.
+      The dark theme stays the default.
+    - The splash screen follows the chosen theme.
+    - Page thumbnails keep each page's own proportions (landscape pages are
+      no longer squeezed into the portrait format) and are framed one by one.
+    - Dependency update: cryptography 50.0.2 (CVE-2026-69247).
+    - New English translations for the theme switch.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Sun, 18 Oct 2026 12:00:00 +0000
+
 pdf-equilibrist (0.1.26-1~noble1) noble; urgency=medium
 
   * New upstream release: an AppImage for every other Linux distribution, and
