@@ -1730,6 +1730,21 @@ rypt</translation>
         <translation>Close</translation>
     </message>
     <message>
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="388" />
+        <source>Thème clair / sombre</source>
+        <translation>Light / dark theme</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="392" />
+        <source>Thème modifié</source>
+        <translation>Theme changed</translation>
+    </message>
+    <message>
+        <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="393" />
+        <source>Le changement de thème sera appliqué au prochain démarrage.</source>
+        <translation>The theme change will be applied after restart.</translation>
+    </message>
+    <message>
         <location filename="..\src\pdf_equilibrist\ui\title_bar.py" line="397" />
         <source>Langue modifiée</source>
         <translation>Language changed</translation>

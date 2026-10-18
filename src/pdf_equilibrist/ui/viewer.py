@@ -56,6 +56,7 @@ from PyQt6.QtGui import QPixmap, QPainter, QColor, QFont, QPen
 import pymupdf
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.utils import open_external
+from pdf_equilibrist import theme
 
 
 class _PageLabel(QLabel):
@@ -322,14 +323,14 @@ class _WelcomePage(QWidget):
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
 
         # Fond sombre uniforme
-        p.fillRect(self.rect(), QColor("#1E1E1E"))
+        p.fillRect(self.rect(), theme.qcolor("#1E1E1E"))
 
         # Centre de l'icône
         cx, cy = self.width() // 2, self.height() // 2 - 40
 
         # Corps du document (rectangle gris arrondi)
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QColor("#2D2D2D"))
+        p.setBrush(QColor("#BDBDBD" if theme.theme_name() == theme.LIGHT else "#2D2D2D"))
         p.drawRoundedRect(cx - 50, cy - 60, 100, 120, 8, 8)
 
         # Lignes de texte symboliques (barres vertes de largeur décroissante)
@@ -339,7 +340,7 @@ class _WelcomePage(QWidget):
         p.drawRoundedRect(cx - 30, cy - 8,  40, 8, 3, 3)
 
         # Message d'instruction sous l'icône
-        p.setPen(QColor("#AAAAAA"))
+        p.setPen(theme.qcolor("#AAAAAA"))
         p.setFont(QFont("Segoe UI", 13))
         p.drawText(
             self.rect().adjusted(0, cy + 90, 0, 0),

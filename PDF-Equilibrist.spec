@@ -2,7 +2,7 @@
 # PDF-Equilibrist — PyInstaller onedir spec
 #
 # Avant de compiler :
-#   python tools/prepare_build.py   ← génère ICO + splash.png
+#   python tools/prepare_build.py   ← génère ICO + splash*.png
 #   pip install pyinstaller
 #   pyinstaller PDF-Equilibrist.spec
 # → dist/PDF-Equilibrist/   (dossier à empaqueter avec Inno Setup)
@@ -96,7 +96,7 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 # ── Splash PyInstaller (bootstrap avant Python) ───────────────────────────────
 splash = Splash(
-    "assets/splash.png",
+    "assets/splash_native.png",
     binaries=a.binaries,
     datas=a.datas,
     text_pos=(14, 298),

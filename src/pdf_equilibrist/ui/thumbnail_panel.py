@@ -36,28 +36,30 @@ que le drag se termine (drop ou annulation).
 Largeur dynamique
 ------------------
 La largeur du panneau s'adapte au document ouvert via ``rebuild()`` :
-chaque page est rendue à une hauteur fixe ``THUMB_H``, et la largeur est
-calculée en respectant le ratio largeur/hauteur de la page. Le panneau
-prend la largeur de la page la plus large + padding.
+chaque page est rendue à une hauteur fixe ``THUMB_H``, et sa largeur est
+calculée individuellement selon son propre ratio (A4/A3 : √2 ; paysage = plus
+large). Chaque cadre épouse sa miniature (``_ThumbDelegate``) ; le panneau prend
+la largeur de la miniature la plus large + padding.
 ``width_changed`` est émis pour que ``MainWindow`` force le splitter
 à respecter la nouvelle largeur.
 """
 from __future__ import annotations
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QListWidget, QListWidgetItem,
-    QLabel, QAbstractItemView, QMenu, QFileDialog,
+    QLabel, QAbstractItemView, QMenu, QFileDialog, QStyledItemDelegate, QStyle,
 )
 from PyQt6.QtGui import (QIcon, QPixmap, QImage, QAction,
                           QPainter, QPen, QColor, QDrag)
-from PyQt6.QtCore import (Qt, pyqtSignal, QSize, QPoint,
+from PyQt6.QtCore import (Qt, pyqtSignal, QSize, QPoint, QRect,
                            QMimeData, QEvent)
 import pymupdf
+from pdf_equilibrist import theme
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations.pages import rotate_pages, extract_pages
 from pdf_equilibrist.ui.dialogs import show_info, show_error, ensure_suffix
 
 ACCENT    = "#6BBF4E"
-THUMB_H   = 160    # hauteur fixe de toutes les miniatures (px)
+THUMB_H   = 160    # hauteur fixe de toutes les miniatures (px) ; largeur propre à chaque page
 THUMB_PAD = 16     # padding horizontal de chaque côté de la miniature
 # Mime type custom pour identifier les drags internes (réorganisation)
 # Différent des URLs de fichiers pour distinguer drop interne vs fichier externe
@@ -96,6 +98,48 @@ class _DropLine(QWidget):
 
 
 # ── Liste (display only + détection début drag) ───────────────────────────────
+
+_PIX_ROLE = Qt.ItemDataRole.UserRole + 1
+
+
+class _ThumbDelegate(QStyledItemDelegate):
+    """Peint chaque miniature avec un cadre qui épouse sa propre largeur."""
+
+    def paint(self, p, option, index):
+        pix = index.data(_PIX_ROLE)
+        if pix is None:
+            return super().paint(p, option, index)
+        selected = bool(option.state & QStyle.StateFlag.State_Selected)
+        hover = bool(option.state & QStyle.StateFlag.State_MouseOver)
+        r = option.rect
+        x = r.x() + (r.width() - pix.width()) // 2
+        y = r.y() + 3
+        accent = QColor(ACCENT)
+        p.save()
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        frame = QRect(x - 3, y - 3, pix.width() + 6, pix.height() + 6)
+        p.setBrush(theme.qcolor("#2D2D2D"))
+        if selected:
+            p.setPen(QPen(accent, 2))
+        elif hover:
+            hov = QColor(accent)
+            hov.setAlpha(136)
+            p.setPen(QPen(hov, 1))
+        else:
+            p.setPen(QPen(theme.qcolor("#3A3A3A"), 1))
+        p.drawRoundedRect(frame, 4, 4)
+        p.drawPixmap(x, y, pix)
+        p.setPen(theme.qcolor(ACCENT) if selected else theme.qcolor("#AAAAAA"))
+        if selected and theme.theme_name() == theme.LIGHT:
+            p.setPen(QColor(theme.ACCENT_TEXT_LIGHT))
+        font = p.font()
+        font.setPixelSize(10)
+        p.setFont(font)
+        p.drawText(QRect(r.x(), frame.bottom() + 2, r.width(), 18),
+                   Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter,
+                   str(index.data(Qt.ItemDataRole.DisplayRole)).strip())
+        p.restore()
+
 
 class _ThumbList(QListWidget):
     drag_started = pyqtSignal(int)   # row dont le drag commence
@@ -172,18 +216,10 @@ class ThumbnailPanel(QWidget):
         self._list.setResizeMode(QListWidget.ResizeMode.Adjust)
         self._list.setSpacing(4)
         self._list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self._list.setStyleSheet(f"""
-            QListWidget {{ background: #181818; border: none; }}
-            QListWidget::item {{
-                background: #2D2D2D; border: 1px solid #3A3A3A;
-                border-radius: 4px; color: #AAAAAA;
-                font-size: 10px; padding: 2px;
-            }}
-            QListWidget::item:selected {{
-                background: #2D2D2D; border: 2px solid {ACCENT}; color: {ACCENT};
-            }}
-            QListWidget::item:hover {{ border-color: {ACCENT}88; }}
+        self._list.setStyleSheet("""
+            QListWidget { background: #181818; border: none; }
         """)
+        self._list.setItemDelegate(_ThumbDelegate(self._list))
         layout.addWidget(self._list)
 
         # Barre d'insertion — posée sur le viewport de la liste
@@ -221,13 +257,14 @@ class ThumbnailPanel(QWidget):
 
         # Mettre à jour la grille de la liste
         self._list.setIconSize(QSize(max_thumb_w, THUMB_H))
-        self._list.setGridSize(QSize(panel_w - 4, THUMB_H + 22))
+        self._list.setGridSize(QSize(panel_w - 4, THUMB_H + 28))
 
         # 2. Ajouter les items
         for i in range(n):
             pix  = self._render_thumb(i)
             item = QListWidgetItem(QIcon(pix), f"  {i+1} / {n}")
-            item.setSizeHint(QSize(panel_w - 4, THUMB_H + 22))
+            item.setData(_PIX_ROLE, pix)
+            item.setSizeHint(QSize(panel_w - 4, THUMB_H + 28))
             item.setTextAlignment(
                 Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignBottom)
             self._list.addItem(item)

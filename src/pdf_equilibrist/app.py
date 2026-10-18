@@ -237,7 +237,10 @@ def create_app(app: QApplication) -> QApplication:
         app.setWindowIcon(QIcon(str(logo)))
 
     # Appliquer le thème sombre global à tous les widgets de l'application
-    app.setStyleSheet(STYLE)
+    # (thème clair en aperçu via PDFEQ_THEME=light — voir theme.py)
+    from pdf_equilibrist import theme
+    theme.install_widget_hook()
+    app.setStyleSheet(theme.adapt(STYLE))
 
     # Import différé : MainWindow charge tous les modules UI au premier import
     from pdf_equilibrist.ui.main_window import MainWindow
