@@ -65,12 +65,15 @@ class Document(QObject):
 
     # Signal émis à chaque modification — abonné par PdfViewer et ThumbnailPanel
     changed = pyqtSignal()
+    # Émis quand le document passe de « enregistré » à « modifié » (True) ou l'inverse (False)
+    modified_changed = pyqtSignal(bool)
 
     def __init__(self):
         super().__init__()
         self.fitz_doc: pymupdf.Document | None = None
         self.path: Path | None = None
         self._undo_stack: deque[bytes] = deque(maxlen=_UNDO_MAX)
+        self._modified = False
 
     # ── Propriété ──────────────────────────────────────────────────────────────
 
@@ -78,6 +81,20 @@ class Document(QObject):
     def is_open(self) -> bool:
         """``True`` si un fichier PDF est actuellement chargé en mémoire."""
         return self.fitz_doc is not None
+
+    @property
+    def is_modified(self) -> bool:
+        """``True`` si le document a des modifications non enregistrées."""
+        return self._modified
+
+    def mark_modified(self) -> None:
+        """Signale une modification non enregistrée (appelé avant chaque opération qui change le PDF)."""
+        self._set_modified(True)
+
+    def _set_modified(self, value: bool) -> None:
+        if self._modified != value:
+            self._modified = value
+            self.modified_changed.emit(value)
 
     # ── Opérations fichier ────────────────────────────────────────────────────
 
@@ -100,6 +117,7 @@ class Document(QObject):
         self.path = Path(path)
         self.fitz_doc = pymupdf.open(str(self.path))
         self._undo_stack.clear()
+        self._set_modified(False)
         self.changed.emit()
 
     def save(self, path: str | Path | None = None):
@@ -145,6 +163,9 @@ class Document(QObject):
                 tmp_path.unlink()
             except OSError:
                 pass
+        # Atteint seulement si l'écriture a réussi (une exception remonte avant) :
+        # le document n'est « enregistré » que si le fichier l'est vraiment.
+        self._set_modified(False)
 
     def close(self):
         """
@@ -157,6 +178,7 @@ class Document(QObject):
             self.fitz_doc.close()
         self.fitz_doc = None
         self.path = None
+        self._set_modified(False)
         self.changed.emit()
 
     # ── Annuler / Rétablir ────────────────────────────────────────────────────
@@ -165,6 +187,7 @@ class Document(QObject):
         """Sauvegarde l'état courant dans la pile d'annulation (avant toute modif)."""
         if self.fitz_doc:
             self._undo_stack.append(self.fitz_doc.tobytes())
+            self.mark_modified()   # toute modification du PDF passe par ici avant d'agir
 
     def undo(self) -> bool:
         """Restaure le dernier état sauvegardé. Retourne True si annulation effectuée."""
@@ -173,6 +196,7 @@ class Document(QObject):
         state = self._undo_stack.pop()
         self.fitz_doc.close()
         self.fitz_doc = pymupdf.open(stream=state, filetype="pdf")
+        self.mark_modified()   # l'état restauré peut différer du fichier : on reste prudent
         self.changed.emit()
         return True
 

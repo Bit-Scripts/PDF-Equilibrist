@@ -51,7 +51,7 @@ import sys
 from pathlib import Path
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
-    QTabBar, QStackedWidget, QFileDialog, QLabel, QSplitter,
+    QTabBar, QStackedWidget, QFileDialog, QLabel, QSplitter, QMessageBox,
 )
 from PyQt6.QtGui import QAction, QKeySequence, QColor, QPainter, QPen
 from PyQt6.QtCore import Qt, QPoint, QSettings, QThread, pyqtSignal
@@ -65,7 +65,7 @@ from pdf_equilibrist.ui.tabs.tab_page      import TabPage
 from pdf_equilibrist.ui.tabs.tab_proteger  import TabProteger
 from pdf_equilibrist.ui.viewer             import PdfViewer
 from pdf_equilibrist.ui.thumbnail_panel    import ThumbnailPanel
-from pdf_equilibrist.ui.dialogs            import ensure_suffix
+from pdf_equilibrist.ui.dialogs            import ensure_suffix, show_error
 from pdf_equilibrist.core.document         import Document
 
 _RECENT_MAX = 10   # nombre maximum de fichiers dans "Ouvrir récemment"
@@ -143,6 +143,7 @@ class MainWindow(QWidget):
 
         # ── Gestion multi-documents ───────────────────────────────────────────
         self._documents: list[Document] = []  # un Document par onglet ouvert
+        self._close_confirmed = False         # True seulement après confirm_close_all() (mise à jour)
         self._active_idx = -1                 # -1 = aucun document actif
 
         # ── Barre de titre ───────────────────────────────────────────────────
@@ -591,6 +592,7 @@ class MainWindow(QWidget):
         # Créer un nouveau Document et l'ouvrir
         doc = Document()
         doc.open(path)
+        doc.modified_changed.connect(lambda _m, d=doc: self._refresh_tab_modified(d))
         self._documents.append(doc)
         idx = len(self._documents) - 1
 
@@ -614,6 +616,10 @@ class MainWindow(QWidget):
             Index dans ``_documents`` de l'onglet à fermer.
         """
         if idx < 0 or idx >= len(self._documents):
+            return
+
+        # Modifications non enregistrées : Enregistrer / Ne pas enregistrer / Annuler
+        if not self._confirm_close_doc(self._documents[idx]):
             return
 
         self._documents[idx].close()  # libère pymupdf.Document (mémoire)
@@ -709,6 +715,7 @@ class MainWindow(QWidget):
         if doc.is_open:
             n = len(doc.fitz_doc)
             self._title_bar.set_tab_title(self._active_idx, doc.path.name)
+            self._title_bar.set_tab_modified(self._active_idx, doc.is_modified)
             self._status_file.setText(str(doc.path))
             self._status_page.setText(
                 self.tr("{0} page").format(n) if n <= 1 else self.tr("{0} pages").format(n))
@@ -731,22 +738,92 @@ class MainWindow(QWidget):
 
     # ── Sauvegarde ───────────────────────────────────────────────────────────
 
-    def _save(self):
-        """Sauvegarde le document actif en place (Ctrl+S)."""
-        if self._current_doc.is_open:
-            self._current_doc.save()
-            self._status_file.setText(
-                self.tr("Enregistré : {0}").format(self._current_doc.path.name))
+    def _save(self) -> bool:
+        """Sauvegarde le document actif en place (Ctrl+S). ``True`` si enregistré."""
+        doc = self._current_doc
+        if not doc.is_open:
+            return False
+        if self._save_doc(doc):
+            self._status_file.setText(self.tr("Enregistré : {0}").format(doc.path.name))
+            return True
+        return False
 
-    def _save_as(self):
-        """Sauvegarde le document actif sous un nouveau chemin (Ctrl+Shift+S)."""
-        if not self._current_doc.is_open:
-            return
+    def _save_doc(self, doc: Document, path: Path | None = None) -> bool:
+        """Enregistre ``doc`` (en place, ou sous ``path``). En cas d'échec : le document reste
+        ouvert et modifié, et l'utilisateur est prévenu. ``True`` si l'écriture a réussi."""
+        try:
+            doc.save(path)
+        except Exception as e:
+            show_error(self, self.tr("Enregistrement impossible"),
+                       self.tr("« {0} » n'a pas pu être enregistré :\n{1}\n\n"
+                               "Le document reste ouvert avec vos modifications.").format(
+                           (path or doc.path).name, e))
+            return False
+        return True
+
+    def _save_as(self) -> bool:
+        """Sauvegarde le document actif sous un nouveau chemin (Ctrl+Shift+S). ``True`` si enregistré."""
+        doc = self._current_doc
+        if not doc.is_open:
+            return False
         path, _ = QFileDialog.getSaveFileName(
             self, self.tr("Enregistrer sous"),
-            str(self._current_doc.path), self.tr("PDF (*.pdf)"))
-        if path:
-            self._current_doc.save(ensure_suffix(path, ".pdf"))
+            str(doc.path), self.tr("PDF (*.pdf)"))
+        if not path:
+            return False
+        return self._save_doc(doc, Path(ensure_suffix(path, ".pdf")))
+
+    # ── Modifications non enregistrées ────────────────────────────────────────
+
+    def _refresh_tab_modified(self, doc: Document):
+        """Met l'astérisque de l'onglet de ``doc`` à jour (signal ``modified_changed``)."""
+        if doc in self._documents:
+            self._title_bar.set_tab_modified(self._documents.index(doc), doc.is_modified)
+
+    def _confirm_close_doc(self, doc: Document) -> bool:
+        """``True`` si ``doc`` peut être fermé : pas de modification, ou l'utilisateur a choisi
+        d'enregistrer (et l'écriture a réussi) ou de ne pas enregistrer. ``False`` = annulé / échec."""
+        if not doc.is_modified:
+            return True
+        if doc in self._documents:   # montrer de quel document il s'agit
+            self._title_bar.set_current_index(self._documents.index(doc))
+        name = doc.path.name if doc.path else ""
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Icon.Warning)
+        box.setWindowTitle(self.tr("Modifications non enregistrées"))
+        box.setText(self.tr("Voulez-vous enregistrer les modifications apportées à « {0} » ?").format(name))
+        box.setInformativeText(self.tr("Vos modifications seront perdues si vous ne les enregistrez pas."))
+        b_save = box.addButton(self.tr("Enregistrer"), QMessageBox.ButtonRole.AcceptRole)
+        b_discard = box.addButton(self.tr("Ne pas enregistrer"), QMessageBox.ButtonRole.DestructiveRole)
+        b_cancel = box.addButton(self.tr("Annuler"), QMessageBox.ButtonRole.RejectRole)
+        box.setDefaultButton(b_save)
+        box.setEscapeButton(b_cancel)   # Échap / croix = Annuler : jamais de fermeture involontaire
+        box.exec()
+        clicked = box.clickedButton()
+        if clicked is b_save:
+            return self._save_doc(doc)   # échec → False : le document reste ouvert
+        return clicked is b_discard
+
+    def confirm_close_all(self) -> bool:
+        """Demande, document par document, que faire des modifications non enregistrées.
+        ``False`` dès qu'un seul choix est « Annuler » (ou qu'un enregistrement échoue) :
+        l'appelant ne doit alors rien fermer. Sert à la fermeture de la fenêtre et aux mises à jour."""
+        for doc in list(self._documents):
+            if not self._confirm_close_doc(doc):
+                return False
+        return True
+
+    def closeEvent(self, event):
+        """Fermeture de la fenêtre (croix, Fichier › Quitter, Alt+F4, fermeture demandée par un
+        installeur) : refusée tant qu'une modification non enregistrée n'a pas été traitée."""
+        if self._close_confirmed or self.confirm_close_all():
+            event.accept()
+        else:
+            event.ignore()
+
+    def allow_close_without_prompt(self):
+        """À appeler seulement juste après un ``confirm_close_all()`` réussi, avant de fermer."""
+        self._close_confirmed = True
 
     # ── Thumbnails ────────────────────────────────────────────────────────────
 

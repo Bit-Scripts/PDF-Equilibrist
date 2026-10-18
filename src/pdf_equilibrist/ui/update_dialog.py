@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QHBoxLayout, QPushButton,
     QProgressBar, QFrame, QLineEdit, QApplication, QMessageBox, QInputDialog,
 )
-from PyQt6.QtCore import QProcess, QProcessEnvironment, QThread, QTimer, pyqtSignal, Qt
+from PyQt6.QtCore import QProcess, QProcessEnvironment, QThread, pyqtSignal, Qt
 from PyQt6.QtGui import QPixmap
 
 from pdf_equilibrist import __version__
@@ -528,7 +528,20 @@ class UpdateDialog(QDialog):
         detail = "\n".join(lines[-3:])
         self._lbl.setText(self.tr("L'installation a échoué (code {0}).\n{1}").format(exit_code, detail))
 
+    def _main_window(self):
+        """Fenêtre principale (parent du dialogue), si elle sait gérer les modifications non enregistrées."""
+        parent = self.parent()
+        return parent if hasattr(parent, "confirm_close_all") else None
+
     def _relaunch(self, path):
+        # Avant de lancer la nouvelle version puis de quitter : traiter les modifications non
+        # enregistrées. « Annuler » arrête tout (rien n'est relancé, rien ne se ferme) ; la nouvelle
+        # version reste installée et se lancera à la prochaine ouverture.
+        main = self._main_window()
+        if main is not None and not main.confirm_close_all():
+            self._lbl.setText(self.tr(
+                "Fermeture annulée : la nouvelle version est installée, relancez l'application quand vous voulez."))
+            return
         try:
             subprocess.Popen(  # nosec B603
                 [str(path)], env=updater.relaunch_env(), start_new_session=True,
@@ -537,6 +550,8 @@ class UpdateDialog(QDialog):
         except OSError as e:
             self._lbl.setText(self.tr("Impossible de relancer l'application : {0}").format(e))
             return
+        if main is not None:
+            main.allow_close_without_prompt()   # déjà demandé juste au-dessus : pas de seconde question
         self._quit_for_installer()
 
     def _download_and_run(self):
@@ -556,9 +571,10 @@ class UpdateDialog(QDialog):
             if os.name == "nt":
                 # Fichier qu'on vient nous-même de télécharger dans le temp
                 os.startfile(str(target))  # nosec B606
-                # L'installeur refuse de continuer tant que l'application tourne
-                # (fichiers verrouillés) : on se ferme pour lui laisser la place.
-                QTimer.singleShot(1500, self._quit_for_installer)
+                # Pas de fermeture automatique ici : c'est l'installeur NSIS qui détecte
+                # l'application ouverte et propose de la fermer (macro CHECK_APP_RUNNING,
+                # installer/PDF-Equilibrist.nsi). _quit_for_installer reste utilisé par
+                # l'AppImage (_download_appimage), qui n'a pas d'installeur pour le faire.
             else:
                 open_external(str(target))
         except Exception:
