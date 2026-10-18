@@ -122,7 +122,7 @@ class Document(QObject):
         self._set_modified(False)
         self.changed.emit()
 
-    def save(self, path: str | Path | None = None):
+    def save(self, path: str | Path | None = None, *, rebind: bool = False):
         """
         Sauvegarde le document sur le disque.
 
@@ -131,6 +131,9 @@ class Document(QObject):
         path : str | Path | None
             Chemin de destination. Si ``None``, sauvegarde en place
             (écrase le fichier source).
+        rebind : bool
+            « Enregistrer sous » : une fois l'écriture réussie, le document pointe sur ce nouveau
+            fichier (``path``), qui devient la cible des prochains enregistrements.
 
         Note
         ----
@@ -167,6 +170,8 @@ class Document(QObject):
                 pass
         # Atteint seulement si l'écriture a réussi (une exception remonte avant) :
         # le document n'est « enregistré » que si le fichier l'est vraiment.
+        if rebind and path:
+            self.path = target
         self._set_modified(False)
 
     def close(self):

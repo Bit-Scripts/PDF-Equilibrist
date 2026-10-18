@@ -80,3 +80,20 @@ def test_close_and_reopen_reset(pdf_path):
     assert not doc.is_modified
     doc.open(pdf_path)
     assert not doc.is_modified
+
+
+def test_save_as_rebinds_the_path(pdf_path, tmp_path):
+    doc = Document()
+    doc.open(pdf_path)
+    doc.checkpoint()
+    new = tmp_path / "copie.pdf"
+    doc.save(new, rebind=True)
+    assert doc.path == new and new.exists()
+    assert not doc.is_modified
+
+
+def test_plain_save_to_other_path_keeps_the_path(pdf_path, tmp_path):
+    doc = Document()
+    doc.open(pdf_path)
+    doc.save(tmp_path / "export.pdf")   # sans rebind : copie, le document garde son fichier
+    assert doc.path == pdf_path

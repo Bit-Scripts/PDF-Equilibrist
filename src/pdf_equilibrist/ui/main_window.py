@@ -769,10 +769,11 @@ class MainWindow(QWidget):
         return False
 
     def _save_doc(self, doc: Document, path: Path | None = None) -> bool:
-        """Enregistre ``doc`` (en place, ou sous ``path``). En cas d'échec : le document reste
-        ouvert et modifié, et l'utilisateur est prévenu. ``True`` si l'écriture a réussi."""
+        """Enregistre ``doc`` (en place, ou sous ``path``, qui devient alors son fichier). En cas
+        d'échec : le document reste ouvert et modifié, et l'utilisateur est prévenu.
+        ``True`` si l'écriture a réussi."""
         try:
-            doc.save(path)
+            doc.save(path, rebind=path is not None)
         except Exception as e:
             show_error(self, self.tr("Enregistrement impossible"),
                        self.tr("« {0} » n'a pas pu être enregistré :\n{1}\n\n"
@@ -791,7 +792,13 @@ class MainWindow(QWidget):
             str(doc.path), self.tr("PDF (*.pdf)"))
         if not path:
             return False
-        return self._save_doc(doc, Path(ensure_suffix(path, ".pdf")))
+        if not self._save_doc(doc, Path(ensure_suffix(path, ".pdf"))):
+            return False
+        # Le document pointe maintenant sur le nouveau fichier : onglet, barre d'état, récents
+        self._on_doc_changed()
+        self._add_recent(str(doc.path))
+        self._status_file.setText(self.tr("Enregistré : {0}").format(doc.path.name))
+        return True
 
     # ── Modifications non enregistrées ────────────────────────────────────────
 

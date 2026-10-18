@@ -35,7 +35,7 @@ _DARK_TO_LIGHT = {
     "#575757": "#B5B5B5", "#585858": "#B5B5B5", "#606060": "#A5A5A5",
     "#666666": "#9A9A9A", "#6a6a6a": "#A8A8A8",
     # textes
-    "#f0f0f0": "#1A1A1A", "#ffffff": "#111111", "#cccccc": "#3F3F3F",
+    "#f0f0f0": "#1A1A1A", "#ffffff": "#111111", "#cccccc": "#3F3F3F", "#d8d8d8": "#3A3A3A",
     "#c8c8c8": "#444444", "#c0c0c0": "#4A4A4A", "#aaaaaa": "#555555",
     "#888888": "#6E6E6E",
     # accent au survol
