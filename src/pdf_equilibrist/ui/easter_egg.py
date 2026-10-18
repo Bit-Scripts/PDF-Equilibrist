@@ -15,6 +15,7 @@ FRAME_MS = 45
 CELL = 16                 # taille d'une colonne / d'un caractère (px)
 GLYPHS = "01ABCDEF<>/|=+*"   # ASCII seulement : aucune police spéciale requise
 
+# random sert uniquement à l'effet visuel (B311 : aucun usage cryptographique)
 
 class MatrixRain(QWidget):
     """Calque transparent aux clics, posé sur une fenêtre, qui se détruit tout seul."""
@@ -25,8 +26,8 @@ class MatrixRain(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground)
         self.setGeometry(host.rect())
         self._cols = max(1, self.width() // CELL)
-        self._heads = [random.uniform(-30, 0) for _ in range(self._cols)]
-        self._speeds = [random.uniform(0.5, 1.4) for _ in range(self._cols)]
+        self._heads = [random.uniform(-30, 0) for _ in range(self._cols)]  # nosec B311
+        self._speeds = [random.uniform(0.5, 1.4) for _ in range(self._cols)]  # nosec B311
         self._tick = 0
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._step)
@@ -65,7 +66,7 @@ class MatrixRain(QWidget):
                 alpha = int(255 * fade * pulse * (1 - k / 14))
                 col = QColor(255, 255, 255, alpha) if k == 0 else QColor(*ACCENT, alpha)
                 p.setPen(col)
-                p.drawText(c * CELL, r * CELL + CELL - 3, random.choice(GLYPHS))
+                p.drawText(c * CELL, r * CELL + CELL - 3, random.choice(GLYPHS))  # nosec B311
         p.end()
 
 
