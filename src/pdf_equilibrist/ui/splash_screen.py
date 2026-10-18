@@ -3,6 +3,7 @@ from __future__ import annotations
 from PyQt6.QtWidgets import QWidget, QLabel, QProgressBar, QVBoxLayout, QApplication
 from PyQt6.QtGui import QPixmap, QColor, QPalette
 from PyQt6.QtCore import Qt
+from pdf_equilibrist import theme
 from pdf_equilibrist.utils import resource_path
 
 ACCENT   = "#6BBF4E"
@@ -20,9 +21,11 @@ class SplashScreen(QWidget):
         )
         self.setFixedSize(W, H)
 
-        # ── Fond noir par défaut ──────────────────────────────────────────────
+        light = theme.theme_name() == theme.LIGHT
+
+        # ── Fond par défaut (noir, ou gris clair en thème clair) ──────────────
         pal = self.palette()
-        pal.setColor(QPalette.ColorRole.Window, QColor("#1E1E1E"))
+        pal.setColor(QPalette.ColorRole.Window, QColor("#F3F3F3" if light else "#1E1E1E"))
         self.setPalette(pal)
         self.setAutoFillBackground(True)
 
@@ -30,8 +33,11 @@ class SplashScreen(QWidget):
         bg = QLabel(self)
         bg.setGeometry(0, 0, W, H)
         pix = QPixmap()
-        for rel in ("assets/splash.png", "assets/Splashscreen.jpg",
-                    "assets/Splashscreen.png"):
+        candidates = ["assets/splash.png", "assets/Splashscreen.jpg",
+                      "assets/Splashscreen.png"]
+        if light:
+            candidates.insert(0, "assets/splash_light.png")
+        for rel in candidates:
             path = resource_path(rel)
             if path.exists():
                 pix.load(str(path))
@@ -45,7 +51,10 @@ class SplashScreen(QWidget):
         # ── Overlay bas ───────────────────────────────────────────────────────
         overlay = QWidget(self)
         overlay.setGeometry(0, H - OVERLAY, W, OVERLAY)
-        overlay.setStyleSheet("background: rgba(10,10,10,220);")
+        overlay.setStyleSheet(
+            "background: rgba(255,255,255,225);" if light
+            else "background: rgba(10,10,10,220);")
+        accent = theme.ACCENT_TEXT_LIGHT if light else ACCENT
 
         ov = QVBoxLayout(overlay)
         ov.setContentsMargins(14, 6, 14, 10)
@@ -53,7 +62,7 @@ class SplashScreen(QWidget):
 
         self._status = QLabel(self.tr("Initialisation…"))
         self._status.setStyleSheet(
-            f"color: {ACCENT}; font-family:'Segoe UI'; font-size:11px;"
+            f"color: {accent}; font-family:'Segoe UI'; font-size:11px;"
             "background:transparent;")
         ov.addWidget(self._status)
 
@@ -64,7 +73,7 @@ class SplashScreen(QWidget):
         self._bar.setFixedHeight(7)
         self._bar.setStyleSheet(f"""
             QProgressBar {{
-                background:#2A2A2A; border:none; border-radius:3px;
+                background:{"#D6D6D6" if light else "#2A2A2A"}; border:none; border-radius:3px;
             }}
             QProgressBar::chunk {{
                 background:{ACCENT}; border-radius:3px;

@@ -196,7 +196,7 @@ Appelée après `StretchDIBits`, re-trace en GDI les paths stroke-only du PDF :
 ## Assets
 
 - Logo / app icon : `assets/logo/PDF-Equilibrist-logo.png` + `.ico` (généré)
-- Splash screen  : `assets/Splashscreen.jpg` → `assets/splash.png` (généré par `prepare_build.py`)
+- Splash screen  : `assets/Splashscreen.jpg` → `assets/splash.png` (Qt sombre), `splash_light.png` (Qt clair), `splash_native.png` (PyInstaller, fond gris neutre) — générés par `prepare_build.py`
 - Boutons fenêtre : `assets/buttons/{close,reduce,maximized,unmaximized}.png`
 
 ## Fonctionnalités non câblées (nécessitent canvas interactif)
