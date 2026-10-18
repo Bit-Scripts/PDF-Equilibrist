@@ -55,6 +55,7 @@ from PyQt6.QtGui import QPixmap, QIcon, QPainter, QColor, QFont, QPen
 from PyQt6.QtCore import Qt, pyqtSignal, QSize, QRectF, QEvent
 import time
 from pdf_equilibrist import theme
+from pdf_equilibrist.ui.quick_access import QuickAccessBar
 
 ACCENT = "#6BBF4E"
 
@@ -235,6 +236,11 @@ class TitleBar(QWidget):
         self._app_name.setStyleSheet(
             "color: #606060; font-size: 11px; padding: 0 10px 0 4px;")
         layout.addWidget(self._app_name)
+
+        # Barre d'accès rapide (Annuler, Rétablir, Ouvrir, Enregistrer, Enregistrer sous) :
+        # reliée aux actions du menu par MainWindow (voir ui/quick_access.py)
+        self.quick_access = QuickAccessBar()
+        layout.addWidget(self.quick_access)
 
         # Séparateur visuel entre le nom et les onglets
         sep = QFrame()

@@ -453,6 +453,10 @@ The document stays open with your changes.</translation>
         <source>Ne pas enregistrer</source>
         <translation>Don't save</translation>
     </message>
+    <message>
+        <source>Rétablir</source>
+        <translation>Redo</translation>
+    </message>
 </context><context>
     <name>PrintDialog</name>
     <message>

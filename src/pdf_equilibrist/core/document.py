@@ -73,6 +73,7 @@ class Document(QObject):
         self.fitz_doc: pymupdf.Document | None = None
         self.path: Path | None = None
         self._undo_stack: deque[bytes] = deque(maxlen=_UNDO_MAX)
+        self._redo_stack: deque[bytes] = deque(maxlen=_UNDO_MAX)
         self._modified = False
 
     # ── Propriété ──────────────────────────────────────────────────────────────
@@ -117,6 +118,7 @@ class Document(QObject):
         self.path = Path(path)
         self.fitz_doc = pymupdf.open(str(self.path))
         self._undo_stack.clear()
+        self._redo_stack.clear()
         self._set_modified(False)
         self.changed.emit()
 
@@ -178,6 +180,8 @@ class Document(QObject):
             self.fitz_doc.close()
         self.fitz_doc = None
         self.path = None
+        self._undo_stack.clear()
+        self._redo_stack.clear()
         self._set_modified(False)
         self.changed.emit()
 
@@ -187,13 +191,24 @@ class Document(QObject):
         """Sauvegarde l'état courant dans la pile d'annulation (avant toute modif)."""
         if self.fitz_doc:
             self._undo_stack.append(self.fitz_doc.tobytes())
+            self._redo_stack.clear()   # une nouvelle modification invalide les états « à rétablir »
             self.mark_modified()   # toute modification du PDF passe par ici avant d'agir
 
     def undo(self) -> bool:
         """Restaure le dernier état sauvegardé. Retourne True si annulation effectuée."""
         if not self._undo_stack or not self.fitz_doc:
             return False
-        state = self._undo_stack.pop()
+        self._redo_stack.append(self.fitz_doc.tobytes())   # pour pouvoir rétablir
+        return self._restore(self._undo_stack.pop())
+
+    def redo(self) -> bool:
+        """Rétablit la modification annulée. Retourne True si rétablissement effectué."""
+        if not self._redo_stack or not self.fitz_doc:
+            return False
+        self._undo_stack.append(self.fitz_doc.tobytes())   # sans vider la pile de rétablissement
+        return self._restore(self._redo_stack.pop())
+
+    def _restore(self, state: bytes) -> bool:
         self.fitz_doc.close()
         self.fitz_doc = pymupdf.open(stream=state, filetype="pdf")
         self.mark_modified()   # l'état restauré peut différer du fichier : on reste prudent
@@ -204,6 +219,11 @@ class Document(QObject):
     def can_undo(self) -> bool:
         """True si au moins un état est disponible dans la pile d'annulation."""
         return len(self._undo_stack) > 0
+
+    @property
+    def can_redo(self) -> bool:
+        """True si au moins un état est disponible dans la pile de rétablissement."""
+        return len(self._redo_stack) > 0
 
     # ── Rendu ─────────────────────────────────────────────────────────────────
 
