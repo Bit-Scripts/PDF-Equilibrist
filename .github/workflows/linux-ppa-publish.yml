@@ -228,8 +228,10 @@ jobs:
             # vendorisées) : le .dsc (petit) s'uploadait bien, exit 124
             # (timeout) survenait toujours sur orig.tar.gz — le SFTP via
             # paramiko est visiblement plus lent que le FTP legacy pour les
-            # gros transferts. 900s garde quand même un filet de sécurité
-            # contre un vrai blocage, sans tuer un transfert juste lent.
-            timeout 900 dput pdf-equilibrist "$changes" < /dev/null
+            # gros transferts. 900s a lui-même coupé l'orig d'une série en 0.1.26 (resolute)
+            # puis en 0.2.0 (noble) : le débit vers Launchpad varie. 2700s (45 min) garde un
+            # filet de sécurité contre un vrai blocage sans tuer un transfert juste lent.
+            ls -l "$workdir"/*.orig.tar.gz "$workdir"/*_source.changes
+            time timeout 2700 dput pdf-equilibrist "$changes" < /dev/null
             echo "::endgroup::"
           done
