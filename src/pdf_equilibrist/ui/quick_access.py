@@ -12,7 +12,7 @@ le thème clair/sombre via ``theme.qcolor``.
 from __future__ import annotations
 
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QPushButton
-from PyQt6.QtGui import QPainter, QPainterPath, QPen, QColor, QKeySequence, QAction
+from PyQt6.QtGui import QPainter, QPainterPath, QPen, QColor, QKeySequence, QAction, QPixmap, QPolygonF
 from PyQt6.QtCore import Qt, QPointF, QRectF
 
 from pdf_equilibrist import theme
@@ -50,18 +50,47 @@ def _folder(p: QPainter) -> None:
     p.drawLine(QPointF(2, 8.5), QPointF(15, 8.5))
 
 
-def _floppy(p: QPainter, dx: float = 0, dy: float = 0, s: float = 1.0) -> None:
-    def r(x, y, w, h):
-        return QRectF(dx + x * s, dy + y * s, w * s, h * s)
-    p.drawRoundedRect(r(2.5, 2.5, 13, 13), 1.6 * s, 1.6 * s)
-    p.drawRect(r(5.5, 2.5, 7, 4))      # volet métallique
-    p.drawRect(r(5.5, 10, 7, 5.5))     # étiquette
+# Disquette et crayon dessinés dans une boîte de 1200 × 1200 (réduite à 18 × 18 par ``_to_box``).
+_STROKE = 85.0
 
 
-def _pencil(p: QPainter) -> None:
-    p.drawLine(QPointF(9.5, 16.5), QPointF(16.5, 9.5))         # corps
-    p.drawLine(QPointF(9.5, 16.5), QPointF(8.5, 18))           # pointe
-    p.drawLine(QPointF(14.8, 7.8), QPointF(18, 11))            # gomme
+def _floppy_paths(full: bool) -> list[QPainterPath]:
+    """Contour (coin haut-droit coupé), volet du haut et étiquette du bas. ``full`` = tracé complet ;
+    sinon le côté droit, le bas et l'étiquette s'arrêtent avant le crayon."""
+    body = QPainterPath()
+    body.moveTo(1012, 1012 if full else 520)
+    body.lineTo(1012, 392)
+    body.lineTo(800, 187)
+    body.lineTo(290, 187)
+    body.quadTo(187, 187, 187, 290)
+    body.lineTo(187, 910)
+    body.quadTo(187, 1012, 290, 1012)
+    body.lineTo(1012 if full else 570, 1012)
+    flap = QPainterPath()
+    flap.moveTo(362, 187)
+    flap.lineTo(362, 360)
+    flap.quadTo(362, 412, 412, 412)
+    flap.lineTo(712, 412)
+    flap.quadTo(762, 412, 762, 360)
+    flap.lineTo(762, 187)
+    label = QPainterPath()
+    label.moveTo(337, 1012)
+    label.lineTo(337, 690)
+    label.quadTo(337, 637, 390, 637)
+    label.lineTo(812, 637)
+    if full:
+        label.quadTo(862, 637, 862, 690)
+        label.lineTo(862, 1012)
+    return [body, flap, label]
+
+
+_PENCIL = QPolygonF([QPointF(990, 650), QPointF(1100, 760), QPointF(1100, 790), QPointF(800, 1080),
+                     QPointF(640, 1125), QPointF(615, 1100), QPointF(665, 940), QPointF(960, 650)])
+
+
+def _to_box(p: QPainter) -> None:
+    p.translate((SIZE - 18) / 2, (SIZE - 18) / 2)
+    p.scale(18 / 1200, 18 / 1200)
 
 
 class QuickButton(QPushButton):
@@ -83,7 +112,8 @@ class QuickButton(QPushButton):
         color = theme.qcolor("#D8D8D8" if enabled else "#555555")
         p.setPen(_pen(color))
         p.setBrush(Qt.BrushStyle.NoBrush)
-        p.translate((SIZE - 18) / 2, (SIZE - 18) / 2)
+        if self.kind in (UNDO, REDO, OPEN):
+            p.translate((SIZE - 18) / 2, (SIZE - 18) / 2)
         if self.kind == UNDO:
             _arrow(p)
         elif self.kind == REDO:
@@ -93,11 +123,34 @@ class QuickButton(QPushButton):
         elif self.kind == OPEN:
             _folder(p)
         elif self.kind == SAVE:
-            _floppy(p)
-        else:                          # SAVE_AS : disquette réduite + crayon
-            _floppy(p, -1.5, -1.5, 0.85)
-            p.setPen(_pen(color, 1.4))
-            _pencil(p)
+            p.resetTransform()
+            _to_box(p)
+            p.setPen(_pen(color, _STROKE))
+            for path in _floppy_paths(full=True):
+                p.drawPath(path)
+        else:                          # SAVE_AS : disquette + crayon plein, séparés par un halo
+            dpr = self.devicePixelRatioF()
+            layer = QPixmap(int(SIZE * dpr), int(SIZE * dpr))
+            layer.setDevicePixelRatio(dpr)
+            layer.fill(Qt.GlobalColor.transparent)
+            lp = QPainter(layer)
+            lp.setRenderHint(QPainter.RenderHint.Antialiasing)
+            _to_box(lp)
+            lp.setPen(_pen(color, _STROKE))
+            lp.setBrush(Qt.BrushStyle.NoBrush)
+            for path in _floppy_paths(full=False):
+                lp.drawPath(path)
+            lp.setCompositionMode(QPainter.CompositionMode.CompositionMode_Clear)   # halo autour du crayon
+            lp.setPen(_pen(color, 190))
+            lp.setBrush(color)
+            lp.drawPolygon(_PENCIL)
+            lp.end()
+            p.resetTransform()
+            p.drawPixmap(0, 0, layer)
+            _to_box(p)
+            p.setPen(_pen(color, 60))
+            p.setBrush(color)
+            p.drawPolygon(_PENCIL)
         p.end()
 
 
