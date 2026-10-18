@@ -396,6 +396,7 @@ class ThumbnailPanel(QWidget):
         n   = len(doc)
         to  = -1 if ins >= n else (ins - 1 if ins > src else ins)
         doc.move_page(src, to)
+        self.document.mark_modified()
         self.document.changed.emit()
         self._list.setCurrentRow((n - 1) if to == -1 else to)
 
@@ -415,6 +416,7 @@ class ThumbnailPanel(QWidget):
         at       = insert_before if insert_before < n_before else -1
         doc.insert_pdf(src, start_at=at)
         src.close()
+        self.document.mark_modified()
         self.document.changed.emit()
         self._list.setCurrentRow(
             insert_before if insert_before < n_before else n_before)

@@ -380,6 +380,24 @@ class TitleBar(QWidget):
         if 0 <= idx < self._tabs.count():
             self._tabs.setTabText(idx, title)
 
+    def set_tab_modified(self, idx: int, modified: bool):
+        """Affiche (ou retire) un astérisque gras juste avant le titre de l'onglet."""
+        if not 0 <= idx < self._tabs.count():
+            return
+        side = QTabBar.ButtonPosition.LeftSide
+        old = self._tabs.tabButton(idx, side)
+        if modified:
+            if old is not None:
+                return
+            star = QLabel("*")
+            star.setStyleSheet("color: #6BBF4E; font-size: 17px; font-weight: bold;"
+                               " background: transparent; padding: 0 1px 3px 4px;")
+            star.setToolTip(self.tr("Modifications non enregistrées"))
+            self._tabs.setTabButton(idx, side, star)
+        elif old is not None:
+            self._tabs.setTabButton(idx, side, None)
+            old.deleteLater()
+
     def current_index(self) -> int:
         """Retourne l'index de l'onglet actuellement sélectionné."""
         return self._tabs.currentIndex()
@@ -476,6 +494,13 @@ class TitleBar(QWidget):
         msg.exec()
 
         if msg.clickedButton() is btn_now:
+            # QApplication.quit() ne passe pas par closeEvent : on traite nous-mêmes les modifications
+            # non enregistrées. « Annuler » → on ne relance rien et on ne quitte pas.
+            main = self.window()
+            if hasattr(main, "confirm_close_all"):
+                if not main.confirm_close_all():
+                    return
+                main.allow_close_without_prompt()
             QProcess.startDetached(sys.executable, sys.argv)
             QApplication.quit()
 

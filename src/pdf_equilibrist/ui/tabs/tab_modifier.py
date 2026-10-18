@@ -241,6 +241,8 @@ class TabModifier(QWidget):
             return apply_ocr_to_pdf(fitz_doc, progress_cb, cancel_cb)
 
         def _on_done(n):
+            if n:
+                self.document.mark_modified()
             self.document.changed.emit()
             if n == 0:
                 show_info(self, "OCR", self.tr(

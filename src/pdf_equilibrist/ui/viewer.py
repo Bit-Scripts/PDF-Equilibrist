@@ -522,6 +522,8 @@ class PdfViewer(QScrollArea):
                 page_index=page_num,
                 page_origin=(0, 0),
             )
+            # Une édition de texte modifie le PDF sans passer par checkpoint()
+            new_w.page_changed.connect(self.document.mark_modified)
             new_w.setStyleSheet(
                 "background: white; border: 1px solid #3A3A3A; border-radius: 2px;"
             )

@@ -423,6 +423,36 @@
         <source>PDF (*.pdf)</source>
         <translation>PDF (*.pdf)</translation>
     </message>
+    <message>
+        <source>Enregistrement impossible</source>
+        <translation>Could not save</translation>
+    </message>
+    <message>
+        <source>« {0} » n'a pas pu être enregistré :
+{1}
+
+Le document reste ouvert avec vos modifications.</source>
+        <translation>"{0}" could not be saved:
+{1}
+
+The document stays open with your changes.</translation>
+    </message>
+    <message>
+        <source>Modifications non enregistrées</source>
+        <translation>Unsaved changes</translation>
+    </message>
+    <message>
+        <source>Voulez-vous enregistrer les modifications apportées à « {0} » ?</source>
+        <translation>Do you want to save the changes made to "{0}"?</translation>
+    </message>
+    <message>
+        <source>Vos modifications seront perdues si vous ne les enregistrez pas.</source>
+        <translation>Your changes will be lost if you don't save them.</translation>
+    </message>
+    <message>
+        <source>Ne pas enregistrer</source>
+        <translation>Don't save</translation>
+    </message>
 </context><context>
     <name>PrintDialog</name>
     <message>
@@ -1764,6 +1794,10 @@ rypt</translation>
         <source>Plus tard</source>
         <translation>Later</translation>
     </message>
+    <message>
+        <source>Modifications non enregistrées</source>
+        <translation>Unsaved changes</translation>
+    </message>
 </context><context>
     <name>UpdateDialog</name>
     <message>
@@ -2051,6 +2085,10 @@ Close the application, then run this file (or: bash install.sh --file &lt;file&g
 Dans un terminal : {0}{1}</source>
         <translation>Automatic installation is not available on this system (pkexec, sudo or the script is missing).
 In a terminal: {0}{1}</translation>
+    </message>
+    <message>
+        <source>Fermeture annulée : la nouvelle version est installée, relancez l'application quand vous voulez.</source>
+        <translation>Closing cancelled: the new version is installed, restart the application whenever you like.</translation>
     </message>
 </context><context>
     <name>_PageLabel</name>
