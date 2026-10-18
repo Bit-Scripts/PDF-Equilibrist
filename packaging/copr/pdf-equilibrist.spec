@@ -1,5 +1,5 @@
 Name:           pdf-equilibrist
-Version:        0.1.26
+Version:        0.2.0
 Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
@@ -197,6 +197,14 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Sun Oct 18 2026 Paul Woisard <paulwoisard@gmail.com> - 0.2.0-1
+- New upstream release: a light theme, and a THEME switch in the title bar.
+  A new light colour scheme is chosen with the THEME switch next to the
+  language button (remembered, applied after a restart; dark stays the
+  default). The splash screen follows the theme. Page thumbnails keep each
+  page's own proportions and are framed one by one. cryptography updated to
+  50.0.2 (CVE-2026-69247).
+
 * Sat Oct 17 2026 Paul Woisard <paulwoisard@gmail.com> - 0.1.26-1
 - New upstream release: an AppImage for every other Linux distribution, and
   updates that install themselves. A single-file AppImage (with its SHA-256
