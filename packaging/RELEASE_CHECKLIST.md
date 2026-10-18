@@ -66,6 +66,9 @@ git push origin v0.2.0       # ← déclenche TOUT : release publique + AUR + PP
       Run workflow avec `tag` = `vX.Y.Z`.
 - [ ] Site : `softwareVersion` mis à jour, liens de téléchargement valides
 - [ ] Si un canal échoue : corriger puis bump du dernier chiffre (le PPA refuse de réutiliser une version avec un contenu différent)
+- [ ] **PPA : orig déjà chez Launchpad ?** Le workflow le teste lui-même (`packaging/ppa/orig_on_launchpad.py`, via le
+      `.dsc` d'une série déjà acceptée) : `-sd` si l'orig y est avec le même SHA-256, `-sa` sinon, erreur s'il y est avec un
+      contenu différent. Le `dput` a un délai de 2700 s (900 s coupait l'orig de ~257 Mo à quelques secondes de la fin).
 - [ ] **PPA : envoi coupé sur UNE série** (ex. `exit 124` du `dput` de l'orig, vu en 0.1.26 sur resolute) : ne pas relancer
       le run entier. Relancer seulement la série manquante, sur le contenu du tag, sans renvoyer l'orig déjà accepté :
       `gh workflow run linux-ppa-publish.yml --ref main -f version=X.Y.Z -f series=resolute -f source_ref=vX.Y.Z -f skip_orig=true`

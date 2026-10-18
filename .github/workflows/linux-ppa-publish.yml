@@ -178,12 +178,36 @@ jobs:
           for s in "${series_arr[@]}"; do
             case "$s" in noble|resolute) ;; *) echo "::error::série inconnue : $s" >&2; exit 1;; esac
           done
-          # -sa : l'orig est joint à l'envoi ; -sd : source seule, l'orig est déjà chez Launchpad
-          orig_flag="-sa"
-          if [ "$SKIP_ORIG" = "true" ]; then orig_flag="-sd"; fi
-          echo "séries : ${series_arr[*]} ; indicateur d'orig : $orig_flag"
+          # -sa : l'orig est joint à l'envoi ; -sd : source seule, l'orig est déjà chez Launchpad.
+          # Le choix se fait série par série en interrogeant Launchpad (orig_on_launchpad.py) :
+          #   same      -> -sd (même taille et même SHA-256 chez Launchpad : inutile de le renvoyer)
+          #   absent    -> -sa (premier envoi de cette version, quelle que soit la série)
+          #   different -> erreur (Launchpad rejetterait « already exists ... different contents »)
+          #   unknown   -> -sa (API indisponible : même octets = accepté sans problème)
+          # skip_orig=true force -sd comme avant (réparation manuelle).
+          orig="/tmp/ppa-build/pdf-equilibrist_${v}.orig.tar.gz"
+          echo "séries : ${series_arr[*]} ; orig : $(sha256sum "$orig" | cut -d' ' -f1) $(stat -c %s "$orig") octets"
+          uploaded=0
           for series in "${series_arr[@]}"; do
             echo "::group::${series}"
+            if [ "$SKIP_ORIG" = "true" ]; then
+              orig_flag="-sd"
+            else
+              # Après un envoi précédent de ce run, Launchpad met quelques minutes à le traiter
+              # avant de lister l'orig : on attend (10 min max) au lieu de le renvoyer pour rien.
+              wait_s=0; if [ "$uploaded" = "1" ]; then wait_s=600; fi
+              state=$(python3 "$GITHUB_WORKSPACE/packaging/ppa/orig_on_launchpad.py" "$orig" "$v" --wait "$wait_s")
+              echo "orig chez Launchpad : $state"
+              case "$state" in
+                same) orig_flag="-sd" ;;
+                absent|unknown) orig_flag="-sa" ;;
+                *)
+                  echo "::error::l'orig ${v} existe déjà chez Launchpad avec un contenu différent : bump du dernier chiffre de la version nécessaire."
+                  exit 1
+                  ;;
+              esac
+            fi
+            echo "indicateur d'orig pour ${series} : $orig_flag"
             workdir="/tmp/ppa-build/${series}"
             rm -rf "$workdir"
             mkdir -p "$workdir"
@@ -233,5 +257,6 @@ jobs:
             # filet de sécurité contre un vrai blocage sans tuer un transfert juste lent.
             ls -l "$workdir"/*.orig.tar.gz "$workdir"/*_source.changes
             time timeout 2700 dput pdf-equilibrist "$changes" < /dev/null
+            uploaded=1
             echo "::endgroup::"
           done
