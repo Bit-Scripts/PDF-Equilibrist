@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QHBoxLayout, QPushButton,
     QProgressBar, QFrame, QLineEdit, QApplication, QMessageBox, QInputDialog,
 )
-from PyQt6.QtCore import QProcess, QProcessEnvironment, QThread, QTimer, pyqtSignal, Qt
+from PyQt6.QtCore import QProcess, QProcessEnvironment, QThread, pyqtSignal, Qt
 from PyQt6.QtGui import QPixmap
 
 from pdf_equilibrist import __version__
@@ -556,9 +556,10 @@ class UpdateDialog(QDialog):
             if os.name == "nt":
                 # Fichier qu'on vient nous-même de télécharger dans le temp
                 os.startfile(str(target))  # nosec B606
-                # L'installeur refuse de continuer tant que l'application tourne
-                # (fichiers verrouillés) : on se ferme pour lui laisser la place.
-                QTimer.singleShot(1500, self._quit_for_installer)
+                # Pas de fermeture automatique ici : c'est l'installeur NSIS qui détecte
+                # l'application ouverte et propose de la fermer (macro CHECK_APP_RUNNING,
+                # installer/PDF-Equilibrist.nsi). _quit_for_installer reste utilisé par
+                # l'AppImage (_download_appimage), qui n'a pas d'installeur pour le faire.
             else:
                 open_external(str(target))
         except Exception:
