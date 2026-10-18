@@ -216,8 +216,8 @@ class ThumbnailPanel(QWidget):
         self._list.setResizeMode(QListWidget.ResizeMode.Adjust)
         self._list.setSpacing(4)
         self._list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self._list.setStyleSheet(f"""
-            QListWidget {{ background: #181818; border: none; }}
+        self._list.setStyleSheet("""
+            QListWidget { background: #181818; border: none; }
         """)
         self._list.setItemDelegate(_ThumbDelegate(self._list))
         layout.addWidget(self._list)
