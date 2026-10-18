@@ -52,7 +52,8 @@ from PyQt6.QtWidgets import (
     QFrame,
 )
 from PyQt6.QtGui import QPixmap, QIcon, QPainter, QColor, QFont, QPen
-from PyQt6.QtCore import Qt, pyqtSignal, QSize, QRectF
+from PyQt6.QtCore import Qt, pyqtSignal, QSize, QRectF, QEvent
+import time
 from pdf_equilibrist import theme
 
 ACCENT = "#6BBF4E"
@@ -225,6 +226,9 @@ class TitleBar(QWidget):
         self._logo.setFixedSize(26, 38)
         self._logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self._logo)
+        self._logo_clicks = 0          # easter-egg : voir ui/easter_egg.py
+        self._logo_last_click = 0.0
+        self._logo.installEventFilter(self)
 
         # ── Nom de l'application ──────────────────────────────────────────────
         self._app_name = QLabel("PDF Equilibrist")
@@ -407,6 +411,26 @@ class TitleBar(QWidget):
         )
 
     # ── Drag et double-clic ───────────────────────────────────────────────────
+
+    def eventFilter(self, obj, event):
+        """Compte les clics sur le logo (7 de suite = easter-egg).
+
+        Un 2ᵉ clic rapide arrive en ``MouseButtonDblClick`` et un clic non traité remonte à la
+        barre (déplacement / agrandir-restaurer) : on absorbe donc les deux sur le logo.
+        """
+        if obj is self._logo and event.type() in (QEvent.Type.MouseButtonPress,
+                                                  QEvent.Type.MouseButtonDblClick):
+            from pdf_equilibrist.ui import easter_egg
+            now = time.monotonic()
+            if (now - self._logo_last_click) * 1000 > easter_egg.CLICK_WINDOW_MS:
+                self._logo_clicks = 0
+            self._logo_last_click = now
+            self._logo_clicks += 1
+            if self._logo_clicks >= easter_egg.CLICKS_NEEDED:
+                self._logo_clicks = 0
+                easter_egg.trigger(self.window())
+            return True
+        return False
 
     def mousePressEvent(self, event):
         """
