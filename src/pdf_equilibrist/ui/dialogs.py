@@ -18,16 +18,25 @@ Fonctions disponibles
 - ``ask_page_index``        : numéro de page via QSpinBox
 - ``ask_watermark_text``    : texte du filigrane
 - ``ask_text_input``        : saisie de texte libre (générique)
+- ``ask_text_format``       : texte + police, taille, gras/italique, couleur
 - ``ask_image_format``      : sélection du format image (combo png/jpg/bmp/tiff)
 - ``show_info``             : message d'information (non bloquant pour l'UX)
 - ``show_error``            : message d'erreur critique
 - ``ensure_suffix``         : force l'extension d'un chemin issu de getSaveFileName
 """
 from PyQt6.QtCore import QCoreApplication
+from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-    QPushButton, QSpinBox, QComboBox, QMessageBox,
+    QPushButton, QSpinBox, QComboBox, QMessageBox, QCheckBox, QColorDialog,
 )
+
+# Polices PDF standard (base 14) : famille -> (normal, gras, italique, gras+italique)
+PDF_FONTS = {
+    "Helvetica": ("helv", "hebo", "heit", "hebi"),
+    "Times":     ("tiro", "tibo", "tiit", "tibi"),
+    "Courier":   ("cour", "cobo", "coit", "cobi"),
+}
 
 
 DIALOG_STYLE = """
@@ -139,6 +148,85 @@ def ask_text_input(parent, title: str, label: str) -> str | None:
     layout.addWidget(txt)
     _ok_cancel(dlg, layout)
     return txt.text().strip() or None if dlg.exec() == QDialog.DialogCode.Accepted else None
+
+
+def pdf_fontname(family: str, bold: bool, italic: bool) -> str:
+    """Nom de police PDF (base 14) pour une famille et un style."""
+    names = PDF_FONTS.get(family, PDF_FONTS["Helvetica"])
+    return names[(1 if bold else 0) + (2 if italic else 0)]
+
+
+def ask_text_format(parent, title: str, label: str) -> dict | None:
+    """Saisie d'un texte avec police, taille, style et couleur.
+
+    Retourne ``{'text', 'fontname', 'family', 'bold', 'italic', 'fontsize',
+    'color'}`` (couleur RGB 0–1) ou ``None`` si annulé / texte vide.
+    """
+    tr = QCoreApplication.translate
+    dlg = QDialog(parent)
+    dlg.setWindowTitle(title)
+    dlg.setStyleSheet(DIALOG_STYLE)
+    dlg.setMinimumWidth(380)
+    layout = QVBoxLayout(dlg)
+    layout.addWidget(QLabel(label))
+    txt = QLineEdit()
+    layout.addWidget(txt)
+
+    row = QHBoxLayout()
+    family = QComboBox()
+    family.addItems(list(PDF_FONTS))
+    size = QSpinBox()
+    size.setRange(4, 200)
+    size.setValue(14)
+    size.setSuffix(" pt")
+    bold = QCheckBox(tr("dialogs", "Gras"))
+    italic = QCheckBox(tr("dialogs", "Italique"))
+    row.addWidget(QLabel(tr("dialogs", "Police :")))
+    row.addWidget(family, 1)
+    row.addWidget(QLabel(tr("dialogs", "Taille :")))
+    row.addWidget(size)
+    layout.addLayout(row)
+
+    row2 = QHBoxLayout()
+    row2.addWidget(bold)
+    row2.addWidget(italic)
+    row2.addStretch()
+    color_btn = QPushButton(tr("dialogs", "Couleur…"))
+    chosen = {"c": QColor(0, 0, 0)}
+
+    def _refresh():
+        c = chosen["c"]
+        fg = "#000" if c.lightness() > 128 else "#FFF"
+        color_btn.setStyleSheet(
+            f"background:{c.name()}; color:{fg}; border:1px solid #4A4A4A;")
+
+    def _pick():
+        c = QColorDialog.getColor(chosen["c"], dlg, tr("dialogs", "Couleur du texte"))
+        if c.isValid():
+            chosen["c"] = c
+            _refresh()
+
+    color_btn.clicked.connect(_pick)
+    _refresh()
+    row2.addWidget(color_btn)
+    layout.addLayout(row2)
+
+    _ok_cancel(dlg, layout)
+    if dlg.exec() != QDialog.DialogCode.Accepted:
+        return None
+    text = txt.text().strip()
+    if not text:
+        return None
+    c = chosen["c"]
+    return {
+        "text": text,
+        "family": family.currentText(),
+        "bold": bold.isChecked(),
+        "italic": italic.isChecked(),
+        "fontname": pdf_fontname(family.currentText(), bold.isChecked(), italic.isChecked()),
+        "fontsize": size.value(),
+        "color": (c.redF(), c.greenF(), c.blueF()),
+    }
 
 
 def ask_image_format(parent) -> str | None:
