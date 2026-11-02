@@ -423,6 +423,57 @@ def add_text(
     )
 
 
+def text_line_metrics(fontname: str) -> tuple[float, float]:
+    """Ascendante et descendante (positive) d'une police, pour une taille de 1 pt."""
+    font = pymupdf.Font(fontname)
+    return font.ascender, -font.descender
+
+
+def text_natural_size(text: str, fontname: str, fontsize: float) -> tuple[float, float]:
+    """Largeur et hauteur (pts) d'une ligne de ``text`` à ``fontsize``."""
+    asc, desc = text_line_metrics(fontname)
+    width = pymupdf.Font(fontname).text_length(text, fontsize=1) * fontsize
+    return width, (asc + desc) * fontsize
+
+
+def fit_fontsize(text: str, fontname: str, box_w: float, box_h: float,
+                 min_size: float = 1.0, max_size: float = 1000.0) -> float:
+    """
+    Plus grande taille de police pour laquelle ``text`` tient dans la boîte.
+
+    C'est la contrainte la plus forte (largeur ou hauteur) qui l'emporte :
+    la boîte est remplie au maximum sans que le texte ne déborde.
+    """
+    asc, desc = text_line_metrics(fontname)
+    unit_w = pymupdf.Font(fontname).text_length(text, fontsize=1)
+    by_h = box_h / (asc + desc)
+    by_w = box_w / unit_w if unit_w > 0 else max_size
+    return max(min_size, min(by_w, by_h, max_size))
+
+
+def add_text_fitted(page: pymupdf.Page, rect: pymupdf.Rect, text: str,
+                    fontname: str = "helv", color: tuple = (0, 0, 0),
+                    angle: float = 0.0) -> float:
+    """
+    Écrit ``text`` sur une ligne, à la taille maximale qui tient dans ``rect``.
+
+    Le texte est aligné à gauche et centré verticalement dans ``rect``.
+    ``angle`` (degrés, sens horaire à l'écran) pivote autour du centre de ``rect``.
+    Retourne la taille de police utilisée (pts).
+    """
+    size = fit_fontsize(text, fontname, rect.width, rect.height)
+    asc, desc = text_line_metrics(fontname)
+    baseline_y = rect.y0 + (rect.height - (asc + desc) * size) / 2 + asc * size
+    morph = None
+    if angle % 360:
+        center = pymupdf.Point((rect.x0 + rect.x1) / 2, (rect.y0 + rect.y1) / 2)
+        morph = (center, pymupdf.Matrix(-angle))
+    page.insert_text(pymupdf.Point(rect.x0, baseline_y), text,
+                     fontname=fontname, fontsize=size, color=color,
+                     morph=morph, overlay=True)
+    return size
+
+
 def add_image(doc: pymupdf.Document, page_index: int,
               image_path: Path, rect: pymupdf.Rect):
     """
