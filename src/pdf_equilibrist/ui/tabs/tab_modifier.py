@@ -157,7 +157,8 @@ class TabModifier(QWidget):
             return
         data = {"type": "text", **fmt}
         self.viewer.show_floating_item(data, self.viewer.current_page_index,
-                                       self._on_placement_commit, None)
+                                       self._on_placement_commit, None,
+                                       click_to_place=True)
 
     def _add_image(self):
         if not self.document.is_open:
@@ -169,7 +170,8 @@ class TabModifier(QWidget):
             return
         data = {"type": "image", "path": path}
         self.viewer.show_floating_item(data, self.viewer.current_page_index,
-                                       self._on_placement_commit, None)
+                                       self._on_placement_commit, None,
+                                       click_to_place=True)
 
     def _watermark(self):
         if not self.document.is_open:

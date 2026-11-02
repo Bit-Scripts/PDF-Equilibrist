@@ -183,6 +183,16 @@ class FloatingItem(QWidget):
             self.move(x, y)
         self._update_size()
 
+    def place_center_at(self, pos: QPoint):
+        """Centre la boîte de l'élément sur ``pos`` (coordonnées de la page), bornée à la page."""
+        r = self._item_rect()
+        x = int(pos.x() - r.center().x())
+        y = int(pos.y() - r.center().y())
+        if self.parent():
+            x = max(0, min(x, self.parent().width() - self.width()))
+            y = max(0, min(y, self.parent().height() - self.height()))
+        self.move(x, y)
+
     def _update_size(self):
         margin = HANDLE_R + 2
         extra  = ROT_DIST + HANDLE_R
@@ -441,13 +451,13 @@ class FloatingItem(QWidget):
         self._bt_bold = QPushButton("G")
         self._bt_bold.setCheckable(True)
         self._bt_bold.setChecked(bool(self._data.get("bold")))
-        self._bt_bold.setToolTip("Gras")
+        self._bt_bold.setToolTip(self.tr("Gras"))
         self._bt_italic = QPushButton("I")
         self._bt_italic.setCheckable(True)
         self._bt_italic.setChecked(bool(self._data.get("italic")))
-        self._bt_italic.setToolTip("Italique")
+        self._bt_italic.setToolTip(self.tr("Italique"))
         self._bt_color = QPushButton("A")
-        self._bt_color.setToolTip("Couleur")
+        self._bt_color.setToolTip(self.tr("Couleur"))
         for w in (self._cb_family, self._sp_size, self._bt_bold,
                   self._bt_italic, self._bt_color):
             lay.addWidget(w)
@@ -496,7 +506,7 @@ class FloatingItem(QWidget):
 
     def _pick_color(self):
         c0 = QColor(*(int(v * 255) for v in self._data.get("color", (0, 0, 0))))
-        c = QColorDialog.getColor(c0, self, "Couleur du texte")
+        c = QColorDialog.getColor(c0, self, self.tr("Couleur du texte"))
         if c.isValid():
             self._data["color"] = (c.redF(), c.greenF(), c.blueF())
             self._paint_color_button()

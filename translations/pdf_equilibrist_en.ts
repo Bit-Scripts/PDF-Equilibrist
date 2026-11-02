@@ -2233,6 +2233,30 @@ Open it in your browser?</translation>
         <source>Format :</source>
         <translation>Format:</translation>
     </message>
+    <message>
+        <source>Gras</source>
+        <translation>Bold</translation>
+    </message>
+    <message>
+        <source>Italique</source>
+        <translation>Italic</translation>
+    </message>
+    <message>
+        <source>Police :</source>
+        <translation>Font:</translation>
+    </message>
+    <message>
+        <source>Taille :</source>
+        <translation>Size:</translation>
+    </message>
+    <message>
+        <source>Couleur…</source>
+        <translation>Color…</translation>
+    </message>
+    <message>
+        <source>Couleur du texte</source>
+        <translation>Text color</translation>
+    </message>
 </context><context>
     <name>main</name>
     <message>
@@ -2274,5 +2298,45 @@ Open it in your browser?</translation>
         <location filename="..\src\pdf_equilibrist\main.py" line="96" />
         <source>PDF Equilibrist n'a pas pu démarrer.</source>
         <translation>PDF Equilibrist could not start.</translation>
+    </message>
+</context><context>
+    <name>PdfViewer</name>
+    <message>
+        <source>le texte</source>
+        <translation>the text</translation>
+    </message>
+    <message>
+        <source>l'image</source>
+        <translation>the image</translation>
+    </message>
+    <message>
+        <source>l'élément</source>
+        <translation>the item</translation>
+    </message>
+    <message>
+        <source>Cliquez sur la page pour poser %1 — Échap pour annuler</source>
+        <translation>Click on the page to place %1 — Esc to cancel</translation>
+    </message>
+    <message>
+        <source>Annuler</source>
+        <translation>Cancel</translation>
+    </message>
+</context><context>
+    <name>FloatingItem</name>
+    <message>
+        <source>Gras</source>
+        <translation>Bold</translation>
+    </message>
+    <message>
+        <source>Italique</source>
+        <translation>Italic</translation>
+    </message>
+    <message>
+        <source>Couleur</source>
+        <translation>Color</translation>
+    </message>
+    <message>
+        <source>Couleur du texte</source>
+        <translation>Text color</translation>
     </message>
 </context></TS>
