@@ -451,13 +451,16 @@ def fit_fontsize(text: str, fontname: str, box_w: float, box_h: float,
     return max(min_size, min(by_w, by_h, max_size))
 
 
+STAMP_PAD = 4.0   # marge (pts) entre le cadre d'un tampon et son texte
+
+
 def add_text_fitted(page: pymupdf.Page, rect: pymupdf.Rect, text: str,
                     fontname: str = "helv", color: tuple = (0, 0, 0),
-                    angle: float = 0.0) -> float:
+                    angle: float = 0.0, center: bool = False) -> float:
     """
     Écrit ``text`` sur une ligne, à la taille maximale qui tient dans ``rect``.
 
-    Le texte est aligné à gauche et centré verticalement dans ``rect``.
+    Le texte est aligné à gauche (ou centré si ``center``) et centré verticalement.
     ``angle`` (degrés, sens horaire à l'écran) pivote autour du centre de ``rect``.
     Retourne la taille de police utilisée (pts).
     """
@@ -468,10 +471,31 @@ def add_text_fitted(page: pymupdf.Page, rect: pymupdf.Rect, text: str,
     if angle % 360:
         center = pymupdf.Point((rect.x0 + rect.x1) / 2, (rect.y0 + rect.y1) / 2)
         morph = (center, pymupdf.Matrix(-angle))
-    page.insert_text(pymupdf.Point(rect.x0, baseline_y), text,
+    x = rect.x0
+    if center:
+        x += (rect.width - text_natural_size(text, fontname, size)[0]) / 2
+    page.insert_text(pymupdf.Point(x, baseline_y), text,
                      fontname=fontname, fontsize=size, color=color,
                      morph=morph, overlay=True)
     return size
+
+
+def add_stamp_fitted(page: pymupdf.Page, rect: pymupdf.Rect, text: str,
+                     color: tuple = (0, 0.5, 0), angle: float = 0.0) -> float:
+    """
+    Grave un tampon texte : cadre de ``rect`` + texte gras centré à la taille maximale.
+
+    Le cadre et le texte pivotent ensemble de ``angle`` degrés (sens horaire à l'écran)
+    autour du centre de ``rect``. Retourne la taille de police utilisée (pts).
+    """
+    morph = None
+    if angle % 360:
+        center = pymupdf.Point((rect.x0 + rect.x1) / 2, (rect.y0 + rect.y1) / 2)
+        morph = (center, pymupdf.Matrix(-angle))
+    page.draw_rect(rect, color=color, fill=None, width=2, morph=morph)
+    inner = pymupdf.Rect(rect.x0 + STAMP_PAD, rect.y0 + STAMP_PAD,
+                         rect.x1 - STAMP_PAD, rect.y1 - STAMP_PAD)
+    return add_text_fitted(page, inner, text, "hebo", color, angle, center=True)
 
 
 def add_image(doc: pymupdf.Document, page_index: int,

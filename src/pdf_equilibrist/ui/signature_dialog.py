@@ -3,7 +3,6 @@ from __future__ import annotations
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QTabWidget, QWidget,
     QLabel, QPushButton, QFileDialog, QGridLayout,
-    QSpinBox,
 )
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
@@ -73,8 +72,8 @@ class _StampBtn(QPushButton):
 class SignatureDialog(QDialog):
     """
     Retourne via .result() un dict :
-      {'type': 'stamp', 'text': str, 'color': tuple, 'page': int, 'x': int, 'y': int}
-      {'type': 'image', 'path': str, 'page': int, 'x': int, 'y': int, 'w': int, 'h': int}
+      {'type': 'stamp', 'text': str, 'color': tuple}
+      {'type': 'image', 'path': str}
     """
 
     def __init__(self, doc: pymupdf.Document, parent=None):
@@ -92,29 +91,6 @@ class SignatureDialog(QDialog):
         tabs.addTab(self._make_stamp_tab(), self.tr("Tampons prédéfinis"))
         tabs.addTab(self._make_image_tab(), self.tr("Signature PNG"))
         layout.addWidget(tabs)
-
-        # ── Position ─────────────────────────────────────────────────────────
-        pos_row = QHBoxLayout()
-        pos_row.addWidget(QLabel(self.tr("Page :")))
-        self._spin_page = QSpinBox()
-        self._spin_page.setRange(1, len(doc))
-        self._spin_page.setValue(1)
-        pos_row.addWidget(self._spin_page)
-
-        pos_row.addSpacing(16)
-        pos_row.addWidget(QLabel("X :"))
-        self._spin_x = QSpinBox()
-        self._spin_x.setRange(0, 1000)
-        self._spin_x.setValue(50)
-        pos_row.addWidget(self._spin_x)
-
-        pos_row.addWidget(QLabel("Y :"))
-        self._spin_y = QSpinBox()
-        self._spin_y.setRange(0, 1000)
-        self._spin_y.setValue(50)
-        pos_row.addWidget(self._spin_y)
-        pos_row.addStretch()
-        layout.addLayout(pos_row)
 
         # ── Boutons ───────────────────────────────────────────────────────────
         btn_row = QHBoxLayout()
@@ -144,9 +120,6 @@ class SignatureDialog(QDialog):
             "type":  "stamp",
             "text":  text,
             "color": color,
-            "page":  self._spin_page.value() - 1,
-            "x":     self._spin_x.value(),
-            "y":     self._spin_y.value(),
         }
         self.accept()
 
@@ -170,20 +143,6 @@ class SignatureDialog(QDialog):
         btn_pick = QPushButton(self.tr("📁  Choisir une image PNG / JPG…"))
         btn_pick.clicked.connect(self._pick_image)
         layout.addWidget(btn_pick)
-
-        size_row = QHBoxLayout()
-        size_row.addWidget(QLabel(self.tr("Largeur :")))
-        self._spin_w = QSpinBox()
-        self._spin_w.setRange(10, 500)
-        self._spin_w.setValue(150)
-        size_row.addWidget(self._spin_w)
-        size_row.addWidget(QLabel(self.tr("px   Hauteur :")))
-        self._spin_h = QSpinBox()
-        self._spin_h.setRange(10, 500)
-        self._spin_h.setValue(80)
-        size_row.addWidget(self._spin_h)
-        size_row.addStretch()
-        layout.addLayout(size_row)
 
         self._btn_insert_img = QPushButton(self.tr("Insérer la signature"))
         self._btn_insert_img.setObjectName("primary")
@@ -210,11 +169,6 @@ class SignatureDialog(QDialog):
         self._result = {
             "type": "image",
             "path": self._img_path,
-            "page": self._spin_page.value() - 1,
-            "x":    self._spin_x.value(),
-            "y":    self._spin_y.value(),
-            "w":    self._spin_w.value(),
-            "h":    self._spin_h.value(),
         }
         self.accept()
 

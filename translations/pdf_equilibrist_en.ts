@@ -1433,6 +1433,10 @@ Remember to save the document.</translation>
         <source>Erreur</source>
         <translation>Error</translation>
     </message>
+    <message>
+        <source>Liens</source>
+        <translation>Links</translation>
+    </message>
 </context><context>
     <name>TabPage</name>
     <message>
@@ -2257,6 +2261,26 @@ Open it in your browser?</translation>
         <source>Couleur du texte</source>
         <translation>Text color</translation>
     </message>
+    <message>
+        <source>Ajouter un lien</source>
+        <translation>Add a link</translation>
+    </message>
+    <message>
+        <source>Adresse web ou e-mail</source>
+        <translation>Web address or e-mail</translation>
+    </message>
+    <message>
+        <source>Page du document</source>
+        <translation>Document page</translation>
+    </message>
+    <message>
+        <source>https://exemple.fr  ou  nom@exemple.fr</source>
+        <translation>https://example.org  or  name@example.org</translation>
+    </message>
+    <message>
+        <source>Page </source>
+        <translation>Page </translation>
+    </message>
 </context><context>
     <name>main</name>
     <message>
@@ -2338,5 +2362,9 @@ Open it in your browser?</translation>
     <message>
         <source>Couleur du texte</source>
         <translation>Text color</translation>
+    </message>
+    <message>
+        <source>Page %1</source>
+        <translation>Page %1</translation>
     </message>
 </context></TS>

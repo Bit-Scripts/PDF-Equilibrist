@@ -19,6 +19,7 @@ Fonctions disponibles
 - ``ask_watermark_text``    : texte du filigrane
 - ``ask_text_input``        : saisie de texte libre (générique)
 - ``ask_text_format``       : texte + police, taille, gras/italique, couleur
+- ``ask_link_target``       : cible d'un lien (adresse web ou page du document)
 - ``ask_image_format``      : sélection du format image (combo png/jpg/bmp/tiff)
 - ``show_info``             : message d'information (non bloquant pour l'UX)
 - ``show_error``            : message d'erreur critique
@@ -227,6 +228,45 @@ def ask_text_format(parent, title: str, label: str) -> dict | None:
         "fontsize": size.value(),
         "color": (c.redF(), c.greenF(), c.blueF()),
     }
+
+
+def ask_link_target(parent, max_page: int) -> dict | None:
+    """Choisit la cible d'un lien : ``{'uri': str}`` ou ``{'goto_page': int}`` (0-based)."""
+    tr = QCoreApplication.translate
+    dlg = QDialog(parent)
+    dlg.setWindowTitle(tr("dialogs", "Ajouter un lien"))
+    dlg.setStyleSheet(DIALOG_STYLE)
+    dlg.setMinimumWidth(360)
+    layout = QVBoxLayout(dlg)
+    kind = QComboBox()
+    kind.addItems([tr("dialogs", "Adresse web ou e-mail"), tr("dialogs", "Page du document")])
+    layout.addWidget(kind)
+    url = QLineEdit()
+    url.setPlaceholderText(tr("dialogs", "https://exemple.fr  ou  nom@exemple.fr"))
+    layout.addWidget(url)
+    page = QSpinBox()
+    page.setRange(1, max(1, max_page))
+    page.setPrefix(tr("dialogs", "Page "))
+    page.hide()
+    layout.addWidget(page)
+
+    def _switch(i):
+        url.setVisible(i == 0)
+        page.setVisible(i == 1)
+    kind.currentIndexChanged.connect(_switch)
+    _ok_cancel(dlg, layout)
+    if dlg.exec() != QDialog.DialogCode.Accepted:
+        return None
+    if kind.currentIndex() == 1:
+        return {"goto_page": page.value() - 1}
+    text = url.text().strip()
+    if not text:
+        return None
+    if "@" in text and ":" not in text:
+        text = "mailto:" + text
+    elif "://" not in text and not text.lower().startswith("mailto:"):
+        text = "https://" + text
+    return {"uri": text}
 
 
 def ask_image_format(parent) -> str | None:

@@ -29,12 +29,15 @@ uniquement quand le mode édition est actif. ``_btn_edit`` change de style
 from pathlib import Path
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QFileDialog
 from pdf_equilibrist.ui.widgets import RibbonButton, RibbonGroup
-from pdf_equilibrist.ui.dialogs import ask_watermark_text, ask_text_format, show_info, show_error, ensure_suffix
+from pdf_equilibrist.ui.dialogs import (
+    ask_watermark_text, ask_text_format, ask_link_target, show_info, show_error, ensure_suffix,
+)
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations.edit import (
-    compress, add_watermark, add_text_fitted,
+    compress, add_watermark, add_text_fitted, add_stamp_fitted,
     extract_text_blocks,
 )
+from pdf_equilibrist.operations.annotate import add_link
 import pymupdf
 
 ACCENT = "#6BBF4E"
@@ -94,13 +97,15 @@ class TabModifier(QWidget):
         grp_sign.add(self._btn_sign)
         layout.addWidget(grp_sign)
 
-        grp_misc = RibbonGroup(self.tr("À venir"))
-        grp_misc.add(RibbonButton("🔗", self.tr("Lien")))
+        grp_misc = RibbonGroup(self.tr("Liens"))
+        self._btn_link = RibbonButton("🔗", self.tr("Lien"))
+        grp_misc.add(self._btn_link)
         layout.addWidget(grp_misc)
         layout.addStretch()
 
         self._btn_ocr.clicked.connect(self._run_ocr)
         self._btn_sign.clicked.connect(self._open_signature)
+        self._btn_link.clicked.connect(self._add_link)
         self._btn_edit.clicked.connect(self._toggle_edit)
         self._btn_commit.clicked.connect(self._commit)
         self._btn_cancel.clicked.connect(self._cancel)
@@ -192,13 +197,30 @@ class TabModifier(QWidget):
         r = dlg.get_result()
         if not r:
             return
-        page_idx = r.get("page", 0)
-        self.viewer.show_floating_item(r, page_idx,
-                                       self._on_placement_commit, None)
+        self.viewer.show_floating_item(r, self.viewer.current_page_index,
+                                       self._on_placement_commit, None,
+                                       click_to_place=True)
+
+    def _add_link(self):
+        if not self.document.is_open:
+            return
+        target = ask_link_target(self, len(self.document.fitz_doc))
+        if not target:
+            return
+        self.viewer.show_floating_item({"type": "link", **target},
+                                       self.viewer.current_page_index,
+                                       self._on_placement_commit, None,
+                                       click_to_place=True)
 
     def _on_placement_commit(self, result: dict, page_index: int):
         """Grave l'élément flottant dans le PDF à la position validée."""
         self.document.checkpoint()
+        self._engrave(result, page_index)
+        # L'objet page de _engrave est libéré ici : sinon PyMuPDF renverrait au viewer
+        # la même page en cache, sans les liens qu'on vient d'ajouter.
+        self.document.changed.emit()
+
+    def _engrave(self, result: dict, page_index: int):
         x0, y0, x1, y1 = result["pdf_rect"]
         angle = result.get("angle", 0.0)
         page  = self.document.fitz_doc[page_index]
@@ -215,15 +237,11 @@ class TabModifier(QWidget):
         elif dtype == "image":
             page.insert_image(rect, filename=result["path"])
         elif dtype == "stamp":
-            color = result.get("color", (0, 0.5, 0))
-            text  = result.get("text", "TAMPON")
-            page.draw_rect(rect, color=color, fill=None, width=2)
-            page.insert_text(
-                pymupdf.Point(x0 + 4, y1 - 6),
-                text, fontsize=14, color=color,
-                rotate=int(-angle), overlay=True,
-            )
-        self.document.changed.emit()
+            add_stamp_fitted(page, rect, result.get("text", "TAMPON"),
+                             result.get("color", (0, 0.5, 0)), angle)
+        elif dtype == "link":
+            add_link(page, rect, uri=result.get("uri"),
+                     goto_page=result.get("goto_page"))
 
     def _run_ocr(self):
         if not self.document.is_open:
