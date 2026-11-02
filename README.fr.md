@@ -17,16 +17,21 @@
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE.md)
 [![Bandit](https://img.shields.io/badge/Bandit-Passed-brightgreen.svg)](.)
 [![Dependencies](https://img.shields.io/badge/Dependencies-Clean-brightgreen.svg)](.)
-[![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen.svg)](PRIVACY.md)
+[![Privacy](https://img.shields.io/badge/Privacy-Local%20first-brightgreen.svg)](PRIVACY.md)
 
 **🇬🇧 [Read this in English](README.md)**
 
 </div>
 
 **PDF-Equilibrist** est un éditeur PDF de bureau, gratuit et open-source, construit en Python
-avec **PyQt6** et **PyMuPDF**. Il fonctionne entièrement en local — pas de cloud, pas de
-télémétrie, pas de compte requis — et permet de lire, modifier, convertir, annoter et
-protéger vos documents PDF.
+avec **PyQt6** et **PyMuPDF**. Il travaille en local : vos documents ne quittent jamais votre
+ordinateur, sans cloud, sans télémétrie, sans compte — et il permet de lire, modifier,
+convertir, annoter et protéger vos documents PDF.
+
+Deux requêtes seulement sortent du logiciel : la recherche de mises à jour (GitHub) et la
+vérification des failles de sécurité connues (CVE, via [OSV](https://osv.dev/)). *Aide ›
+Connexions Internet* les coupe totalement : aucune requête ne part, le logiciel est 100 % local,
+et seul l'outil de vérification des failles devient indisponible.
 
 ![PDF-Equilibrist](assets/images/PDF-Equilibrist.png)
 
