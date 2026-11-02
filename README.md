@@ -29,8 +29,9 @@ cloud, no telemetry, no account — and it lets you read, edit, convert, annotat
 your PDF documents.
 
 Only two requests ever leave the app: the update check (GitHub) and the known-vulnerability
-check (CVE, via [OSV](https://osv.dev/)). Turn them off in *Help › Internet connections* and
-it is 100% local — only the vulnerability-check tool becomes unavailable.
+check (CVE, via [OSV](https://osv.dev/)). *Help › Internet connections* cuts them off
+completely: no request is ever sent, the app is 100% local, and only the vulnerability-check
+tool becomes unavailable.
 
 ![PDF-Equilibrist](assets/images/en/PDF-Equilibrist.png)
 

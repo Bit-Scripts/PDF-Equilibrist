@@ -29,9 +29,9 @@ ordinateur, sans cloud, sans télémétrie, sans compte — et il permet de lire
 convertir, annoter et protéger vos documents PDF.
 
 Deux requêtes seulement sortent du logiciel : la recherche de mises à jour (GitHub) et la
-vérification des failles de sécurité connues (CVE, via [OSV](https://osv.dev/)). Coupez-les
-dans *Aide › Connexions Internet* : il est alors 100 % local, et seul l'outil de vérification
-des failles devient indisponible.
+vérification des failles de sécurité connues (CVE, via [OSV](https://osv.dev/)). *Aide ›
+Connexions Internet* les coupe totalement : aucune requête ne part, le logiciel est 100 % local,
+et seul l'outil de vérification des failles devient indisponible.
 
 ![PDF-Equilibrist](assets/images/PDF-Equilibrist.png)
 
