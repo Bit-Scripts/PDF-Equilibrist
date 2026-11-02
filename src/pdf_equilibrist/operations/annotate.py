@@ -174,3 +174,38 @@ def add_stamp(
     annot = page.add_stamp_annot(rect, stamp=stamp_id)
     annot.update()
     return annot
+
+
+LINK_SCHEMES = ("http", "https", "mailto")
+
+
+def add_link(
+    page: pymupdf.Page,
+    rect: pymupdf.Rect,
+    uri: str | None = None,
+    goto_page: int | None = None,
+) -> None:
+    """
+    Rend la zone ``rect`` cliquable : lien vers une adresse (``uri``) ou une page.
+
+    Parameters
+    ----------
+    page : pymupdf.Page
+        Page qui porte la zone cliquable.
+    rect : pymupdf.Rect
+        Zone cliquable en coordonnées PDF.
+    uri : str | None
+        Adresse ``http://``, ``https://`` ou ``mailto:`` (autres schémas refusés).
+    goto_page : int | None
+        Numéro de page 0-based à atteindre (si ``uri`` est ``None``).
+    """
+    if uri is not None:
+        scheme = uri.split(":", 1)[0].lower() if ":" in uri else ""
+        if scheme not in LINK_SCHEMES:
+            raise ValueError(f"Schéma de lien non autorisé : {uri!r}")
+        page.insert_link({"kind": pymupdf.LINK_URI, "from": rect, "uri": uri})
+    elif goto_page is not None:
+        page.insert_link({"kind": pymupdf.LINK_GOTO, "from": rect,
+                          "page": goto_page, "to": pymupdf.Point(0, 0)})
+    else:
+        raise ValueError("add_link : fournir uri ou goto_page")

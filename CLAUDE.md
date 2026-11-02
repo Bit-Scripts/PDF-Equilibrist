@@ -73,11 +73,11 @@ src/pdf_equilibrist/
 │       └── tab_proteger.py   chiffrer (AES-256), déchiffrer
 │
 └── operations/              # logique PDF pure, sans UI, testable unitairement
-    ├── edit.py              # extract_text_blocks, apply_text_edits, compress,
-    │                        #   add_watermark, add_text, add_image
+    ├── edit.py              # extract_text_blocks, apply_text_edits, compress, add_watermark,
+    │                        #   add_text, add_text_fitted, add_stamp_fitted, add_image
     ├── pages.py             # rotate_pages, invert_pages, split_pdf, merge_pdfs,
     │                        #   insert_page, crop_page, set_page_size
-    ├── annotate.py          # highlight, strikeout, underline, add_text_box, add_stamp
+    ├── annotate.py          # highlight, strikeout, underline, add_text_box, add_stamp, add_link
     ├── convert.py           # to_images, to_word, to_excel, to_powerpoint,
     │                        #   image_to_pdf, office_to_pdf, detect_office_engine
     ├── ocr.py               # OCR RapidOCR/ONNX — modèles .onnx embarqués dans la wheel,
@@ -154,10 +154,16 @@ MainWindow._rebind_doc(doc)             ← déconnecte l'ancien, reconnecte le 
 
 ## Placement flottant (texte / image / tampon)
 
-1. `viewer.show_floating_item(data, page_index, on_commit, on_cancel)`
+1. `viewer.show_floating_item(data, page_index, on_commit, on_cancel, click_to_place=True)` :
+   bandeau « Cliquez sur la page pour poser… » (Échap / Annuler), l'élément est posé centré sur le clic, sur la page cliquée
 2. `FloatingItem` apparaît sur la page — drag pour déplacer, coins pour redimensionner, poignée verte pour pivoter
+   - **texte / tampon** : la taille de police est dynamique (suit la boîte, largeur ou hauteur selon la contrainte la plus forte) ;
+     barre police/taille/gras/italique/couleur pour le texte jusqu'à « Valider »
+   - **image / signature PNG** : le ratio est conservé au redimensionnement
+   - **lien** : zone cliquable (URL http/https/mailto ou page du document), sans rotation
 3. Clic "Valider" → `on_commit(result_dict, page_index)` avec `pdf_rect` en coordonnées PDF
-4. Le tab grave l'élément dans `fitz.Document` puis `document.changed.emit()`
+4. Le tab grave l'élément (`add_text_fitted`, `add_stamp_fitted`, `insert_image`, `add_link`) dans `fitz.Document` puis
+   `document.changed.emit()` — **après** avoir libéré l'objet page (cache PyMuPDF : sinon le viewer ne voit pas les liens ajoutés)
 
 ## Conversion Office → PDF
 
@@ -217,7 +223,6 @@ Appelée après `StretchDIBits`, re-trace en GDI les paths stroke-only du PDF :
 ## Fonctionnalités non câblées (nécessitent canvas interactif)
 
 - Crayon (dessin libre sur page)
-- Lien (sélection zone cliquable)
 - Signature manuscrite dessinée (import PNG OK via FloatingItem)
 - Rogner la page (sélection rectangle)
 - Office en PDF nécessite MS Office ou LibreOffice installé

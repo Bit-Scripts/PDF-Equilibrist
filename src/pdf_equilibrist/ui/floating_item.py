@@ -43,7 +43,7 @@ from PyQt6.QtGui import (QPainter, QPen, QBrush, QColor, QPixmap,
 from PyQt6.QtCore import Qt, pyqtSignal, QPoint, QPointF, QRectF, QSizeF
 
 from pdf_equilibrist.operations.edit import (
-    fit_fontsize, text_line_metrics, text_natural_size,
+    STAMP_PAD, fit_fontsize, text_line_metrics, text_natural_size,
 )
 from pdf_equilibrist.ui.dialogs import PDF_FONTS, pdf_fontname
 
@@ -65,16 +65,19 @@ class FloatingItem(QWidget):
     """
     Widget interactif superposé sur une page PDF pour le placement visuel.
 
-    Supporte trois types d'éléments via le dict ``data`` :
+    Supporte quatre types d'éléments via le dict ``data`` :
     - ``{'type': 'text',  'text': str, 'fontsize': int, 'color': tuple,
       'fontname': str (base 14), 'family': str, 'bold': bool, 'italic': bool}``
     - ``{'type': 'image', 'path': str}``
-    - ``{'type': 'stamp', 'text': str, 'color': tuple}``
+    - ``{'type': 'stamp', 'text': str, 'color': tuple}`` (texte ajusté à la boîte)
+    - ``{'type': 'link', 'uri': str}`` ou ``{'type': 'link', 'goto_page': int}``
+      (zone cliquable, sans rotation)
 
     Pour un texte, la **taille de police est dynamique** : elle suit la boîte
     (largeur ou hauteur, la contrainte la plus forte) quand on la redimensionne,
     et une barre de mise en forme (police, taille, gras, italique, couleur)
-    reste utilisable jusqu'à la validation.
+    reste utilisable jusqu'à la validation. Une image garde ses proportions :
+    la redimensionner agrandit ou réduit l'image entière.
 
     Signals
     -------
@@ -122,6 +125,7 @@ class FloatingItem(QWidget):
         self._item_size   = QSizeF(200, 60)
         self._resize_anchor = QPointF()
         self._fmt_bar: QWidget | None = None
+        self._aspect: float | None = None   # ratio L/H imposé (images)
 
         # Pré-charger pixmap si image
         self._pixmap: QPixmap | None = None
@@ -158,9 +162,13 @@ class FloatingItem(QWidget):
 
         # Taille initiale selon le contenu
         if self._pixmap and not self._pixmap.isNull():
-            pw = min(self._pixmap.width(),  int(300 * zoom))
-            ph = min(self._pixmap.height(), int(200 * zoom))
-            self._item_size = QSizeF(pw, ph)
+            # Taille initiale : l'image tient dans 300×300 pt (zoom compris) en gardant
+            # ses proportions ; le redimensionnement conserve ensuite ce ratio.
+            iw, ih = self._pixmap.width(), self._pixmap.height()
+            self._aspect = iw / ih
+            k = min(1.0, 300 * zoom / iw, 300 * zoom / ih)
+            k = max(k, MIN_SIZE / min(iw, ih))
+            self._item_size = QSizeF(iw * k, ih * k)
         elif data.get("type") == "text":
             self._data.setdefault("fontname", "helv")
             self._data.setdefault("family", "Helvetica")
@@ -169,7 +177,14 @@ class FloatingItem(QWidget):
             self._item_size = QSizeF(max(MIN_SIZE, w * zoom), max(MIN_SIZE / 2, h * zoom))
             self._build_format_bar()
         elif data.get("type") == "stamp":
-            self._item_size = QSizeF(200, 44)
+            self._data.setdefault("text", "TAMPON")
+            self._data.update(fontname="hebo", family="Helvetica", bold=True, italic=False)
+            fs = float(data.get("fontsize", 16))
+            w, h = text_natural_size(self._data["text"], "hebo", fs)
+            self._data["fontsize"] = fs
+            self._item_size = QSizeF((w + 2 * STAMP_PAD) * zoom, (h + 2 * STAMP_PAD) * zoom)
+        elif data.get("type") == "link":
+            self._item_size = QSizeF(160 * zoom, 28 * zoom)
 
         self._place_at_center()
 
@@ -182,6 +197,18 @@ class FloatingItem(QWidget):
             y = int(ph / 2 - self._item_size.height() / 2)
             self.move(x, y)
         self._update_size()
+
+    def _keep_aspect(self, new_w: float, new_h: float) -> tuple[float, float]:
+        """Ajuste (largeur, hauteur) au ratio de l'image : l'axe le plus tiré commande."""
+        w0, h0 = self._size_at_drag.width(), self._size_at_drag.height()
+        if abs(new_w - w0) / w0 >= abs(new_h - h0) / h0:
+            new_h = new_w / self._aspect
+        else:
+            new_w = new_h * self._aspect
+        low = min(new_w, new_h)
+        if low < MIN_SIZE:
+            new_w, new_h = new_w * MIN_SIZE / low, new_h * MIN_SIZE / low
+        return new_w, new_h
 
     def place_center_at(self, pos: QPoint):
         """Centre la boîte de l'élément sur ``pos`` (coordonnées de la page), bornée à la page."""
@@ -290,6 +317,8 @@ class FloatingItem(QWidget):
             if h_idx in (0, 1, 7):  new_h = max(MIN_SIZE, new_h - delta.y())
             if h_idx in (4,):       new_h = max(MIN_SIZE, new_h + delta.y())
             if h_idx in (5,):       new_h = max(MIN_SIZE, new_h - delta.y())
+            if self._aspect:
+                new_w, new_h = self._keep_aspect(new_w, new_h)
             self._item_size = QSizeF(new_w, new_h)
             self._refit_text()
             self._update_size()
@@ -370,12 +399,21 @@ class FloatingItem(QWidget):
             qc = QColor(r_val, g_val, b_val)
             p.setPen(QPen(qc, 2))
             p.setBrush(QColor(r_val, g_val, b_val, 20))
-            p.drawRoundedRect(r, 6, 6)
-            p.setPen(QPen(qc))
-            font = QFont("Segoe UI", 14, QFont.Weight.Bold)
-            p.setFont(font)
-            p.drawText(r, Qt.AlignmentFlag.AlignCenter,
-                       self._data.get("text", "TAMPON"))
+            p.drawRect(r)
+            pad = self._pad_pt() * max(self._zoom, 0.01)
+            self._draw_text(p, r.adjusted(pad, pad, -pad, -pad), center=True)
+
+        elif dtype == "link":
+            p.setPen(QPen(QColor("#3B82F6"), 2, Qt.PenStyle.DashLine))
+            p.setBrush(QColor(59, 130, 246, 55))
+            p.drawRect(r)
+            p.setPen(QPen(QColor("#FFFFFF")))
+            p.setFont(QFont("Segoe UI", 10, QFont.Weight.Bold))
+            label = self._data.get("uri") or self.tr("Page %1").replace(
+                "%1", str(int(self._data.get("goto_page", 0)) + 1))
+            p.drawText(r.adjusted(6, 0, -6, 0),
+                       Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft,
+                       "🔗  " + label)
 
         elif dtype == "text":
             p.fillRect(r, QColor(255, 255, 200, 180))
@@ -386,18 +424,23 @@ class FloatingItem(QWidget):
     def _text_font(self) -> str:
         return self._data.get("fontname", "helv")
 
+    def _pad_pt(self) -> float:
+        """Marge intérieure (pts) entre le cadre et le texte : tampon seulement."""
+        return STAMP_PAD if self._data.get("type") == "stamp" else 0.0
+
     def _refit_text(self):
         """Recalcule la taille de police pour que le texte remplisse la boîte."""
-        if self._data.get("type") != "text":
+        if self._data.get("type") not in ("text", "stamp"):
             return
         z = max(self._zoom, 0.01)
+        pad = 2 * self._pad_pt()
         size = fit_fontsize(self._data.get("text", ""), self._text_font(),
-                            self._item_size.width() / z,
-                            self._item_size.height() / z)
+                            self._item_size.width() / z - pad,
+                            self._item_size.height() / z - pad)
         self._data["fontsize"] = round(size, 2)
         self._sync_size_spin()
 
-    def _draw_text(self, p: QPainter, r: QRectF):
+    def _draw_text(self, p: QPainter, r: QRectF, center: bool = False):
         text = self._data.get("text", "")
         if not text:
             return
@@ -421,7 +464,7 @@ class FloatingItem(QWidget):
         p.setPen(QPen(QColor(*(int(c * 255) for c in color))))
         p.setFont(qf)
         baseline = r.top() + (r.height() - (asc + desc) * size_px) / 2 + asc * size_px
-        p.translate(r.left(), baseline)
+        p.translate(r.left() + ((r.width() - want_w) / 2 if center else 0), baseline)
         p.scale(want_w / qt_w, size_px / 100.0)
         p.drawText(QPointF(0, 0), text)
         p.restore()
