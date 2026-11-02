@@ -1,5 +1,5 @@
 Name:           pdf-equilibrist
-Version:        0.2.2
+Version:        0.2.3
 Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
@@ -197,6 +197,14 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Mon Nov 02 2026 Paul Woisard <paulwoisard@gmail.com> - 0.2.3-1
+- New upstream release: add text where you click, with a text size that
+  follows the box. Add text and Add image wait for a click on the PDF and
+  drop the item where you clicked (Escape cancels). The text size now scales
+  with the box (width or height, whichever is tighter), and font, size, bold,
+  italic and colour stay editable until validation. Text can be placed at
+  any angle.
+
 * Mon Nov 02 2026 Paul Woisard <paulwoisard@gmail.com> - 0.2.2-1
 - New upstream release: font, size, style and colour for added text.
   "Add text" now opens a formatting dialog (font, size, bold, italic,

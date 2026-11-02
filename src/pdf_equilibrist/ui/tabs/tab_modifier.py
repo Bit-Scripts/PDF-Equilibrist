@@ -32,7 +32,7 @@ from pdf_equilibrist.ui.widgets import RibbonButton, RibbonGroup
 from pdf_equilibrist.ui.dialogs import ask_watermark_text, ask_text_format, show_info, show_error, ensure_suffix
 from pdf_equilibrist.core.document import Document
 from pdf_equilibrist.operations.edit import (
-    compress, add_watermark,
+    compress, add_watermark, add_text_fitted,
     extract_text_blocks,
 )
 import pymupdf
@@ -157,7 +157,8 @@ class TabModifier(QWidget):
             return
         data = {"type": "text", **fmt}
         self.viewer.show_floating_item(data, self.viewer.current_page_index,
-                                       self._on_placement_commit, None)
+                                       self._on_placement_commit, None,
+                                       click_to_place=True)
 
     def _add_image(self):
         if not self.document.is_open:
@@ -169,7 +170,8 @@ class TabModifier(QWidget):
             return
         data = {"type": "image", "path": path}
         self.viewer.show_floating_item(data, self.viewer.current_page_index,
-                                       self._on_placement_commit, None)
+                                       self._on_placement_commit, None,
+                                       click_to_place=True)
 
     def _watermark(self):
         if not self.document.is_open:
@@ -204,14 +206,11 @@ class TabModifier(QWidget):
 
         dtype = result.get("type")
         if dtype == "text":
-            page.insert_text(
-                pymupdf.Point(x0, y1),
-                result.get("text", ""),
+            add_text_fitted(
+                page, rect, result.get("text", ""),
                 fontname=result.get("fontname", "helv"),
-                fontsize=result.get("fontsize", 14),
                 color=result.get("color", (0, 0, 0)),
-                rotate=int(-angle),
-                overlay=True,
+                angle=angle,
             )
         elif dtype == "image":
             page.insert_image(rect, filename=result["path"])

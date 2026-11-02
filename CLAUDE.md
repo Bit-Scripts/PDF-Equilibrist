@@ -96,6 +96,21 @@ src/pdf_equilibrist/
   ci.yml et par tous les workflows de publication — rien n'est buildé ni publié s'il échoue.
 - En local : `flake8 src tests && bandit -r src -q && pytest -q` (`QT_QPA_PLATFORM=offscreen`).
 
+## Release et tags
+
+**Toujours préparer la prochaine release avant tout push de tag** (ou toute création de release GitHub, qui crée le tag).
+Un tag `v*` déclenche automatiquement et publiquement : release Windows, AppImage, AUR, PPA, COPR et site. Un tag ne se « retire » pas proprement.
+
+1. Préparer dans une PR, mergée **avant** le tag (voir `packaging/RELEASE_CHECKLIST.md`) :
+   - `packaging/ppa/debian/changelog` : entrées `X.Y.Z-1~noble1` **et** `X.Y.Z-1~resolute1` en tête
+     (le workflow PPA échoue si le haut du changelog ne correspond pas au tag) ;
+   - `packaging/copr/pdf-equilibrist.spec` : `Version:` + entrée `%changelog` ;
+   - exemples de `RELEASE_CHECKLIST.md` alignés sur la nouvelle version.
+2. Ne **pas** toucher à `PKGBUILD` / `.SRCINFO` (mis à jour par `linux-aur-publish.yml` après le tag) ni à
+   `__version__` / `pyproject.toml` (injectés par les workflows à partir du tag).
+3. Poser le tag sur `main` seulement quand la PR est mergée et que CI + « Linux packages check » sont verts sur `main`.
+4. Demander la confirmation de l'utilisateur avant de pousser le tag, sauf demande explicite.
+
 ## PyMuPDF
 
 Toujours `import pymupdf` (jamais `import fitz` : module de compatibilité déprécié qui affiche un avertissement).

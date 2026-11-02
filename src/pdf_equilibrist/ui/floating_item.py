@@ -36,15 +36,29 @@ La rotation est appliquée via ``QPainter.rotate()`` autour du centre de l'élé
 """
 from __future__ import annotations
 import math
-from PyQt6.QtWidgets import QWidget, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import (QWidget, QPushButton, QHBoxLayout, QComboBox,
+                             QDoubleSpinBox, QColorDialog)
 from PyQt6.QtGui import (QPainter, QPen, QBrush, QColor, QPixmap,
-                          QFont)
+                          QFont, QFontMetricsF)
 from PyQt6.QtCore import Qt, pyqtSignal, QPoint, QPointF, QRectF, QSizeF
+
+from pdf_equilibrist.operations.edit import (
+    fit_fontsize, text_line_metrics, text_natural_size,
+)
+from pdf_equilibrist.ui.dialogs import PDF_FONTS, pdf_fontname
 
 ACCENT   = "#6BBF4E"
 HANDLE_R = 6     # rayon des poignées de redimensionnement (px)
 ROT_DIST = 28    # distance de la poignée de rotation au-dessus du bord haut (px)
 MIN_SIZE = 40    # taille minimale de l'élément lors du redimensionnement (px)
+BAR_H    = 32    # hauteur d'une barre d'outils sous l'élément (px)
+
+# Familles Qt de repli pour l'aperçu (la gravure utilise les polices PDF standard)
+_QT_FAMILIES = {
+    "Helvetica": ["Helvetica", "Arial", "Liberation Sans"],
+    "Times":     ["Times New Roman", "Times", "Liberation Serif"],
+    "Courier":   ["Courier New", "Courier", "Liberation Mono"],
+}
 
 
 class FloatingItem(QWidget):
@@ -56,6 +70,11 @@ class FloatingItem(QWidget):
       'fontname': str (base 14), 'family': str, 'bold': bool, 'italic': bool}``
     - ``{'type': 'image', 'path': str}``
     - ``{'type': 'stamp', 'text': str, 'color': tuple}``
+
+    Pour un texte, la **taille de police est dynamique** : elle suit la boîte
+    (largeur ou hauteur, la contrainte la plus forte) quand on la redimensionne,
+    et une barre de mise en forme (police, taille, gras, italique, couleur)
+    reste utilisable jusqu'à la validation.
 
     Signals
     -------
@@ -102,6 +121,7 @@ class FloatingItem(QWidget):
         self._item_origin = QPoint()  # position avant drag
         self._item_size   = QSizeF(200, 60)
         self._resize_anchor = QPointF()
+        self._fmt_bar: QWidget | None = None
 
         # Pré-charger pixmap si image
         self._pixmap: QPixmap | None = None
@@ -142,9 +162,12 @@ class FloatingItem(QWidget):
             ph = min(self._pixmap.height(), int(200 * zoom))
             self._item_size = QSizeF(pw, ph)
         elif data.get("type") == "text":
-            fs = data.get("fontsize", 12)
-            w  = max(120, len(data.get("text", "")) * int(fs * zoom * 0.7))
-            self._item_size = QSizeF(w, fs * zoom * 2)
+            self._data.setdefault("fontname", "helv")
+            self._data.setdefault("family", "Helvetica")
+            fs = float(data.get("fontsize", 12))
+            w, h = text_natural_size(data.get("text", ""), self._data["fontname"], fs)
+            self._item_size = QSizeF(max(MIN_SIZE, w * zoom), max(MIN_SIZE / 2, h * zoom))
+            self._build_format_bar()
         elif data.get("type") == "stamp":
             self._item_size = QSizeF(200, 44)
 
@@ -160,13 +183,30 @@ class FloatingItem(QWidget):
             self.move(x, y)
         self._update_size()
 
+    def place_center_at(self, pos: QPoint):
+        """Centre la boîte de l'élément sur ``pos`` (coordonnées de la page), bornée à la page."""
+        r = self._item_rect()
+        x = int(pos.x() - r.center().x())
+        y = int(pos.y() - r.center().y())
+        if self.parent():
+            x = max(0, min(x, self.parent().width() - self.width()))
+            y = max(0, min(y, self.parent().height() - self.height()))
+        self.move(x, y)
+
     def _update_size(self):
         margin = HANDLE_R + 2
         extra  = ROT_DIST + HANDLE_R
         w = int(self._item_size.width())  + margin * 2
         h = int(self._item_size.height()) + margin * 2 + extra
-        self.resize(w, h + 32)   # +32 pour la toolbar
+        bars = BAR_H
         self._toolbar.move(0, h + 2)
+        if self._fmt_bar is not None:
+            self._fmt_bar.move(0, h + 2 + BAR_H)
+            bars += BAR_H
+            w = max(w, self._fmt_bar.width())
+        # le widget ne doit pas rogner les barres d'outils quand la boîte est petite
+        w = max(w, self._toolbar.width())
+        self.resize(w, h + bars)
 
     # ── Géométrie interne ────────────────────────────────────────────────────
 
@@ -251,6 +291,7 @@ class FloatingItem(QWidget):
             if h_idx in (4,):       new_h = max(MIN_SIZE, new_h + delta.y())
             if h_idx in (5,):       new_h = max(MIN_SIZE, new_h - delta.y())
             self._item_size = QSizeF(new_w, new_h)
+            self._refit_text()
             self._update_size()
             self.update()
 
@@ -338,18 +379,138 @@ class FloatingItem(QWidget):
 
         elif dtype == "text":
             p.fillRect(r, QColor(255, 255, 200, 180))
-            p.setPen(QPen(QColor("#333333")))
-            color = self._data.get("color", (0, 0, 0))
-            r_val, g_val, b_val = (int(c * 255) for c in color)
-            p.setPen(QPen(QColor(r_val, g_val, b_val)))
-            fs = max(8, int(self._data.get("fontsize", 12) * self._zoom))
-            qf = QFont(self._data.get("family", "Segoe UI"), fs)
-            qf.setBold(bool(self._data.get("bold")))
-            qf.setItalic(bool(self._data.get("italic")))
-            p.setFont(qf)
-            p.drawText(r.adjusted(4, 4, -4, -4),
-                       Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
-                       self._data.get("text", ""))
+            self._draw_text(p, r)
+
+    # ── Texte : taille dynamique et mise en forme ────────────────────────────
+
+    def _text_font(self) -> str:
+        return self._data.get("fontname", "helv")
+
+    def _refit_text(self):
+        """Recalcule la taille de police pour que le texte remplisse la boîte."""
+        if self._data.get("type") != "text":
+            return
+        z = max(self._zoom, 0.01)
+        size = fit_fontsize(self._data.get("text", ""), self._text_font(),
+                            self._item_size.width() / z,
+                            self._item_size.height() / z)
+        self._data["fontsize"] = round(size, 2)
+        self._sync_size_spin()
+
+    def _draw_text(self, p: QPainter, r: QRectF):
+        text = self._data.get("text", "")
+        if not text:
+            return
+        z = max(self._zoom, 0.01)
+        size_px = float(self._data.get("fontsize", 12)) * z
+        asc, desc = text_line_metrics(self._text_font())
+        # Aperçu fidèle à la gravure : la largeur suit les métriques de la police
+        # PDF, même si la police Qt de remplacement est un peu différente.
+        want_w = text_natural_size(text, self._text_font(),
+                                   float(self._data.get("fontsize", 12)))[0] * z
+        qf = QFont()
+        qf.setFamilies(_QT_FAMILIES.get(self._data.get("family", "Helvetica"),
+                                         _QT_FAMILIES["Helvetica"]))
+        qf.setPixelSize(100)
+        qf.setBold(bool(self._data.get("bold")))
+        qf.setItalic(bool(self._data.get("italic")))
+        qt_w = QFontMetricsF(qf).horizontalAdvance(text) or 1.0
+        color = self._data.get("color", (0, 0, 0))
+        p.save()
+        p.setClipRect(r)
+        p.setPen(QPen(QColor(*(int(c * 255) for c in color))))
+        p.setFont(qf)
+        baseline = r.top() + (r.height() - (asc + desc) * size_px) / 2 + asc * size_px
+        p.translate(r.left(), baseline)
+        p.scale(want_w / qt_w, size_px / 100.0)
+        p.drawText(QPointF(0, 0), text)
+        p.restore()
+
+    def _build_format_bar(self):
+        """Barre sous la boîte : police, taille, gras, italique, couleur."""
+        bar = QWidget(self)
+        lay = QHBoxLayout(bar)
+        lay.setContentsMargins(2, 2, 2, 2)
+        lay.setSpacing(4)
+        style = ("QWidget { background:#2D2D2D; color:#F0F0F0; font-size:11px; }"
+                 "QComboBox, QDoubleSpinBox { background:#1E1E1E; border:1px solid #3A3A3A;"
+                 " border-radius:4px; padding:1px 4px; }"
+                 "QPushButton { background:#3A3A3A; border:1px solid #4A4A4A;"
+                 " border-radius:4px; padding:2px 8px; }"
+                 f"QPushButton:checked {{ background:{ACCENT}; color:#1E1E1E; }}")
+        bar.setStyleSheet(style)
+
+        self._cb_family = QComboBox()
+        self._cb_family.addItems(list(PDF_FONTS))
+        self._cb_family.setCurrentText(self._data.get("family", "Helvetica"))
+        self._sp_size = QDoubleSpinBox()
+        self._sp_size.setRange(1.0, 400.0)
+        self._sp_size.setDecimals(1)
+        self._sp_size.setSuffix(" pt")
+        self._sp_size.setKeyboardTracking(False)
+        self._bt_bold = QPushButton("G")
+        self._bt_bold.setCheckable(True)
+        self._bt_bold.setChecked(bool(self._data.get("bold")))
+        self._bt_bold.setToolTip(self.tr("Gras"))
+        self._bt_italic = QPushButton("I")
+        self._bt_italic.setCheckable(True)
+        self._bt_italic.setChecked(bool(self._data.get("italic")))
+        self._bt_italic.setToolTip(self.tr("Italique"))
+        self._bt_color = QPushButton("A")
+        self._bt_color.setToolTip(self.tr("Couleur"))
+        for w in (self._cb_family, self._sp_size, self._bt_bold,
+                  self._bt_italic, self._bt_color):
+            lay.addWidget(w)
+        bar.adjustSize()
+
+        self._fmt_bar = bar
+        self._sync_size_spin()
+        self._paint_color_button()
+        self._cb_family.currentTextChanged.connect(self._on_style_changed)
+        self._bt_bold.toggled.connect(self._on_style_changed)
+        self._bt_italic.toggled.connect(self._on_style_changed)
+        self._sp_size.valueChanged.connect(self._on_size_edited)
+        self._bt_color.clicked.connect(self._pick_color)
+
+    def _sync_size_spin(self):
+        if self._fmt_bar is None:
+            return
+        self._sp_size.blockSignals(True)
+        self._sp_size.setValue(float(self._data.get("fontsize", 12)))
+        self._sp_size.blockSignals(False)
+
+    def _paint_color_button(self):
+        c = QColor(*(int(v * 255) for v in self._data.get("color", (0, 0, 0))))
+        fg = "#000000" if c.lightness() > 128 else "#FFFFFF"
+        self._bt_color.setStyleSheet(
+            f"QPushButton {{ background:{c.name()}; color:{fg};"
+            f" border:1px solid #4A4A4A; font-weight:bold; }}")
+
+    def _on_style_changed(self, *_):
+        """Police / gras / italique : la boîte ne bouge pas, la taille se réajuste."""
+        family = self._cb_family.currentText()
+        bold, italic = self._bt_bold.isChecked(), self._bt_italic.isChecked()
+        self._data.update(family=family, bold=bold, italic=italic,
+                          fontname=pdf_fontname(family, bold, italic))
+        self._refit_text()
+        self.update()
+
+    def _on_size_edited(self, value: float):
+        """Taille saisie : la boîte s'ajuste au texte à cette taille (coin haut-gauche fixe)."""
+        self._data["fontsize"] = round(float(value), 2)
+        w, h = text_natural_size(self._data.get("text", ""), self._text_font(), value)
+        z = max(self._zoom, 0.01)
+        self._item_size = QSizeF(max(MIN_SIZE / 2, w * z), max(MIN_SIZE / 4, h * z))
+        self._update_size()
+        self.update()
+
+    def _pick_color(self):
+        c0 = QColor(*(int(v * 255) for v in self._data.get("color", (0, 0, 0))))
+        c = QColorDialog.getColor(c0, self, self.tr("Couleur du texte"))
+        if c.isValid():
+            self._data["color"] = (c.redF(), c.greenF(), c.blueF())
+            self._paint_color_button()
+            self.update()
 
     # ── Validation ───────────────────────────────────────────────────────────
 

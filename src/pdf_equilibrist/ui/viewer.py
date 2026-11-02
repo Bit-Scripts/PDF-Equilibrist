@@ -47,11 +47,16 @@ Placement flottant
 ``show_floating_item()`` crée un ``FloatingItem`` posé sur le widget de page.
 Le ``FloatingItem`` est un enfant direct du widget de page (pas du viewer),
 ce qui lui permet d'utiliser les coordonnées locales de la page.
+
+Avec ``click_to_place=True``, le viewer attend d'abord un clic sur le PDF
+(bandeau d'aide « Cliquez sur la page… », Échap pour annuler) et pose
+l'élément à l'endroit cliqué, sur la page cliquée.
 """
 from __future__ import annotations
 from pathlib import Path
-from PyQt6.QtWidgets import QScrollArea, QLabel, QWidget, QVBoxLayout
-from PyQt6.QtCore import Qt, pyqtSignal, QPoint, QRect
+from PyQt6.QtWidgets import (QScrollArea, QLabel, QWidget, QVBoxLayout,
+                             QHBoxLayout, QPushButton)
+from PyQt6.QtCore import Qt, pyqtSignal, QPoint, QRect, QEvent
 from PyQt6.QtGui import QPixmap, QPainter, QColor, QFont, QPen
 import pymupdf
 from pdf_equilibrist.core.document import Document
@@ -389,6 +394,8 @@ class PdfViewer(QScrollArea):
         self.zoom     = 1.0
         self._edit_mode    = False
         self._page_widgets: list[QWidget] = []
+        self._placing: tuple | None = None   # (data, on_commit, on_cancel) en attente d'un clic
+        self._place_bar: QWidget | None = None
 
         # ── Page d'accueil ────────────────────────────────────────────────────
         self._welcome = _WelcomePage()
@@ -442,6 +449,7 @@ class PdfViewer(QScrollArea):
 
         Affiche la page d'accueil si aucun document n'est ouvert.
         """
+        self._cancel_placement()
         # Vider la liste de références et supprimer les anciens widgets
         self._page_widgets.clear()
         for i in reversed(range(self._pages_layout.count())):
@@ -552,7 +560,7 @@ class PdfViewer(QScrollArea):
     # ── Placement flottant ────────────────────────────────────────────────────
 
     def show_floating_item(self, data: dict, page_index: int,
-                           on_commit, on_cancel):
+                           on_commit, on_cancel, click_to_place: bool = False):
         """
         Crée et affiche un ``FloatingItem`` sur la page indiquée.
 
@@ -566,13 +574,24 @@ class PdfViewer(QScrollArea):
             Données de l'élément à placer :
             ``{'type': 'text'|'image'|'stamp', ...}``
         page_index : int
-            Numéro de page 0-based sur laquelle afficher l'élément.
+            Numéro de page 0-based sur laquelle afficher l'élément
+            (ignoré si ``click_to_place``).
         on_commit : callable
             Callback ``(result_dict, page_index)`` appelé quand l'utilisateur
             valide. ``result_dict`` contient ``pdf_rect`` en coordonnées PDF.
         on_cancel : callable | None
             Callback appelé si l'utilisateur annule. Peut être ``None``.
+        click_to_place : bool
+            Si vrai, attend un clic sur une page et pose l'élément à cet endroit
+            au lieu de le centrer sur ``page_index``.
         """
+        if click_to_place:
+            self._begin_placement(data, on_commit, on_cancel)
+            return
+        self._spawn_floating_item(data, page_index, on_commit, on_cancel)
+
+    def _spawn_floating_item(self, data: dict, page_index: int, on_commit, on_cancel,
+                             center_at: QPoint | None = None):
         from pdf_equilibrist.ui.floating_item import FloatingItem
 
         if page_index >= len(self._page_widgets):
@@ -580,6 +599,8 @@ class PdfViewer(QScrollArea):
 
         page_widget = self._page_widgets[page_index]
         item = FloatingItem(data, self.zoom, page_widget)
+        if center_at is not None:
+            item.place_center_at(center_at)
         item.show()
         item.raise_()   # au-dessus de tous les autres widgets enfants
 
@@ -594,6 +615,85 @@ class PdfViewer(QScrollArea):
 
         item.committed.connect(_on_commit)
         item.cancelled.connect(_on_cancel)
+
+    # ── Pose par clic ─────────────────────────────────────────────────────────
+
+    def _begin_placement(self, data: dict, on_commit, on_cancel):
+        """Attend un clic sur le PDF : bandeau d'aide, curseur en croix, Échap annule."""
+        self._cancel_placement()
+        if not self._page_widgets:
+            return
+        self._placing = (data, on_commit, on_cancel)
+        for w in self._page_widgets:
+            w.installEventFilter(self)
+            w.setCursor(Qt.CursorShape.CrossCursor)
+        kind = {"text": self.tr("le texte"), "image": self.tr("l'image")}.get(
+            data.get("type"), self.tr("l'élément"))
+        self._show_place_bar(self.tr("Cliquez sur la page pour poser %1 — Échap pour annuler")
+                             .replace("%1", kind))
+        self.setFocus()
+
+    def _show_place_bar(self, message: str):
+        bar = QWidget(self.viewport())
+        bar.setStyleSheet(
+            f"QWidget {{ background:{theme.ACCENT}; border-radius:6px; }}"
+            "QLabel { color:#1E1E1E; font-weight:bold; background:transparent; }"
+            "QPushButton { background:#1E1E1E; color:#F0F0F0; border:none;"
+            " border-radius:4px; padding:3px 10px; }"
+            "QPushButton:hover { background:#3A3A3A; }")
+        lay = QHBoxLayout(bar)
+        lay.setContentsMargins(12, 6, 8, 6)
+        lay.addWidget(QLabel(message))
+        cancel = QPushButton(self.tr("Annuler"))
+        cancel.clicked.connect(self._cancel_placement)
+        lay.addWidget(cancel)
+        bar.adjustSize()
+        bar.move(max(0, (self.viewport().width() - bar.width()) // 2), 10)
+        bar.show()
+        bar.raise_()
+        self._place_bar = bar
+
+    def _end_placement(self):
+        """Nettoie le mode « clic pour poser » sans appeler de callback."""
+        self._placing = None
+        for w in self._page_widgets:
+            w.removeEventFilter(self)
+            w.unsetCursor()
+        if self._place_bar is not None:
+            self._place_bar.hide()
+            self._place_bar.deleteLater()
+            self._place_bar = None
+
+    def _cancel_placement(self):
+        if self._placing is None:
+            return
+        on_cancel = self._placing[2]
+        self._end_placement()
+        if on_cancel:
+            on_cancel()
+
+    def eventFilter(self, obj, event):
+        if self._placing is not None and obj in self._page_widgets:
+            et = event.type()
+            if et == QEvent.Type.MouseButtonPress:
+                if event.button() == Qt.MouseButton.LeftButton:
+                    data, on_commit, on_cancel = self._placing
+                    page_index = self._page_widgets.index(obj)
+                    pos = event.position().toPoint()
+                    self._end_placement()
+                    self._spawn_floating_item(data, page_index, on_commit,
+                                              on_cancel, center_at=pos)
+                return True
+            if et in (QEvent.Type.MouseButtonRelease, QEvent.Type.MouseMove,
+                      QEvent.Type.MouseButtonDblClick):
+                return True   # pas de sélection de texte ni de lien pendant la pose
+        return super().eventFilter(obj, event)
+
+    def keyPressEvent(self, event):
+        if self._placing is not None and event.key() == Qt.Key.Key_Escape:
+            self._cancel_placement()
+            return
+        super().keyPressEvent(event)
 
     # ── Page courante / sélection ─────────────────────────────────────────────
 
