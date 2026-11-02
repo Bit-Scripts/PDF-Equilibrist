@@ -5,12 +5,12 @@
   "meta.description": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Aucun cloud, aucune télémétrie.",
   "meta.canonical": "https://pdf-equilibrist.org/",
 
-  "og.description": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Fonctionne entièrement en local — pas de cloud, pas de télémétrie.",
+  "og.description": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Fonctionne en local : pas de cloud, pas de télémétrie, vérification de mise à jour désactivable.",
   "og.locale": "fr_FR",
 
   "twitter.description": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF.",
 
-  "jsonld.description": "Éditeur PDF open-source fonctionnant entièrement en local pour Windows et Linux.",
+  "jsonld.description": "Éditeur PDF open-source fonctionnant en local pour Windows et Linux.",
 
   "img.logo.alt": "Logo PDF-Equilibrist — éditeur PDF open-source local",
   "img.hero.alt": "PDF-Equilibrist logo — logiciel d'édition PDF gratuit",
@@ -28,7 +28,7 @@
   "nav.security": "Sécurité",
   "nav.docs": "Documentation",
 
-  "hero.tagline1": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Il fonctionne entièrement en local — pas de cloud, pas de télémétrie, pas de compte requis.",
+  "hero.tagline1": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Il travaille en local : vos documents ne quittent jamais votre ordinateur, sans cloud, sans télémétrie, sans compte. Une seule connexion automatique, la recherche de la dernière version sur GitHub, que vous pouvez désactiver à tout moment.",
   "hero.tagline2": "PDF‑Equilibrist est disponible pour Windows, Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) et toute autre distribution Linux (AppImage).",
 
   "cta.download.windows": "Télécharger (Windows)",
