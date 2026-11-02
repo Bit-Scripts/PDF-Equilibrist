@@ -11,6 +11,11 @@ pdf-equilibrist (0.2.3-1~noble1) noble; urgency=medium
     - Font, size, bold, italic and colour stay editable until the text is
       validated.
     - Text can be placed at any angle, not only multiples of 90 degrees.
+    - Images, PNG signatures and stamps are placed with a click too, and
+      keep their proportions (images, signatures) or fit their text to the
+      box (stamps) when resized.
+    - New "Link" button: place a clickable area by clicking on the page and
+      point it to a web address, an e-mail address or a page of the document.
     - New English translations.
 
  -- Paul Woisard <paulwoisard@gmail.com>  Mon, 02 Nov 2026 15:00:00 +0000
@@ -28,6 +33,11 @@ pdf-equilibrist (0.2.3-1~resolute1) resolute; urgency=medium
     - Font, size, bold, italic and colour stay editable until the text is
       validated.
     - Text can be placed at any angle, not only multiples of 90 degrees.
+    - Images, PNG signatures and stamps are placed with a click too, and
+      keep their proportions (images, signatures) or fit their text to the
+      box (stamps) when resized.
+    - New "Link" button: place a clickable area by clicking on the page and
+      point it to a web address, an e-mail address or a page of the document.
     - New English translations.
 
  -- Paul Woisard <paulwoisard@gmail.com>  Mon, 02 Nov 2026 15:00:00 +0000

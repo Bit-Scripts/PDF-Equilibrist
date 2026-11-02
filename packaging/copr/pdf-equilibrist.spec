@@ -203,7 +203,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
   drop the item where you clicked (Escape cancels). The text size now scales
   with the box (width or height, whichever is tighter), and font, size, bold,
   italic and colour stay editable until validation. Text can be placed at
-  any angle.
+  any angle. Images, PNG signatures and stamps are placed with a click too
+  and keep their proportions or fit their text to the box. New Link button:
+  a clickable area pointing to a web address, an e-mail or a page.
 
 * Mon Nov 02 2026 Paul Woisard <paulwoisard@gmail.com> - 0.2.2-1
 - New upstream release: font, size, style and colour for added text.
