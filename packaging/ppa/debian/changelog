@@ -1,3 +1,21 @@
+pdf-equilibrist (0.2.2-1~noble1) noble; urgency=medium
+
+  * New upstream release: font, size, style and colour for added text.
+    - "Add text" now opens a formatting dialog: font (Helvetica, Times or
+      Courier), size, bold, italic and colour. The floating preview and the
+      text written into the PDF use the chosen font, style and colour.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Mon, 02 Nov 2026 12:00:00 +0000
+
+pdf-equilibrist (0.2.2-1~resolute1) resolute; urgency=medium
+
+  * New upstream release: font, size, style and colour for added text.
+    - "Add text" now opens a formatting dialog: font (Helvetica, Times or
+      Courier), size, bold, italic and colour. The floating preview and the
+      text written into the PDF use the chosen font, style and colour.
+
+ -- Paul Woisard <paulwoisard@gmail.com>  Mon, 02 Nov 2026 12:00:00 +0000
+
 pdf-equilibrist (0.2.1-1~noble1) noble; urgency=medium
 
   * New upstream release: no more lost work, and a quick access toolbar.

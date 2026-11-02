@@ -1,5 +1,5 @@
 Name:           pdf-equilibrist
-Version:        0.2.1
+Version:        0.2.2
 Release:        1%{?dist}
 Summary:        Free and open-source desktop PDF editor
 
@@ -197,6 +197,11 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
 
 %changelog
+* Mon Nov 02 2026 Paul Woisard <paulwoisard@gmail.com> - 0.2.2-1
+- New upstream release: font, size, style and colour for added text.
+  "Add text" now opens a formatting dialog (font, size, bold, italic,
+  colour); the preview and the text written into the PDF follow it.
+
 * Sun Oct 18 2026 Paul Woisard <paulwoisard@gmail.com> - 0.2.1-1
 - New upstream release: no more lost work, and a quick access toolbar.
   Closing the window, a tab or a document with unsaved changes now asks what
