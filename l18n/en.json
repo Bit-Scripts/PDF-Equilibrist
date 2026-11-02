@@ -29,7 +29,7 @@
   "nav.docs": "Documentation",
 
   "hero.tagline1": "Free, open-source desktop PDF editor built in Python with PyQt6 and PyMuPDF. It works locally: your documents never leave your computer — no cloud, no telemetry, no account.",
-  "hero.network": "Only two requests ever leave the app: the update check (GitHub) and the known-vulnerability check (CVE, via OSV). Turn them off in <em>Help › Internet connections</em> and it is 100% local — only the vulnerability-check tool becomes unavailable.",
+  "hero.network": "Only two requests ever leave the app: the update check (GitHub) and the known-vulnerability check (CVE, via OSV). <em>Help › Internet connections</em> cuts them off completely: no request is ever sent, the app is 100% local, and only the vulnerability-check tool becomes unavailable.",
   "hero.tagline2": "PDF‑Equilibrist is available for Windows, Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) and any other Linux distribution (AppImage).",
 
   "cta.download.windows": "Download (Windows)",
