@@ -52,7 +52,8 @@ class FloatingItem(QWidget):
     Widget interactif superposé sur une page PDF pour le placement visuel.
 
     Supporte trois types d'éléments via le dict ``data`` :
-    - ``{'type': 'text',  'text': str, 'fontsize': int, 'color': tuple}``
+    - ``{'type': 'text',  'text': str, 'fontsize': int, 'color': tuple,
+      'fontname': str (base 14), 'family': str, 'bold': bool, 'italic': bool}``
     - ``{'type': 'image', 'path': str}``
     - ``{'type': 'stamp', 'text': str, 'color': tuple}``
 
@@ -342,7 +343,10 @@ class FloatingItem(QWidget):
             r_val, g_val, b_val = (int(c * 255) for c in color)
             p.setPen(QPen(QColor(r_val, g_val, b_val)))
             fs = max(8, int(self._data.get("fontsize", 12) * self._zoom))
-            p.setFont(QFont("Segoe UI", fs))
+            qf = QFont(self._data.get("family", "Segoe UI"), fs)
+            qf.setBold(bool(self._data.get("bold")))
+            qf.setItalic(bool(self._data.get("italic")))
+            p.setFont(qf)
             p.drawText(r.adjusted(4, 4, -4, -4),
                        Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
                        self._data.get("text", ""))
