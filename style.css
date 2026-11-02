@@ -150,6 +150,7 @@ img { max-width: 100%; display: block; }
 .hero img.logo { width: 88px; height: 88px; margin: 0 auto 20px; }
 .hero h1 { font-size: 2.4rem; margin: 0 0 12px; }
 .hero p.tagline { color: var(--text-dim); max-width: 640px; margin: 0 auto 28px; font-size: 1.1rem; }
+.hero p.tagline.note { font-size: .95rem; margin-top: -12px; }
 
 .app-notice {
   display: inline-block;

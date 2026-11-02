@@ -5,7 +5,7 @@
   "meta.description": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Aucun cloud, aucune télémétrie.",
   "meta.canonical": "https://pdf-equilibrist.org/",
 
-  "og.description": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Fonctionne en local : pas de cloud, pas de télémétrie, vérification de mise à jour désactivable.",
+  "og.description": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Fonctionne en local : pas de cloud, pas de télémétrie, pas de compte.",
   "og.locale": "fr_FR",
 
   "twitter.description": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF.",
@@ -28,7 +28,8 @@
   "nav.security": "Sécurité",
   "nav.docs": "Documentation",
 
-  "hero.tagline1": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Il travaille en local : vos documents ne quittent jamais votre ordinateur, sans cloud, sans télémétrie, sans compte. Seules deux connexions sortent du logiciel : la recherche de la dernière version sur GitHub (automatique, désactivable à tout moment) et, quand vous la lancez, la vérification en ligne des failles CVE via l'API OSV (noms et versions des bibliothèques uniquement).",
+  "hero.tagline1": "Éditeur PDF de bureau, gratuit et open-source, construit en Python avec PyQt6 et PyMuPDF. Il travaille en local : vos documents ne quittent jamais votre ordinateur, sans cloud, sans télémétrie, sans compte.",
+  "hero.network": "Deux requêtes seulement sortent du logiciel : la recherche de mises à jour (GitHub) et la vérification des failles de sécurité connues (CVE, via OSV). Coupez-les dans <em>Aide › Connexions Internet</em> : il est alors 100 % local, et seul l'outil de vérification des failles devient indisponible.",
   "hero.tagline2": "PDF‑Equilibrist est disponible pour Windows, Arch Linux (AUR), Ubuntu (PPA), Fedora (COPR) et toute autre distribution Linux (AppImage).",
 
   "cta.download.windows": "Télécharger (Windows)",
