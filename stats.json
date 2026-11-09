@@ -1,6 +1,6 @@
 {
   "generated": "2026-11-09",
-  "total": 840,
+  "total": 841,
   "channels": {
     "github": {
       "total": 531,
@@ -14,9 +14,9 @@
       "latest": "v0.2.3"
     },
     "launchpad": {
-      "total": 156,
+      "total": 157,
       "by_series": {
-        "resolute": 69,
+        "resolute": 70,
         "noble": 87
       }
     },
