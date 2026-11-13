@@ -1,15 +1,15 @@
 {
   "generated": "2026-11-13",
-  "total": 1107,
+  "total": 1115,
   "channels": {
     "github": {
-      "total": 548,
+      "total": 553,
       "releases": 30,
       "latest": "v0.2.3",
       "latest_date": "2026-11-02"
     },
     "appimage": {
-      "total": 52,
+      "total": 55,
       "releases": 6,
       "latest": "v0.2.3"
     },
@@ -28,11 +28,11 @@
         "Fedora 45": 66,
         "Fedora rawhide": 47
       },
-      "enablements": 82,
+      "enablements": 83,
       "enablements_by_release": {
         "Fedora 43": 15,
         "Fedora 44": 42,
-        "Fedora 45": 9,
+        "Fedora 45": 10,
         "Fedora rawhide": 16
       }
     },
