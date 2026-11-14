@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy / Politique de confidentialité — PDF-Equilibrist</title>
+<meta name="description" content="PDF-Equilibrist privacy policy: local document processing, network connections and privacy controls. Politique de confidentialité de PDF-Equilibrist.">
+<link rel="icon" href="../assets/logo/PDF-Equilibrist-logo.png">
+<link rel="stylesheet" href="../style.css">
+<link rel="canonical" href="https://pdf-equilibrist.org/privacy/">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="../index.html">
+    <img src="../assets/logo/PDF-Equilibrist-logo.png" alt="PDF-Equilibrist logo">
+    PDF-Equilibrist
+  </a>
+  <nav aria-label="Main navigation">
+    <a href="../index.html">Home</a>
+    <a href="../index.html#fonctionnalites">Features</a>
+    <a href="../docs/index.html">Documentation</a>
+    <a href="./index.html" class="active" aria-current="page">Privacy</a>
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist">GitHub</a>
+    <span class="lang-switch privacy-lang-switch" aria-label="Page language">
+      <a href="#privacy-policy-pdf-equilibrist" lang="en">EN</a><a href="#politique-de-confidentialité" lang="fr">FR</a>
+    </span>
+  </nav>
+</div>
+
+<main class="legal-layout">
+  <article class="docs-content legal-content">
+<section lang="en" aria-labelledby="privacy-policy-pdf-equilibrist">
+<h1 id="privacy-policy-pdf-equilibrist">Privacy Policy — PDF-Equilibrist</h1>
+<p><em><a href="#politique-de-confidentialité">Version française plus bas</a></em></p>
+<p>PDF-Equilibrist is a local desktop application, free and open source (GPLv3). Your documents are processed on your computer and are <strong>never</strong> sent anywhere. There is no telemetry, no analytics, no account and no online activation.</p>
+<h2 id="network-connections">Network connections</h2>
+<p>The application can contact exactly two online services. Neither ever receives the content of a document, and both can be blocked (see below).</p>
+<div class="table-scroll" tabindex="0">
+<table><thead><tr>
+<th scope="col">Service</th>
+<th scope="col">Endpoint</th>
+<th scope="col">When</th>
+<th scope="col">What is sent</th>
+</tr></thead><tbody>
+<tr>
+<td>GitHub</td>
+<td><code>api.github.com</code></td>
+<td>At startup, if "Check for updates at startup" is enabled (default on Windows only), and when you open <em>Help › Check for Updates</em> or <em>Help › About PDF-Equilibrist</em></td>
+<td>Nothing: the version comparison happens on your computer. Clicking <em>Download and install</em> (Windows) downloads the installer from GitHub; on an AppImage, <em>Download the new AppImage</em> and the install-script link download the file from the GitHub release.</td>
+</tr>
+<tr>
+<td>OSV.dev</td>
+<td><code>api.osv.dev</code></td>
+<td>Only when you run <em>Help › Check CVE Vulnerabilities</em></td>
+<td>The names and versions of the libraries used by the application</td>
+</tr>
+</tbody></table></div>
+<p>Like any Internet request, these connections expose your IP address to the service contacted. Whenever the application connects, it says so on screen and names the service.</p>
+<p><strong>OCR makes no connection.</strong> The text-recognition models (RapidOCR, ONNX format) are shipped inside the application: nothing is downloaded at first use, the feature works offline, and your scanned pages never leave your computer.</p>
+<p>On Linux (AUR, PPA, COPR), the startup check is disabled by default: updates are handled by your package manager. (A Flatpak package is temporarily suspended; where it exists, the check is never run.)</p>
+<h2 id="blocking-all-connections">Blocking all connections</h2>
+<p><em>Help › Internet connections › Block all Internet connections</em> stops every request before it is sent — the block is enforced in a single place in the code (<code>src/pdf_equilibrist/network.py</code>), not just by hiding buttons. The CVE check then only runs its local source analysis (Bandit).</p>
+<h2 id="links-inside-pdf-files">Links inside PDF files</h2>
+<p>Clicking a web link inside a PDF shows the full address and asks for confirmation. If you accept, your web browser — not PDF-Equilibrist — opens it.</p>
+</section>
+<section lang="fr" aria-labelledby="politique-de-confidentialité">
+<h2 id="politique-de-confidentialité">Politique de confidentialité</h2>
+<p>PDF-Equilibrist est une application de bureau locale, libre et gratuite (GPLv3). Vos documents sont traités sur votre ordinateur et ne sont <strong>jamais</strong> envoyés nulle part. Aucune télémétrie, aucune statistique d'usage, aucun compte, aucune activation en ligne.</p>
+<h3 id="connexions-réseau">Connexions réseau</h3>
+<p>L'application peut contacter exactement deux services en ligne. Aucun ne reçoit jamais le contenu d'un document, et les deux peuvent être bloqués (voir plus bas).</p>
+<div class="table-scroll" tabindex="0">
+<table><thead><tr>
+<th scope="col">Service</th>
+<th scope="col">Point d'accès</th>
+<th scope="col">Quand</th>
+<th scope="col">Ce qui est envoyé</th>
+</tr></thead><tbody>
+<tr>
+<td>GitHub</td>
+<td><code>api.github.com</code></td>
+<td>Au démarrage si « Vérifier les mises à jour au démarrage » est coché (par défaut sous Windows uniquement), et à l'ouverture de <em>Aide › Vérifier les mises à jour</em> ou <em>Aide › À propos de PDF-Equilibrist</em></td>
+<td>Rien : la comparaison de version se fait sur votre ordinateur. Le bouton <em>Télécharger et installer</em> (Windows) télécharge l'installeur depuis GitHub ; sous AppImage, <em>Télécharger la nouvelle AppImage</em> et le lien du script d'installation téléchargent le fichier depuis la release GitHub.</td>
+</tr>
+<tr>
+<td>OSV.dev</td>
+<td><code>api.osv.dev</code></td>
+<td>Uniquement quand vous lancez <em>Aide › Vérifier les vulnérabilités CVE</em></td>
+<td>Les noms et versions des bibliothèques utilisées par l'application</td>
+</tr>
+</tbody></table></div>
+<p>Comme toute requête Internet, ces connexions exposent votre adresse IP au service contacté. Chaque fois que l'application se connecte, elle l'indique à l'écran en nommant le service.</p>
+<p><strong>L'OCR n'établit aucune connexion.</strong> Les modèles de reconnaissance de texte (RapidOCR, format ONNX) sont livrés dans l'application : rien n'est téléchargé au premier usage, la fonction marche hors ligne et vos pages scannées ne quittent jamais votre ordinateur.</p>
+<p>Sous Linux (AUR, PPA, COPR), la vérification au démarrage est désactivée par défaut : les mises à jour relèvent du gestionnaire de paquets. (Le paquet Flatpak est temporairement suspendu ; là où il existe, la vérification n'est jamais lancée.)</p>
+<h3 id="bloquer-toutes-les-connexions">Bloquer toutes les connexions</h3>
+<p><em>Aide › Connexions Internet › Bloquer toutes les connexions Internet</em> arrête chaque requête avant son envoi — le blocage est appliqué à un seul endroit du code (<code>src/pdf_equilibrist/network.py</code>), pas seulement en masquant des boutons. La vérification CVE se limite alors à l'analyse locale du code (Bandit).</p>
+<h3 id="liens-contenus-dans-les-pdf">Liens contenus dans les PDF</h3>
+<p>Un clic sur un lien web d'un PDF affiche l'adresse complète et demande confirmation. Si vous acceptez, c'est votre navigateur — pas PDF-Equilibrist — qui l'ouvre.</p>
+</section>
+  </article>
+</main>
+
+<footer>
+  <div class="container">
+    GNU GPL v3.0 License (or later) —
+    <a href="https://github.com/Bit-Scripts/PDF-Equilibrist/blob/main/LICENSE.md">LICENSE.md</a>
+    · A project by <a href="https://bit-scripts.github.io/">Bit-Scripts</a>
+  </div>
+</footer>
+
+</body>
+</html>

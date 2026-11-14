@@ -18,7 +18,8 @@ jobs:
               "keyLocation": "https://pdf-equilibrist.org/da89694506444512ad5a2b1ed7fd5753.txt",
               "urlList": [
                 "https://pdf-equilibrist.org/",
-                "https://pdf-equilibrist.org/docs/"
+                "https://pdf-equilibrist.org/docs/",
+                "https://pdf-equilibrist.org/privacy/"
               ]
             }')
           echo "IndexNow status: $STATUS"

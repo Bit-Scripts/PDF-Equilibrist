@@ -342,6 +342,43 @@ footer {
 }
 .docs-loading { color: var(--text-dim); padding: 40px; }
 
+/* Static legal pages generated from Markdown at build time */
+.legal-layout {
+  min-height: calc(100vh - 61px);
+}
+.legal-content {
+  margin: 0 auto;
+  max-width: 960px;
+}
+.legal-content section + section {
+  border-top: 1px solid var(--border);
+  margin-top: 48px;
+  padding-top: 40px;
+}
+.legal-content [id] {
+  scroll-margin-top: 90px;
+}
+.privacy-lang-switch a {
+  margin-left: 0;
+}
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+.table-scroll table {
+  min-width: 720px;
+}
+.table-scroll:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.legal-content hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 40px 0;
+}
+
 /* Sections repliables « Pour les développeurs » (docs/0.FONCTIONNALITES.md) */
 .docs-content details {
   border: 1px solid var(--border);
