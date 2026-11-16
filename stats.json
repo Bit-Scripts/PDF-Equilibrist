@@ -1,15 +1,15 @@
 {
-  "generated": "2026-11-15",
-  "total": 1122,
+  "generated": "2026-11-16",
+  "total": 1126,
   "channels": {
     "github": {
-      "total": 555,
+      "total": 558,
       "releases": 30,
       "latest": "v0.2.3",
       "latest_date": "2026-11-02"
     },
     "appimage": {
-      "total": 57,
+      "total": 58,
       "releases": 6,
       "latest": "v0.2.3"
     },
@@ -18,7 +18,8 @@
       "by_series": {
         "resolute": 72,
         "noble": 88
-      }
+      },
+      "stale": true
     },
     "copr": {
       "total": 350,
@@ -43,5 +44,8 @@
       "first_submitted": "2026-07-25",
       "last_modified": "2026-11-02"
     }
-  }
+  },
+  "failed": [
+    "launchpad"
+  ]
 }
