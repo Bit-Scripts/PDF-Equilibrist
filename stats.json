@@ -1,15 +1,15 @@
 {
-  "generated": "2026-11-23",
-  "total": 1152,
+  "generated": "2026-11-27",
+  "total": 1192,
   "channels": {
     "github": {
-      "total": 572,
+      "total": 577,
       "releases": 30,
       "latest": "v0.2.3",
       "latest_date": "2026-11-02"
     },
     "appimage": {
-      "total": 65,
+      "total": 95,
       "releases": 6,
       "latest": "v0.2.3"
     },
@@ -18,21 +18,22 @@
       "by_series": {
         "resolute": 73,
         "noble": 90
-      }
+      },
+      "stale": true
     },
     "copr": {
-      "total": 352,
+      "total": 357,
       "by_release": {
         "Fedora 43": 78,
         "Fedora 44": 159,
-        "Fedora 45": 68,
+        "Fedora 45": 73,
         "Fedora rawhide": 47
       },
-      "enablements": 84,
+      "enablements": 88,
       "enablements_by_release": {
         "Fedora 43": 15,
-        "Fedora 44": 43,
-        "Fedora 45": 10,
+        "Fedora 44": 45,
+        "Fedora 45": 12,
         "Fedora rawhide": 16
       }
     },
@@ -43,5 +44,8 @@
       "first_submitted": "2026-07-25",
       "last_modified": "2026-11-02"
     }
-  }
+  },
+  "failed": [
+    "launchpad"
+  ]
 }
